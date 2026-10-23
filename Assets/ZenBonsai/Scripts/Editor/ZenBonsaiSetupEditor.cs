@@ -328,93 +328,151 @@ namespace ZenBonsai.Editor
             spatialMenu.treeStatusText = mStatus;
 
             // =========================================================================
-            // FILA FRONTAL EN LA MESA: 3 BOTONES DE ÁRBOLES + BOTÓN INFO + BOTÓN OPCIONES
+            // FILA FRONTAL EN LA MESA: 3 BOTONES DE ÁRBOLES (MEDALLONES KAMON) + BOTÓN INFO + BOTÓN OPCIONES
             // =========================================================================
-            spatialMenu.btnSakura = Create3DTouchButton(panelContainer.transform, "Btn_Sakura", "🌸\nSakura",
-                new Vector3(-0.194f, 0.010f, -0.014f), new Vector3(0.086f, 0.052f, 0.018f), sakuraMat, new Color(0.18f, 0.06f, 0.10f), 12);
+            spatialMenu.btnSakura = Create3DRoundTouchButton(panelContainer.transform, "Btn_Sakura",
+                "🌸", "桜", "Sakura", "Cerezo Flor",
+                new Vector3(-0.188f, 0.008f, -0.014f), 0.076f, sakuraMat, new Color(1.0f, 0.68f, 0.82f), goldMat, urushiMat);
 
-            spatialMenu.btnMatsu = Create3DTouchButton(panelContainer.transform, "Btn_Matsu", "🌲\nMatsu",
-                new Vector3(-0.098f, 0.010f, -0.014f), new Vector3(0.086f, 0.052f, 0.018f), matsuMat, Color.white, 12);
+            spatialMenu.btnMatsu = Create3DRoundTouchButton(panelContainer.transform, "Btn_Matsu",
+                "🌲", "松", "Matsu", "Pino Negro",
+                new Vector3(-0.096f, 0.008f, -0.014f), 0.076f, matsuMat, new Color(0.60f, 0.96f, 0.72f), goldMat, urushiMat);
 
-            spatialMenu.btnMomiji = Create3DTouchButton(panelContainer.transform, "Btn_Momiji", "🍁\nMomiji",
-                new Vector3(-0.002f, 0.010f, -0.014f), new Vector3(0.086f, 0.052f, 0.018f), momijiMat, Color.white, 12);
+            spatialMenu.btnMomiji = Create3DRoundTouchButton(panelContainer.transform, "Btn_Momiji",
+                "🍁", "楓", "Momiji", "Arce Rojo",
+                new Vector3(-0.004f, 0.008f, -0.014f), 0.076f, momijiMat, new Color(1.0f, 0.70f, 0.45f), goldMat, urushiMat);
 
-            spatialMenu.btnInfo = Create3DTouchButton(panelContainer.transform, "Btn_Info", "📖 Info y\nCuidados",
-                new Vector3(0.104f, 0.010f, -0.014f), new Vector3(0.088f, 0.052f, 0.018f), infoButtonMat, new Color(0.92f, 0.99f, 1.0f), 11);
+            spatialMenu.btnInfo = Create3DThematicRectButton(panelContainer.transform, "Btn_Info",
+                "伝承", "📖 Cuidados", "Ficha Botánica",
+                new Vector3(0.100f, 0.008f, -0.014f), new Vector3(0.088f, 0.054f, 0.018f), infoButtonMat, new Color(0.92f, 0.99f, 1.0f), goldMat, urushiMat);
 
-            spatialMenu.btnOptions = Create3DTouchButton(panelContainer.transform, "Btn_Options", "⚙️ Menú\nOpciones",
-                new Vector3(0.200f, 0.010f, -0.014f), new Vector3(0.088f, 0.052f, 0.018f), buttonMat, new Color(1.0f, 0.90f, 0.58f), 11);
+            spatialMenu.btnOptions = Create3DThematicRectButton(panelContainer.transform, "Btn_Options",
+                "神境", "⚙️ Opciones", "Ajustes Zen",
+                new Vector3(0.198f, 0.008f, -0.014f), new Vector3(0.088f, 0.054f, 0.018f), buttonMat, new Color(1.0f, 0.90f, 0.58f), goldMat, urushiMat);
 
             // =========================================================================
-            // 2. FICHA BOTÁNICA DESPLEGABLE (INFO PANEL) FRENTE AL JUGADOR AL PULSAR "INFO"
-            // Se abre frente al jugador (ligeramente a la izquierda para ver el árbol a la vez, sin girar el cuello)
+            // 2. FICHA BOTÁNICA DESPLEGABLE (INFO PANEL) - KAKEMONO (PERGAMINO JAPONÉS)
             // =========================================================================
             GameObject infoCard = new GameObject("InfoPanel_BotanicalCard");
             infoCard.transform.SetParent(menuRoot.transform, false);
-            infoCard.transform.localPosition = new Vector3(-0.22f, 0.16f, -0.14f);
+            infoCard.transform.localPosition = new Vector3(-0.24f, 0.17f, -0.14f);
             infoCard.transform.localRotation = Quaternion.Euler(12f, -14f, 0f);
             spatialMenu.infoPanelBox = infoCard;
 
+            // Marco exterior Urushi / Seda oscura de montaje
             GameObject infoOuter = GameObject.CreatePrimitive(PrimitiveType.Cube);
             infoOuter.name = "InfoCard_OuterFrame";
             infoOuter.transform.SetParent(infoCard.transform, false);
             infoOuter.transform.localPosition = Vector3.zero;
-            infoOuter.transform.localScale = new Vector3(0.42f, 0.29f, 0.012f);
+            infoOuter.transform.localScale = new Vector3(0.44f, 0.33f, 0.012f);
             infoOuter.GetComponent<Renderer>().sharedMaterial = urushiMat;
             var icCol = infoOuter.GetComponent<Collider>(); if (icCol != null) DestroyImmediate(icCol);
 
+            // Tablero interior Washi / Seda palisandro
             GameObject infoInner = GameObject.CreatePrimitive(PrimitiveType.Cube);
             infoInner.name = "InfoCard_InnerBoard";
             infoInner.transform.SetParent(infoCard.transform, false);
             infoInner.transform.localPosition = new Vector3(0f, 0f, -0.003f);
-            infoInner.transform.localScale = new Vector3(0.398f, 0.268f, 0.009f);
+            infoInner.transform.localScale = new Vector3(0.418f, 0.308f, 0.009f);
             infoInner.GetComponent<Renderer>().sharedMaterial = rosewoodMat;
             var iiCol = infoInner.GetComponent<Collider>(); if (iiCol != null) DestroyImmediate(iiCol);
 
+            // Barra superior de pergamino Kakemono (Ten) en madera Hinoki con remates dorados Jiku
+            GameObject scrollRodTop = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            scrollRodTop.name = "Kakemono_TopRod";
+            scrollRodTop.transform.SetParent(infoCard.transform, false);
+            scrollRodTop.transform.localPosition = new Vector3(0f, 0.168f, -0.007f);
+            scrollRodTop.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+            scrollRodTop.transform.localScale = new Vector3(0.012f, 0.225f, 0.012f);
+            scrollRodTop.GetComponent<Renderer>().sharedMaterial = hinokiMat;
+            var srtCol = scrollRodTop.GetComponent<Collider>(); if (srtCol != null) DestroyImmediate(srtCol);
+
+            // Remates dorados (Jiku) en los extremos de la barra superior
+            float[] jikuX = { -0.232f, 0.232f };
+            for (int j = 0; j < 2; j++)
+            {
+                GameObject jiku = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                jiku.name = $"Kakemono_TopFinial_{j}";
+                jiku.transform.SetParent(infoCard.transform, false);
+                jiku.transform.localPosition = new Vector3(jikuX[j], 0.168f, -0.007f);
+                jiku.transform.localScale = Vector3.one * 0.018f;
+                jiku.GetComponent<Renderer>().sharedMaterial = goldMat;
+                var jCol = jiku.GetComponent<Collider>(); if (jCol != null) DestroyImmediate(jCol);
+            }
+
+            // Barra inferior contrapeso de pergamino Kakemono (Chi)
+            GameObject scrollRodBottom = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            scrollRodBottom.name = "Kakemono_BottomRod";
+            scrollRodBottom.transform.SetParent(infoCard.transform, false);
+            scrollRodBottom.transform.localPosition = new Vector3(0f, -0.168f, -0.007f);
+            scrollRodBottom.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+            scrollRodBottom.transform.localScale = new Vector3(0.014f, 0.225f, 0.014f);
+            scrollRodBottom.GetComponent<Renderer>().sharedMaterial = hinokiMat;
+            var srbCol = scrollRodBottom.GetComponent<Collider>(); if (srbCol != null) DestroyImmediate(srbCol);
+
+            for (int j = 0; j < 2; j++)
+            {
+                GameObject jikuB = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                jikuB.name = $"Kakemono_BottomFinial_{j}";
+                jikuB.transform.SetParent(infoCard.transform, false);
+                jikuB.transform.localPosition = new Vector3(jikuX[j], -0.168f, -0.007f);
+                jikuB.transform.localScale = Vector3.one * 0.020f;
+                jikuB.GetComponent<Renderer>().sharedMaterial = goldMat;
+                var jbCol = jikuB.GetComponent<Collider>(); if (jbCol != null) DestroyImmediate(jbCol);
+            }
+
+            // Filete dorado de separación bajo el título
             GameObject infoGoldRim = GameObject.CreatePrimitive(PrimitiveType.Cube);
             infoGoldRim.name = "InfoCard_GoldBorder";
             infoGoldRim.transform.SetParent(infoCard.transform, false);
-            infoGoldRim.transform.localPosition = new Vector3(0f, 0.130f, -0.008f);
-            infoGoldRim.transform.localScale = new Vector3(0.385f, 0.006f, 0.005f);
+            infoGoldRim.transform.localPosition = new Vector3(0f, 0.118f, -0.008f);
+            infoGoldRim.transform.localScale = new Vector3(0.400f, 0.004f, 0.005f);
             infoGoldRim.GetComponent<Renderer>().sharedMaterial = goldMat;
             var igCol = infoGoldRim.GetComponent<Collider>(); if (igCol != null) DestroyImmediate(igCol);
 
+            // Botón "✕ Cerrar" en la esquina superior derecha del pergamino
+            spatialMenu.btnCloseInfo = Create3DTouchButton(infoCard.transform, "Btn_CloseInfo", "✕ Cerrar",
+                new Vector3(0.168f, 0.138f, -0.014f), new Vector3(0.068f, 0.028f, 0.016f), buttonMat, new Color(1.0f, 0.85f, 0.85f), 10);
+
+            // Canvas en alta resolución (dynamicPixelsPerUnit = 5f, escala 0.00035f para eliminar toda borrosidad en Quest 3)
             GameObject infoCanvasObj = new GameObject("InfoCard_Canvas");
             infoCanvasObj.transform.SetParent(infoCard.transform, false);
             infoCanvasObj.transform.localPosition = new Vector3(0f, 0f, -0.009f);
-            infoCanvasObj.transform.localScale = Vector3.one * 0.001f;
+            infoCanvasObj.transform.localScale = Vector3.one * 0.00035f;
             Canvas iCanvas = infoCanvasObj.AddComponent<Canvas>();
             iCanvas.renderMode = RenderMode.WorldSpace;
+            CanvasScaler iScaler = infoCanvasObj.AddComponent<CanvasScaler>();
+            iScaler.dynamicPixelsPerUnit = 5f;
 
             GameObject iTitleObj = new GameObject("InfoTitle");
             iTitleObj.transform.SetParent(infoCanvasObj.transform, false);
-            iTitleObj.transform.localPosition = new Vector3(0f, 96f, 0f);
+            iTitleObj.transform.localPosition = new Vector3(-80f, 395f, 0f);
             Text iTitle = iTitleObj.AddComponent<Text>();
             iTitle.font = uiFont;
-            iTitle.alignment = TextAnchor.MiddleCenter;
-            iTitle.fontSize = 15;
+            iTitle.alignment = TextAnchor.MiddleLeft;
+            iTitle.fontSize = 32;
             iTitle.fontStyle = FontStyle.Bold;
             iTitle.color = new Color(1.0f, 0.78f, 0.88f);
-            iTitleObj.GetComponent<RectTransform>().sizeDelta = new Vector2(365, 28);
+            iTitleObj.GetComponent<RectTransform>().sizeDelta = new Vector2(860, 60);
             spatialMenu.infoPanelTitle = iTitle;
 
             GameObject iBodyObj = new GameObject("InfoBody");
             iBodyObj.transform.SetParent(infoCanvasObj.transform, false);
-            iBodyObj.transform.localPosition = new Vector3(0f, -12f, 0f);
+            iBodyObj.transform.localPosition = new Vector3(0f, -32f, 0f);
             Text iBody = iBodyObj.AddComponent<Text>();
             iBody.font = uiFont;
-            iBody.alignment = TextAnchor.MiddleLeft;
-            iBody.fontSize = 11;
-            iBody.lineSpacing = 1.14f;
-            iBody.color = new Color(0.95f, 0.93f, 0.88f);
-            iBodyObj.GetComponent<RectTransform>().sizeDelta = new Vector2(360, 185);
+            iBody.alignment = TextAnchor.UpperLeft;
+            iBody.fontSize = 25;
+            iBody.lineSpacing = 1.25f;
+            iBody.color = new Color(0.96f, 0.95f, 0.92f);
+            iBodyObj.GetComponent<RectTransform>().sizeDelta = new Vector2(1120, 680);
             spatialMenu.infoPanelBody = iBody;
 
             infoCard.SetActive(false);
 
             // =========================================================================
-            // 3. PANEL DE OPCIONES DEL SANTUARIO FRENTE AL JUGADOR AL PULSAR "OPCIONES"
-            // Posicionado ergonómicamente delante del jugador sentado (sin tener que girarse a la izquierda)
+            // 3. PANEL DE OPCIONES DEL SANTUARIO FRENTE AL JUGADOR
+            // Posicionado ergonómicamente delante del jugador sentado
             // =========================================================================
             GameObject optionsCard = new GameObject("OptionsPanel_Card");
             optionsCard.transform.SetParent(menuRoot.transform, false);
@@ -426,7 +484,7 @@ namespace ZenBonsai.Editor
             optOuter.name = "OptionsCard_OuterFrame";
             optOuter.transform.SetParent(optionsCard.transform, false);
             optOuter.transform.localPosition = Vector3.zero;
-            optOuter.transform.localScale = new Vector3(0.45f, 0.39f, 0.012f);
+            optOuter.transform.localScale = new Vector3(0.46f, 0.40f, 0.012f);
             optOuter.GetComponent<Renderer>().sharedMaterial = urushiMat;
             var ocCol = optOuter.GetComponent<Collider>(); if (ocCol != null) DestroyImmediate(ocCol);
 
@@ -434,65 +492,84 @@ namespace ZenBonsai.Editor
             optInner.name = "OptionsCard_InnerBoard";
             optInner.transform.SetParent(optionsCard.transform, false);
             optInner.transform.localPosition = new Vector3(0f, 0f, -0.003f);
-            optInner.transform.localScale = new Vector3(0.428f, 0.368f, 0.009f);
+            optInner.transform.localScale = new Vector3(0.438f, 0.378f, 0.009f);
             optInner.GetComponent<Renderer>().sharedMaterial = rosewoodMat;
             var oiCol = optInner.GetComponent<Collider>(); if (oiCol != null) DestroyImmediate(oiCol);
 
             GameObject optGoldRim = GameObject.CreatePrimitive(PrimitiveType.Cube);
             optGoldRim.name = "OptionsCard_GoldBorder";
             optGoldRim.transform.SetParent(optionsCard.transform, false);
-            optGoldRim.transform.localPosition = new Vector3(0f, 0.176f, -0.008f);
-            optGoldRim.transform.localScale = new Vector3(0.415f, 0.006f, 0.005f);
+            optGoldRim.transform.localPosition = new Vector3(0f, 0.180f, -0.008f);
+            optGoldRim.transform.localScale = new Vector3(0.425f, 0.006f, 0.005f);
             optGoldRim.GetComponent<Renderer>().sharedMaterial = goldMat;
             var ogCol = optGoldRim.GetComponent<Collider>(); if (ogCol != null) DestroyImmediate(ogCol);
 
+            // Botón "✕ Cerrar" en la esquina superior derecha del panel de opciones
+            spatialMenu.btnCloseOptions = Create3DTouchButton(optionsCard.transform, "Btn_CloseOptions", "✕ Cerrar",
+                new Vector3(0.180f, 0.155f, -0.014f), new Vector3(0.068f, 0.028f, 0.016f), buttonMat, new Color(1.0f, 0.85f, 0.85f), 10);
+
+            // Canvas en alta resolución (dynamicPixelsPerUnit = 5f, escala 0.00035f)
             GameObject optCanvasObj = new GameObject("OptionsCard_Canvas");
             optCanvasObj.transform.SetParent(optionsCard.transform, false);
             optCanvasObj.transform.localPosition = new Vector3(0f, 0f, -0.009f);
-            optCanvasObj.transform.localScale = Vector3.one * 0.001f;
+            optCanvasObj.transform.localScale = Vector3.one * 0.00035f;
             Canvas oCanvas = optCanvasObj.AddComponent<Canvas>();
             oCanvas.renderMode = RenderMode.WorldSpace;
+            CanvasScaler oScaler = optCanvasObj.AddComponent<CanvasScaler>();
+            oScaler.dynamicPixelsPerUnit = 5f;
 
             GameObject oTitleObj = new GameObject("OptionsTitle");
             oTitleObj.transform.SetParent(optCanvasObj.transform, false);
-            oTitleObj.transform.localPosition = new Vector3(0f, 156f, 0f);
+            oTitleObj.transform.localPosition = new Vector3(-60f, 442f, 0f);
             Text oTitle = oTitleObj.AddComponent<Text>();
             oTitle.font = uiFont;
-            oTitle.alignment = TextAnchor.MiddleCenter;
-            oTitle.fontSize = 14;
+            oTitle.alignment = TextAnchor.MiddleLeft;
+            oTitle.fontSize = 32;
             oTitle.fontStyle = FontStyle.Bold;
             oTitle.text = "⚙️ OPCIONES DEL SANTUARIO ZEN";
             oTitle.color = new Color(0.98f, 0.88f, 0.52f);
-            oTitleObj.GetComponent<RectTransform>().sizeDelta = new Vector2(390, 26);
+            oTitleObj.GetComponent<RectTransform>().sizeDelta = new Vector2(850, 48);
+
+            GameObject oSubtitleObj = new GameObject("OptionsSubtitle");
+            oSubtitleObj.transform.SetParent(optCanvasObj.transform, false);
+            oSubtitleObj.transform.localPosition = new Vector3(0f, 380f, 0f);
+            Text oSubtitle = oSubtitleObj.AddComponent<Text>();
+            oSubtitle.font = uiFont;
+            oSubtitle.alignment = TextAnchor.MiddleCenter;
+            oSubtitle.fontSize = 18;
+            oSubtitle.fontStyle = FontStyle.Normal;
+            oSubtitle.text = "Toca directamente con el dedo índice para ajustar el santuario y la mesa";
+            oSubtitle.color = new Color(0.80f, 0.90f, 0.98f, 0.85f);
+            oSubtitleObj.GetComponent<RectTransform>().sizeDelta = new Vector2(1100, 32);
 
             // Cuadrícula 2x4 de botones con detección exacta de la yema del índice (Columna Izq: x = -0.106m, Columna Der: x = +0.106m)
-            // Fila 1 (y = +0.096m): Mesa Fija vs Centrar Mesa
+            // Fila 1 (y = +0.076m): Mesa Fija vs Centrar Mesa
             spatialMenu.btnOptLockTable = Create3DTouchButton(optionsCard.transform, "Btn_OptLockTable", "🔓 Mesa:\nMóvil (2 Manos)",
-                new Vector3(-0.106f, 0.096f, -0.014f), new Vector3(0.184f, 0.050f, 0.018f), buttonMat, Color.white, 11);
+                new Vector3(-0.106f, 0.076f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), buttonMat, Color.white, 11);
 
             spatialMenu.btnOptRecenter = Create3DTouchButton(optionsCard.transform, "Btn_OptRecenter", "🎯 Centrar\nMesa Frente a Mí",
-                new Vector3(0.106f, 0.096f, -0.014f), new Vector3(0.184f, 0.050f, 0.018f), infoButtonMat, new Color(0.92f, 0.99f, 1.0f), 11);
+                new Vector3(0.106f, 0.076f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), infoButtonMat, new Color(0.92f, 0.99f, 1.0f), 11);
 
-            // Fila 2 (y = +0.032m): Iluminación vs Entorno Virtual (Santuario Fuji / MR)
+            // Fila 2 (y = +0.016m): Iluminación vs Entorno Virtual (Santuario Fuji / MR)
             spatialMenu.btnOptLighting = Create3DTouchButton(optionsCard.transform, "Btn_OptLighting", "🌅 Ambiente:\nDía Zen",
-                new Vector3(-0.106f, 0.032f, -0.014f), new Vector3(0.184f, 0.050f, 0.018f), buttonMat, new Color(1.0f, 0.92f, 0.68f), 11);
+                new Vector3(-0.106f, 0.016f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), buttonMat, new Color(1.0f, 0.92f, 0.68f), 11);
 
             spatialMenu.btnOptEnvironment = Create3DTouchButton(optionsCard.transform, "Btn_OptEnvironment", "🥽 Entorno:\nPassthrough MR",
-                new Vector3(0.106f, 0.032f, -0.014f), new Vector3(0.184f, 0.050f, 0.018f), buttonMat, new Color(0.70f, 0.92f, 1.0f), 11);
+                new Vector3(0.106f, 0.016f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), buttonMat, new Color(0.70f, 0.92f, 1.0f), 11);
 
-            // Fila 3 (y = -0.032m): Música Zen vs Enfoque de Cuidado
+            // Fila 3 (y = -0.044m): Música Zen vs Enfoque de Cuidado
             spatialMenu.btnOptMusic = Create3DTouchButton(optionsCard.transform, "Btn_OptMusic", "🎵 Música:\nShakuhachi",
-                new Vector3(-0.106f, -0.032f, -0.014f), new Vector3(0.184f, 0.050f, 0.018f), buttonMat, new Color(0.95f, 0.85f, 1.0f), 11);
+                new Vector3(-0.106f, -0.044f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), buttonMat, new Color(0.95f, 0.85f, 1.0f), 11);
 
             spatialMenu.btnOptTreeFocus = Create3DTouchButton(optionsCard.transform, "Btn_OptTreeFocus", "🌿 Cuidado:\n3 Árboles (Tríada)",
-                new Vector3(0.106f, -0.032f, -0.014f), new Vector3(0.184f, 0.050f, 0.018f), buttonMat, new Color(0.82f, 0.98f, 0.82f), 11);
+                new Vector3(0.106f, -0.044f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), buttonMat, new Color(0.82f, 0.98f, 0.82f), 11);
 
-            // Fila 4 (y = -0.096m): Volumen de Sonido vs Pétalos de Sakura
+            // Fila 4 (y = -0.104m): Volumen de Sonido vs Pétalos de Sakura
             spatialMenu.btnOptSound = Create3DTouchButton(optionsCard.transform, "Btn_OptSound", "🔊 Sonido:\n100%",
-                new Vector3(-0.106f, -0.096f, -0.014f), new Vector3(0.184f, 0.050f, 0.018f), buttonMat, new Color(0.84f, 0.98f, 0.86f), 11);
+                new Vector3(-0.106f, -0.104f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), buttonMat, new Color(0.84f, 0.98f, 0.86f), 11);
 
             spatialMenu.btnOptPetals = Create3DTouchButton(optionsCard.transform, "Btn_OptPetals", "🌸 Pétalos:\nActivados",
-                new Vector3(0.106f, -0.096f, -0.014f), new Vector3(0.184f, 0.050f, 0.018f), buttonMat, new Color(1.0f, 0.82f, 0.90f), 11);
+                new Vector3(0.106f, -0.104f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), buttonMat, new Color(1.0f, 0.82f, 0.90f), 11);
 
             optionsCard.SetActive(false);
 
@@ -1955,7 +2032,7 @@ namespace ZenBonsai.Editor
 
             // Collider 100% centrado con el botón visual (sin desfase vertical)
             BoxCollider box = btnObj.AddComponent<BoxCollider>();
-            box.size = new Vector3(size.x * 0.92f, size.y * 0.92f, 0.032f);
+            box.size = new Vector3(size.x * 0.95f, size.y * 0.95f, 0.034f);
             box.center = Vector3.zero;
             box.isTrigger = true;
 
@@ -2013,16 +2090,16 @@ namespace ZenBonsai.Editor
                 neonRenderers[n] = nr;
             }
 
-            // IMPORTANTE: LabelCanvas es hijo de btnObj (escala uniforme 1,1,1), NUNCA de plate,
-            // para que el nombre del botón se vea grande, nítido y perfectamente centrado dentro del botón
+            // Canvas en alta resolución (dynamicPixelsPerUnit = 5f, escala 0.00035f para eliminar toda borrosidad en Quest 3)
             GameObject textCanvasObj = new GameObject("LabelCanvas");
             textCanvasObj.transform.SetParent(btnObj.transform, false);
             textCanvasObj.transform.localPosition = new Vector3(0f, 0f, -(size.z * 0.5f + 0.002f));
-            textCanvasObj.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
+            textCanvasObj.transform.localScale = new Vector3(0.00035f, 0.00035f, 0.00035f);
 
             Canvas canvas = textCanvasObj.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
-            textCanvasObj.AddComponent<CanvasScaler>();
+            CanvasScaler scaler = textCanvasObj.AddComponent<CanvasScaler>();
+            scaler.dynamicPixelsPerUnit = 5f;
 
             GameObject tChild = new GameObject("Text");
             tChild.transform.SetParent(textCanvasObj.transform, false);
@@ -2031,17 +2108,309 @@ namespace ZenBonsai.Editor
             if (txt.font == null) txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             txt.alignment = TextAnchor.MiddleCenter;
             txt.fontStyle = FontStyle.Bold;
-            txt.fontSize = Mathf.RoundToInt(fontSize);
+            txt.fontSize = Mathf.RoundToInt(fontSize * 2.85f);
+            txt.lineSpacing = 1.15f;
             txt.text = label;
             txt.color = textColor;
             RectTransform rect = tChild.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(size.x * 1000f, size.y * 1000f);
+            rect.sizeDelta = new Vector2(size.x / 0.00035f, size.y / 0.00035f);
 
             ZenTouchButton touchBtn = btnObj.AddComponent<ZenTouchButton>();
             touchBtn.visualPlate = plate.transform;
             touchBtn.neonBorderRenderers = neonRenderers;
             touchBtn.buttonLabelText = txt;
             touchBtn.touchHalfSize = new Vector2(size.x * 0.52f, size.y * 0.52f);
+            touchBtn.isCircular = false;
+            touchBtn.pressDisplacement = new Vector3(0f, 0f, 0.010f);
+            return touchBtn;
+        }
+
+        private static ZenTouchButton Create3DRoundTouchButton(
+            Transform parent,
+            string name,
+            string symbolIcon,
+            string kanjiBadge,
+            string treeName,
+            string subtitle,
+            Vector3 localPos,
+            float diameter,
+            Material baseMat,
+            Color accentColor,
+            Material goldMat,
+            Material urushiMat)
+        {
+            GameObject btnObj = new GameObject(name);
+            btnObj.transform.SetParent(parent, false);
+            btnObj.transform.localPosition = localPos;
+
+            BoxCollider box = btnObj.AddComponent<BoxCollider>();
+            box.size = new Vector3(diameter * 0.96f, diameter * 0.96f, 0.034f);
+            box.center = Vector3.zero;
+            box.isTrigger = true;
+
+            Rigidbody rb = btnObj.AddComponent<Rigidbody>();
+            rb.isKinematic = true;
+            rb.useGravity = false;
+
+            // Marco circular exterior dorado (Fukurin / Medallón de laca y oro estilo Kamon)
+            GameObject outerRim = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            outerRim.name = "MedallionRim";
+            outerRim.transform.SetParent(btnObj.transform, false);
+            outerRim.transform.localPosition = new Vector3(0f, 0f, 0.002f);
+            outerRim.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            outerRim.transform.localScale = new Vector3(diameter * 1.08f, 0.005f, diameter * 1.08f);
+            outerRim.GetComponent<Renderer>().sharedMaterial = goldMat;
+            var rimCol = outerRim.GetComponent<Collider>(); if (rimCol != null) DestroyImmediate(rimCol);
+
+            // Plato interactivo circular (se hunde suavemente al tocar con la yema del dedo)
+            GameObject plate = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            plate.name = "Plate";
+            plate.transform.SetParent(btnObj.transform, false);
+            plate.transform.localPosition = Vector3.zero;
+            plate.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            plate.transform.localScale = new Vector3(diameter, 0.008f, diameter);
+            Material btnInstanceMat = CreateOrGetPBRMaterial($"Zen_Btn_{name}", baseMat.color, 0.72f, 0.06f);
+            plate.GetComponent<Renderer>().sharedMaterial = btnInstanceMat;
+            var plateCol = plate.GetComponent<Collider>(); if (plateCol != null) DestroyImmediate(plateCol);
+
+            // Halo circular de neón (8 segmentos en arco que se iluminan cuando el árbol pide cuidado)
+            Renderer[] neonRenderers = new Renderer[8];
+            Material neonBaseMat = CreateOrGetPBRMaterial($"Zen_NeonRing_{name}", new Color(0.15f, 0.90f, 1.0f), 0.92f, 0.0f);
+            float segRadius = diameter * 0.52f;
+            float arcLength = (2f * Mathf.PI * segRadius / 8f) * 0.76f;
+            for (int i = 0; i < 8; i++)
+            {
+                float angle = i * (360f / 8f) * Mathf.Deg2Rad;
+                Vector3 segPos = new Vector3(Mathf.Cos(angle) * segRadius, Mathf.Sin(angle) * segRadius, -0.006f);
+                GameObject neonSeg = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                neonSeg.name = $"NeonSeg_{i}";
+                neonSeg.transform.SetParent(btnObj.transform, false);
+                neonSeg.transform.localPosition = segPos;
+                neonSeg.transform.localRotation = Quaternion.Euler(0f, 0f, i * (360f / 8f) + 90f);
+                neonSeg.transform.localScale = new Vector3(arcLength, 0.004f, 0.004f);
+                Renderer nr = neonSeg.GetComponent<Renderer>();
+                nr.sharedMaterial = neonBaseMat;
+                var nCol = neonSeg.GetComponent<Collider>(); if (nCol != null) DestroyImmediate(nCol);
+                neonSeg.SetActive(false);
+                neonRenderers[i] = nr;
+            }
+
+            // Canvas en alta resolución (dynamicPixelsPerUnit = 5f, escala 0.00035f para máxima nitidez en VR)
+            GameObject canvasObj = new GameObject("MedallionCanvas");
+            canvasObj.transform.SetParent(btnObj.transform, false);
+            canvasObj.transform.localPosition = new Vector3(0f, 0f, -(0.008f * 0.5f + 0.002f));
+            canvasObj.transform.localScale = Vector3.one * 0.00035f;
+
+            Canvas canvas = canvasObj.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.WorldSpace;
+            CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
+            scaler.dynamicPixelsPerUnit = 5f;
+
+            Font uiFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            if (uiFont == null) uiFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+
+            // Símbolo e icono superior (🌸 桜 / 🌲 松 / 🍁 楓)
+            GameObject iconObj = new GameObject("IconText");
+            iconObj.transform.SetParent(canvasObj.transform, false);
+            iconObj.transform.localPosition = new Vector3(0f, 32f, 0f);
+            Text iconTxt = iconObj.AddComponent<Text>();
+            iconTxt.font = uiFont;
+            iconTxt.alignment = TextAnchor.MiddleCenter;
+            iconTxt.fontStyle = FontStyle.Bold;
+            iconTxt.fontSize = 28;
+            iconTxt.text = $"{symbolIcon} {kanjiBadge}";
+            iconTxt.color = accentColor;
+            iconObj.GetComponent<RectTransform>().sizeDelta = new Vector2(210, 36);
+
+            // Nombre principal del árbol en letras latinas ("SAKURA", "MATSU", "MOMIJI")
+            GameObject nameObj = new GameObject("NameText");
+            nameObj.transform.SetParent(canvasObj.transform, false);
+            nameObj.transform.localPosition = new Vector3(0f, -2f, 0f);
+            Text nameTxt = nameObj.AddComponent<Text>();
+            nameTxt.font = uiFont;
+            nameTxt.alignment = TextAnchor.MiddleCenter;
+            nameTxt.fontStyle = FontStyle.Bold;
+            nameTxt.fontSize = 22;
+            nameTxt.text = treeName.ToUpperInvariant();
+            nameTxt.color = Color.white;
+            nameObj.GetComponent<RectTransform>().sizeDelta = new Vector2(210, 28);
+
+            // Subtítulo botánico ("Cerezo Flor", "Pino Negro", "Arce Rojo")
+            GameObject subObj = new GameObject("SubText");
+            subObj.transform.SetParent(canvasObj.transform, false);
+            subObj.transform.localPosition = new Vector3(0f, -28f, 0f);
+            Text subTxt = subObj.AddComponent<Text>();
+            subTxt.font = uiFont;
+            subTxt.alignment = TextAnchor.MiddleCenter;
+            subTxt.fontStyle = FontStyle.Normal;
+            subTxt.fontSize = 13;
+            subTxt.text = subtitle;
+            subTxt.color = new Color(0.92f, 0.92f, 0.92f, 0.88f);
+            subObj.GetComponent<RectTransform>().sizeDelta = new Vector2(210, 20);
+
+            ZenTouchButton touchBtn = btnObj.AddComponent<ZenTouchButton>();
+            touchBtn.visualPlate = plate.transform;
+            touchBtn.neonBorderRenderers = neonRenderers;
+            touchBtn.buttonLabelText = nameTxt;
+            touchBtn.touchHalfSize = new Vector2(diameter * 0.52f, diameter * 0.52f);
+            touchBtn.isCircular = true;
+            touchBtn.pressDisplacement = new Vector3(0f, 0f, 0.010f);
+            return touchBtn;
+        }
+
+        private static ZenTouchButton Create3DThematicRectButton(
+            Transform parent,
+            string name,
+            string kanjiBadge,
+            string title,
+            string subtitle,
+            Vector3 localPos,
+            Vector3 size,
+            Material bgMat,
+            Color textColor,
+            Material goldMat,
+            Material urushiMat)
+        {
+            GameObject btnObj = new GameObject(name);
+            btnObj.transform.SetParent(parent, false);
+            btnObj.transform.localPosition = localPos;
+
+            BoxCollider box = btnObj.AddComponent<BoxCollider>();
+            box.size = new Vector3(size.x * 0.95f, size.y * 0.95f, 0.034f);
+            box.center = Vector3.zero;
+            box.isTrigger = true;
+
+            Rigidbody rb = btnObj.AddComponent<Rigidbody>();
+            rb.isKinematic = true;
+            rb.useGravity = false;
+
+            // Marco exterior Urushi negro lacado
+            GameObject outerFrame = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            outerFrame.name = "ThematicOuterFrame";
+            outerFrame.transform.SetParent(btnObj.transform, false);
+            outerFrame.transform.localPosition = new Vector3(0f, 0f, 0.002f);
+            outerFrame.transform.localScale = new Vector3(size.x * 1.05f, size.y * 1.05f, size.z * 0.9f);
+            outerFrame.GetComponent<Renderer>().sharedMaterial = urushiMat;
+            var ofCol = outerFrame.GetComponent<Collider>(); if (ofCol != null) DestroyImmediate(ofCol);
+
+            // Remate decorativo dorado estilo Ema / Torii en el borde superior
+            GameObject topBracket = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            topBracket.name = "ThematicGoldBracket";
+            topBracket.transform.SetParent(btnObj.transform, false);
+            topBracket.transform.localPosition = new Vector3(0f, size.y * 0.525f, -0.004f);
+            topBracket.transform.localScale = new Vector3(size.x * 1.06f, 0.0035f, 0.006f);
+            topBracket.GetComponent<Renderer>().sharedMaterial = goldMat;
+            var tbCol = topBracket.GetComponent<Collider>(); if (tbCol != null) DestroyImmediate(tbCol);
+
+            // Plato interactivo interior que se hunde al presionar
+            GameObject plate = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            plate.name = "Plate";
+            plate.transform.SetParent(btnObj.transform, false);
+            plate.transform.localPosition = Vector3.zero;
+            plate.transform.localScale = size;
+            Material btnInstanceMat = CreateOrGetPBRMaterial($"Zen_Btn_{name}", bgMat.color, 0.72f, 0.05f);
+            plate.GetComponent<Renderer>().sharedMaterial = btnInstanceMat;
+            var plateCol = plate.GetComponent<Collider>(); if (plateCol != null) DestroyImmediate(plateCol);
+
+            // Marco de neón
+            Material neonBaseMat = CreateOrGetPBRMaterial($"Zen_NeonBorder_{name}", new Color(0.15f, 0.90f, 1.0f), 0.92f, 0.0f);
+            float tubeThick = 0.0050f;
+            float zFront = -(size.z * 0.5f + 0.0015f);
+            float hx = size.x * 0.5f + tubeThick * 0.45f;
+            float hy = size.y * 0.5f + tubeThick * 0.45f;
+
+            Vector3[] barPositions =
+            {
+                new Vector3(0f, hy, zFront),
+                new Vector3(0f, -hy, zFront),
+                new Vector3(-hx, 0f, zFront),
+                new Vector3(hx, 0f, zFront)
+            };
+            Vector3[] barScales =
+            {
+                new Vector3(size.x + tubeThick * 1.8f, tubeThick, tubeThick),
+                new Vector3(size.x + tubeThick * 1.8f, tubeThick, tubeThick),
+                new Vector3(tubeThick, size.y + tubeThick * 1.8f, tubeThick),
+                new Vector3(tubeThick, size.y + tubeThick * 1.8f, tubeThick)
+            };
+
+            Renderer[] neonRenderers = new Renderer[4];
+            for (int n = 0; n < 4; n++)
+            {
+                GameObject neonBar = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                neonBar.name = $"NeonBorder_{n}";
+                neonBar.transform.SetParent(btnObj.transform, false);
+                neonBar.transform.localPosition = barPositions[n];
+                neonBar.transform.localScale = barScales[n];
+                Renderer nr = neonBar.GetComponent<Renderer>();
+                nr.sharedMaterial = neonBaseMat;
+                var nCol = neonBar.GetComponent<Collider>(); if (nCol != null) DestroyImmediate(nCol);
+                neonBar.SetActive(false);
+                neonRenderers[n] = nr;
+            }
+
+            // Canvas en alta resolución
+            GameObject textCanvasObj = new GameObject("ThematicCanvas");
+            textCanvasObj.transform.SetParent(btnObj.transform, false);
+            textCanvasObj.transform.localPosition = new Vector3(0f, 0f, -(size.z * 0.5f + 0.002f));
+            textCanvasObj.transform.localScale = new Vector3(0.00035f, 0.00035f, 0.00035f);
+
+            Canvas canvas = textCanvasObj.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.WorldSpace;
+            CanvasScaler scaler = textCanvasObj.AddComponent<CanvasScaler>();
+            scaler.dynamicPixelsPerUnit = 5f;
+
+            Font uiFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            if (uiFont == null) uiFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+
+            float cw = size.x / 0.00035f;
+
+            // Sello Kanji superior (e.g. "【 伝承 】" o "【 神境 】")
+            GameObject kanjiObj = new GameObject("KanjiBadge");
+            kanjiObj.transform.SetParent(textCanvasObj.transform, false);
+            kanjiObj.transform.localPosition = new Vector3(0f, 34f, 0f);
+            Text kanjiTxt = kanjiObj.AddComponent<Text>();
+            kanjiTxt.font = uiFont;
+            kanjiTxt.alignment = TextAnchor.MiddleCenter;
+            kanjiTxt.fontStyle = FontStyle.Bold;
+            kanjiTxt.fontSize = 15;
+            kanjiTxt.text = $"【 {kanjiBadge} 】";
+            kanjiTxt.color = new Color(0.98f, 0.85f, 0.40f);
+            kanjiObj.GetComponent<RectTransform>().sizeDelta = new Vector2(cw, 22);
+
+            // Título principal ("📖 Cuidados" o "⚙️ Opciones")
+            GameObject titleObj = new GameObject("MainTitle");
+            titleObj.transform.SetParent(textCanvasObj.transform, false);
+            titleObj.transform.localPosition = new Vector3(0f, 4f, 0f);
+            Text titleTxt = titleObj.AddComponent<Text>();
+            titleTxt.font = uiFont;
+            titleTxt.alignment = TextAnchor.MiddleCenter;
+            titleTxt.fontStyle = FontStyle.Bold;
+            titleTxt.fontSize = 22;
+            titleTxt.text = title;
+            titleTxt.color = textColor;
+            titleObj.GetComponent<RectTransform>().sizeDelta = new Vector2(cw, 32);
+
+            // Subtítulo ("Ficha Botánica" o "Ajustes Zen")
+            GameObject subObj = new GameObject("SubTitle");
+            subObj.transform.SetParent(textCanvasObj.transform, false);
+            subObj.transform.localPosition = new Vector3(0f, -26f, 0f);
+            Text subTxt = subObj.AddComponent<Text>();
+            subTxt.font = uiFont;
+            subTxt.alignment = TextAnchor.MiddleCenter;
+            subTxt.fontStyle = FontStyle.Normal;
+            subTxt.fontSize = 13;
+            subTxt.text = subtitle;
+            subTxt.color = new Color(0.88f, 0.94f, 1.0f, 0.85f);
+            subObj.GetComponent<RectTransform>().sizeDelta = new Vector2(cw, 20);
+
+            ZenTouchButton touchBtn = btnObj.AddComponent<ZenTouchButton>();
+            touchBtn.visualPlate = plate.transform;
+            touchBtn.neonBorderRenderers = neonRenderers;
+            touchBtn.buttonLabelText = titleTxt;
+            touchBtn.touchHalfSize = new Vector2(size.x * 0.52f, size.y * 0.52f);
+            touchBtn.isCircular = false;
+            touchBtn.pressDisplacement = new Vector3(0f, 0f, 0.010f);
             return touchBtn;
         }
 

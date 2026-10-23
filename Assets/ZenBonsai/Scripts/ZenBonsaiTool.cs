@@ -162,21 +162,41 @@ namespace ZenBonsai
             }
             else
             {
-                // Agarre en las yemas de los dedos (pinch entre índice y pulgar)
-                Vector3 fingerOffset = isHoldingLeft
-                    ? new Vector3(-0.015f, -0.015f, 0.125f)
-                    : new Vector3(0.015f, -0.015f, 0.125f);
-                targetGripPos = holdingHand.TransformPoint(fingerOffset);
-                targetGripRot = holdingHand.rotation * Quaternion.Euler(14f, isHoldingLeft ? 8f : -8f, 0f);
+                // Agarre anatómico en las yemas de los dedos (pinch real entre índice y pulgar)
+                if (ZenFingerTips.TryGetPinchPoint(isHoldingLeft, out Vector3 pinchPt))
+                {
+                    targetGripPos = pinchPt;
+                }
+                else
+                {
+                    // Desfase anatómico exacto en la cara interna/palmar de los dedos (-Y hacia abajo, no sobre el dorso)
+                    Vector3 fingerOffset = isHoldingLeft
+                        ? new Vector3(0.022f, -0.040f, 0.115f)
+                        : new Vector3(-0.022f, -0.040f, 0.115f);
+                    targetGripPos = holdingHand.TransformPoint(fingerOffset);
+                }
+
+                // Orientación ergonómica por herramienta: se sostiene con los dedos apuntando hacia adelante
+                float pitchAngle = 18f;
+                float yawAngle = isHoldingLeft ? -8f : 8f;
+                if (toolType == BonsaiToolType.WaterLadle)
+                {
+                    pitchAngle = 14f; // Inclinación natural para verter agua con suave giro de muñeca
+                    yawAngle = isHoldingLeft ? -10f : 10f;
+                }
+                else if (toolType == BonsaiToolType.Broom)
+                {
+                    pitchAngle = 24f;
+                }
+                targetGripRot = holdingHand.rotation * Quaternion.Euler(pitchAngle, yawAngle, 0f);
             }
 
-            // CRÍTICO: Posicionar de modo que el HANDLE_ANCHOR encaje exactamente en la mano/dedos
-            // (evita que la herramienta quede retrasada pegada a la muñeca)
-            Vector3 handleOffset = handleAnchor != null ? (transform.position - handleAnchor.position) : Vector3.zero;
-            Vector3 finalTargetPos = targetGripPos + handleOffset;
+            // CRÍTICO: Posicionar de modo que el HANDLE_ANCHOR encaje exactamente en las yemas de los dedos
+            Vector3 localAnchorOffset = (handleAnchor != null && handleAnchor != transform) ? handleAnchor.localPosition : Vector3.zero;
+            Vector3 finalTargetPos = targetGripPos - targetGripRot * localAnchorOffset;
 
-            transform.position = Vector3.Lerp(transform.position, finalTargetPos, Time.deltaTime * 32f);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetGripRot, Time.deltaTime * 28f);
+            transform.position = Vector3.Lerp(transform.position, finalTargetPos, Time.deltaTime * 36f);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetGripRot, Time.deltaTime * 32f);
 
             // Comportamiento funcional según herramienta
             switch (toolType)
@@ -229,9 +249,15 @@ namespace ZenBonsai
                 return handAnchor.position + handAnchor.forward * 0.045f - handAnchor.up * 0.02f;
             }
 
+            // Usar punto de pellizco anatómico real entre los dedos
+            if (ZenFingerTips.TryGetPinchPoint(isLeft, out Vector3 pinchPt))
+            {
+                return pinchPt;
+            }
+
             Vector3 fingerOffset = isLeft
-                ? new Vector3(-0.015f, -0.015f, 0.120f)
-                : new Vector3(0.015f, -0.015f, 0.120f);
+                ? new Vector3(0.022f, -0.040f, 0.115f)
+                : new Vector3(-0.022f, -0.040f, 0.115f);
             return handAnchor.TransformPoint(fingerOffset);
         }
 
@@ -390,7 +416,7 @@ namespace ZenBonsai
                 }
             }
 
-            // 2. Hand Tracking nativo de Quest (EXCLUSIVAMENTE pellizco deliberado de dedo ÍNDICE + PULGAR)
+            // 2. Hand Tracking nativo de Quest (agarre por pellizco o puño en los dedos)
             OVRPlugin.Hand hand = isLeft ? OVRPlugin.Hand.HandLeft : OVRPlugin.Hand.HandRight;
             if (OVRPlugin.GetHandState(OVRPlugin.Step.Render, hand, ref (isLeft ? ref leftHandState : ref rightHandState)))
             {
@@ -400,22 +426,29 @@ namespace ZenBonsai
                     untrackedHoldTimer = 0f;
 
                     float indexStrength = 0f;
-                    if (state.PinchStrength != null && state.PinchStrength.Length > (int)OVRPlugin.HandFinger.Index)
+                    float middleStrength = 0f;
+                    if (state.PinchStrength != null)
                     {
-                        indexStrength = state.PinchStrength[(int)OVRPlugin.HandFinger.Index];
+                        if (state.PinchStrength.Length > (int)OVRPlugin.HandFinger.Index)
+                            indexStrength = state.PinchStrength[(int)OVRPlugin.HandFinger.Index];
+                        if (state.PinchStrength.Length > (int)OVRPlugin.HandFinger.Middle)
+                            middleStrength = state.PinchStrength[(int)OVRPlugin.HandFinger.Middle];
                     }
 
-                    // Umbral exigente: > 0.72f para agarrar con clara intención (evita que manos semi-cerradas o apuntando cojan cosas)
-                    // Soltar inmediatamente cuando el índice se abre (< 0.42f)
-                    float threshold = isCurrentlyHeld ? 0.40f : 0.62f;
-                    return (indexStrength > threshold);
+                    float bestPinch = Mathf.Max(indexStrength, middleStrength);
+
+                    // Agarre intencional (> 0.55f) para coger la herramienta.
+                    // Retención permisiva (> 0.18f) para que nunca se desenganche al mover o rotar la muñeca.
+                    // Solo se suelta cuando el usuario abre claramente la mano (< 0.18f).
+                    float threshold = isCurrentlyHeld ? 0.18f : 0.55f;
+                    return (bestPinch > threshold);
                 }
             }
 
             if (isCurrentlyHeld)
             {
                 untrackedHoldTimer += Time.deltaTime;
-                return untrackedHoldTimer < 0.12f;
+                return untrackedHoldTimer < 0.65f; // Margen generoso de 650 ms ante oclusiones al girar la muñeca
             }
             return false;
         }
@@ -471,17 +504,20 @@ namespace ZenBonsai
             float horizDist = Vector2.Distance(new Vector2(cupPos.x, cupPos.z), new Vector2(potPos.x, potPos.z));
             float heightAbovePot = cupPos.y - potPos.y;
 
-            return horizDist < 0.20f && heightAbovePot > 0.01f && heightAbovePot < 0.42f;
+            return horizDist < 0.22f && heightAbovePot > 0.01f && heightAbovePot < 0.45f;
         }
 
         private void HandleWateringCanBehavior()
         {
             // Solo verter agua cuando:
             // 1) El cuenco del cazo (actionPoint) está situado sobre la maceta del bonsái
-            // 2) Y el cazo está INCLINADO hacia abajo o girado (vaciando agua deliberadamente)
+            // 2) Y el cazo está inclinado > 30° hacia abajo o girado de muñeca (vaciando agua deliberadamente)
             if (!IsLadleCupOverPot()) return;
 
-            bool isTilted = (transform.forward.y < -0.15f || Vector3.Dot(transform.up, Vector3.down) > 0.12f);
+            // Inclinación hacia adelante (pitch) o giro natural de muñeca (roll) de más de 30°
+            bool isTilted = (Vector3.Dot(transform.up, Vector3.up) < 0.85f ||
+                             transform.forward.y < -0.18f ||
+                             Mathf.Abs(transform.right.y) > 0.45f);
             if (!isTilted) return;
 
             Vector3 cupSpoutPos = actionPoint != null ? actionPoint.position : transform.position;

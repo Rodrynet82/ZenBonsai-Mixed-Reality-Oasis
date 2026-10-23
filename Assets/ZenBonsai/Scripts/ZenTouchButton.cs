@@ -129,8 +129,10 @@ namespace ZenBonsai
 
         [Header("Zona táctil (se rellena al construir la escena)")]
         public Vector2 touchHalfSize = new Vector2(0.05f, 0.03f);
+        public bool isCircular = false;
 
         private bool wasPokedInside = false;
+        private float prevLocalZ = -999f;
         private static Transform leftControllerAnchor;
         private static Transform rightControllerAnchor;
 
@@ -165,13 +167,34 @@ namespace ZenBonsai
             }
         }
 
-        private bool IsPointInPressZone(Vector3 worldPoint)
+        private bool IsPointInPressZone(Vector3 worldPoint, out bool isCrossing)
         {
+            isCrossing = false;
             Vector3 p = transform.InverseTransformPoint(worldPoint);
-            // La cara frontal del botón está en z = -0.010 (el frente mira hacia -Z local).
-            // Se pulsa al situar la yema entre 1.8 cm delante de la cara y 1.2 cm dentro del botón.
-            if (p.z > 0.012f || p.z < -0.028f) return false;
-            return Mathf.Abs(p.x) <= touchHalfSize.x * 0.92f && Mathf.Abs(p.y) <= touchHalfSize.y * 0.92f;
+
+            // Verificación en plano frontal X/Y (con margen cómodo para las yemas)
+            if (isCircular)
+            {
+                float r2 = p.x * p.x + p.y * p.y;
+                float maxR = touchHalfSize.x * 1.08f;
+                if (r2 > maxR * maxR) return false;
+            }
+            else
+            {
+                if (Mathf.Abs(p.x) > touchHalfSize.x * 1.08f || Mathf.Abs(p.y) > touchHalfSize.y * 1.08f)
+                    return false;
+            }
+
+            // Detección de cruce de trayectoria hacia la placa del botón (z = -0.008m)
+            if (prevLocalZ > -900f && prevLocalZ < -0.006f && p.z >= -0.006f)
+            {
+                isCrossing = true;
+            }
+            prevLocalZ = p.z;
+
+            // Zona de profundidad amplia y tolerante (entre 4.5 cm delante y 3.8 cm detrás de la cara frontal)
+            if (p.z > 0.038f || p.z < -0.048f) return false;
+            return true;
         }
 
         private void CheckPokeInput()
@@ -179,12 +202,18 @@ namespace ZenBonsai
             if (Time.timeSinceLevelLoad < 0.6f) return;
 
             bool inside = false;
+            bool crossed = false;
 
-            // 1. Yemas de los dedos índice (Hand Tracking)
+            // 1. Yemas de los dedos índice, pulgar y corazón (Hand Tracking)
             IList<Vector3> tips = ZenFingerTips.GetIndexTips();
-            for (int i = 0; i < tips.Count && !inside; i++)
+            for (int i = 0; i < tips.Count; i++)
             {
-                if (IsPointInPressZone(tips[i])) inside = true;
+                if (IsPointInPressZone(tips[i], out bool cross))
+                {
+                    inside = true;
+                    if (cross) crossed = true;
+                    break;
+                }
             }
 
             // 2. Punta de los mandos Touch (toque físico) y puntero + gatillo
@@ -202,13 +231,17 @@ namespace ZenBonsai
                     Transform ctrl = ctrls[c];
                     if (ctrl == null) continue;
 
-                    if (IsPointInPressZone(ctrl.position + ctrl.forward * 0.05f)) inside = true;
+                    if (IsPointInPressZone(ctrl.position + ctrl.forward * 0.05f, out bool ctrlCross))
+                    {
+                        inside = true;
+                        if (ctrlCross) crossed = true;
+                    }
 
                     if (OVRInput.GetDown(triggers[c]) && Time.time >= GlobalPressCooldownUntil)
                     {
                         Vector3 toButton = transform.position - ctrl.position;
                         float dist = toButton.magnitude;
-                        if (dist < 1.0f && Vector3.Dot(ctrl.forward, toButton / Mathf.Max(dist, 0.001f)) > 0.994f)
+                        if (dist < 1.2f && Vector3.Dot(ctrl.forward, toButton / Mathf.Max(dist, 0.001f)) > 0.990f)
                         {
                             Press();
                             return;
@@ -217,12 +250,25 @@ namespace ZenBonsai
                 }
             }
 
-            // Solo se pulsa al ENTRAR en la zona (no repite mientras el dedo se mantiene dentro)
-            if (inside && !wasPokedInside)
+            // Registro instantáneo y fiable: pulsa al entrar en la zona o al cruzar la placa frontal
+            if (inside || crossed)
             {
-                Press();
+                if (!wasPokedInside)
+                {
+                    if (Time.time >= GlobalPressCooldownUntil)
+                    {
+                        wasPokedInside = true;
+                        Press();
+                    }
+                    // Si estaba en cooldown durante este frame, NO marcamos wasPokedInside=true
+                    // para procesar el toque inmediatamente al instante siguiente
+                }
             }
-            wasPokedInside = inside;
+            else
+            {
+                wasPokedInside = false;
+                prevLocalZ = -999f;
+            }
         }
 
         /// <summary>
@@ -320,7 +366,7 @@ namespace ZenBonsai
         {
             EnsureInitialized();
             if (Time.time < GlobalPressCooldownUntil) return;
-            GlobalPressCooldownUntil = Time.time + 0.55f; // Bloquear cualquier otro botón durante 550 ms para que nunca se toquen dos
+            GlobalPressCooldownUntil = Time.time + 0.28f; // Cooldown ágil de 280 ms para evitar rebotes pero responder inmediatamente
 
             // Efecto visual de hundimiento y destello luminoso inmediato
             targetLocalPos = initialLocalPos + pressDisplacement;
@@ -400,19 +446,70 @@ namespace ZenBonsai
     }
 
     /// <summary>
-    /// Posición real de las yemas de los dedos ÍNDICE (hand tracking de Quest).
-    /// Se usa para pulsar botones con precisión de milímetros en lugar de depender de los colliders
-    /// de falange/palma, que provocaban toques desplazados ("hay que pulsar más arriba").
+    /// Posición real de las yemas de los dedos (hand tracking de Quest).
+    /// Se usa para pulsar botones con precisión de milímetros y para ubicar herramientas en las yemas.
     /// </summary>
     public static class ZenFingerTips
     {
-        private static readonly List<Vector3> tips = new List<Vector3>(4);
-        private static readonly Dictionary<OVRSkeleton, Transform> tipBones = new Dictionary<OVRSkeleton, Transform>();
+        private static readonly List<Vector3> tips = new List<Vector3>(8);
+        private static readonly Dictionary<OVRSkeleton, (Transform index, Transform thumb, Transform middle)> skeletonTips =
+            new Dictionary<OVRSkeleton, (Transform index, Transform thumb, Transform middle)>();
         private static OVRSkeleton[] skeletons = new OVRSkeleton[0];
         private static float nextScanTime = 0f;
         private static int lastFrame = -1;
         private static Transform leftAnchor;
         private static Transform rightAnchor;
+
+        private static void UpdateSkeletonsIfNeeded()
+        {
+            if (Time.unscaledTime >= nextScanTime)
+            {
+                nextScanTime = Time.unscaledTime + 1.2f;
+                skeletons = UnityEngine.Object.FindObjectsByType<OVRSkeleton>(FindObjectsInactive.Exclude);
+            }
+        }
+
+        public static bool TryGetPinchPoint(bool isLeft, out Vector3 pinchPoint)
+        {
+            pinchPoint = Vector3.zero;
+            UpdateSkeletonsIfNeeded();
+
+            for (int i = 0; i < skeletons.Length; i++)
+            {
+                OVRSkeleton sk = skeletons[i];
+                if (sk == null || !sk.isActiveAndEnabled || !sk.IsInitialized || !sk.IsDataValid) continue;
+                bool skIsLeft = (sk.GetSkeletonType() == OVRSkeleton.SkeletonType.HandLeft);
+                if (skIsLeft != isLeft) continue;
+
+                if (!skeletonTips.TryGetValue(sk, out var boneGroup) || boneGroup.index == null || boneGroup.thumb == null)
+                {
+                    Transform idx = null, thm = null, mid = null;
+                    var bones = sk.Bones;
+                    if (bones != null)
+                    {
+                        for (int b = 0; b < bones.Count; b++)
+                        {
+                            if (bones[b].Id == OVRSkeleton.BoneId.Hand_IndexTip) idx = bones[b].Transform;
+                            else if (bones[b].Id == OVRSkeleton.BoneId.Hand_ThumbTip) thm = bones[b].Transform;
+                            else if (bones[b].Id == OVRSkeleton.BoneId.Hand_MiddleTip) mid = bones[b].Transform;
+                        }
+                    }
+                    boneGroup = (idx, thm, mid);
+                    skeletonTips[sk] = boneGroup;
+                }
+
+                if (boneGroup.thumb != null && boneGroup.index != null)
+                {
+                    // Comprobar que no devuelvan la posición de la muñeca
+                    if ((boneGroup.index.position - sk.transform.position).sqrMagnitude > 0.05f * 0.05f)
+                    {
+                        pinchPoint = (boneGroup.thumb.position + boneGroup.index.position) * 0.5f;
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
 
         public static IList<Vector3> GetIndexTips()
         {
@@ -420,54 +517,60 @@ namespace ZenBonsai
             lastFrame = Time.frameCount;
             tips.Clear();
 
-            if (Time.unscaledTime >= nextScanTime)
-            {
-                nextScanTime = Time.unscaledTime + 1.5f;
-                skeletons = UnityEngine.Object.FindObjectsByType<OVRSkeleton>(FindObjectsSortMode.None);
-            }
+            UpdateSkeletonsIfNeeded();
 
             for (int i = 0; i < skeletons.Length; i++)
             {
                 OVRSkeleton sk = skeletons[i];
                 if (sk == null || !sk.isActiveAndEnabled || !sk.IsInitialized || !sk.IsDataValid) continue;
 
-                if (!tipBones.TryGetValue(sk, out Transform tipT) || tipT == null)
+                if (!skeletonTips.TryGetValue(sk, out var boneGroup) || boneGroup.index == null)
                 {
-                    tipT = null;
+                    Transform idx = null, thm = null, mid = null;
                     var bones = sk.Bones;
                     if (bones != null)
                     {
                         for (int b = 0; b < bones.Count; b++)
                         {
-                            if (bones[b].Id == OVRSkeleton.BoneId.Hand_IndexTip)
-                            {
-                                tipT = bones[b].Transform;
-                                break;
-                            }
+                            if (bones[b].Id == OVRSkeleton.BoneId.Hand_IndexTip) idx = bones[b].Transform;
+                            else if (bones[b].Id == OVRSkeleton.BoneId.Hand_ThumbTip) thm = bones[b].Transform;
+                            else if (bones[b].Id == OVRSkeleton.BoneId.Hand_MiddleTip) mid = bones[b].Transform;
                         }
                     }
-                    tipBones[sk] = tipT;
+                    boneGroup = (idx, thm, mid);
+                    skeletonTips[sk] = boneGroup;
                 }
 
-                if (tipT == null) continue;
+                Vector3 wristPos = sk.transform.position;
 
-                // Validación: si el hueso devuelve el origen de la muñeca, se descarta
-                if ((tipT.position - sk.transform.position).sqrMagnitude > 0.06f * 0.06f)
+                if (boneGroup.index != null && (boneGroup.index.position - wristPos).sqrMagnitude > 0.05f * 0.05f)
                 {
-                    tips.Add(tipT.position);
+                    tips.Add(boneGroup.index.position);
+                }
+                if (boneGroup.middle != null && (boneGroup.middle.position - wristPos).sqrMagnitude > 0.05f * 0.05f)
+                {
+                    tips.Add(boneGroup.middle.position);
+                }
+                if (boneGroup.thumb != null && (boneGroup.thumb.position - wristPos).sqrMagnitude > 0.05f * 0.05f)
+                {
+                    tips.Add(boneGroup.thumb.position);
                 }
             }
 
             if (tips.Count == 0)
             {
-                // Alternativa: estimación desde los anclajes de mano (solo si la mano está rastreada)
+                // Alternativa: estimación ergonómica desde los anclajes de mano
                 if (leftAnchor == null) { var l = GameObject.Find("LeftHandAnchor"); if (l != null) leftAnchor = l.transform; }
                 if (rightAnchor == null) { var r = GameObject.Find("RightHandAnchor"); if (r != null) rightAnchor = r.transform; }
 
                 if (leftAnchor != null && IsHandTracked(OVRPlugin.Hand.HandLeft))
-                    tips.Add(leftAnchor.TransformPoint(new Vector3(0f, -0.01f, 0.15f)));
+                {
+                    tips.Add(leftAnchor.TransformPoint(new Vector3(0.012f, -0.025f, 0.135f)));
+                }
                 if (rightAnchor != null && IsHandTracked(OVRPlugin.Hand.HandRight))
-                    tips.Add(rightAnchor.TransformPoint(new Vector3(0f, -0.01f, 0.15f)));
+                {
+                    tips.Add(rightAnchor.TransformPoint(new Vector3(-0.012f, -0.025f, 0.135f)));
+                }
             }
 
             return tips;

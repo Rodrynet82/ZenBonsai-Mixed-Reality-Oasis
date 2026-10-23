@@ -76,6 +76,8 @@ namespace ZenBonsai
             if (btnMomiji != null) btnMomiji.onClick.AddListener(SelectMomiji);
             if (btnInfo != null) btnInfo.onClick.AddListener(ToggleInfoPanel);
             if (btnOptions != null) btnOptions.onClick.AddListener(ToggleOptionsPanel);
+            if (btnCloseInfo != null) btnCloseInfo.onClick.AddListener(CloseInfoPanel);
+            if (btnCloseOptions != null) btnCloseOptions.onClick.AddListener(CloseOptionsPanel);
 
             if (btnOptLockTable != null) btnOptLockTable.onClick.AddListener(ToggleLockTable);
             if (btnOptRecenter != null) btnOptRecenter.onClick.AddListener(TriggerRecenterTable);
@@ -277,6 +279,10 @@ namespace ZenBonsai
             UpdateUI();
         }
 
+        [Header("Botones de Cierre Rápido")]
+        public ZenTouchButton btnCloseInfo;
+        public ZenTouchButton btnCloseOptions;
+
         public void ToggleInfoPanel()
         {
             isInfoOpen = !isInfoOpen;
@@ -287,6 +293,13 @@ namespace ZenBonsai
             UpdateUI();
         }
 
+        public void CloseInfoPanel()
+        {
+            isInfoOpen = false;
+            if (infoPanelBox != null) infoPanelBox.SetActive(false);
+            UpdateUI();
+        }
+
         public void ToggleOptionsPanel()
         {
             isOptionsOpen = !isOptionsOpen;
@@ -294,6 +307,13 @@ namespace ZenBonsai
 
             if (optionsPanelBox != null) optionsPanelBox.SetActive(isOptionsOpen);
             if (infoPanelBox != null) infoPanelBox.SetActive(isInfoOpen);
+            UpdateUI();
+        }
+
+        public void CloseOptionsPanel()
+        {
+            isOptionsOpen = false;
+            if (optionsPanelBox != null) optionsPanelBox.SetActive(false);
             UpdateUI();
         }
 
