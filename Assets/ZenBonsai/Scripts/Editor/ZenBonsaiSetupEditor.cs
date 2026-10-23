@@ -64,24 +64,30 @@ namespace ZenBonsai.Editor
             // ==========================================
             // PALETA DE MATERIALES PBR DE ALTA DEFINICIÓN CON TEXTURAS DE CORTEZA REALISTA
             // ==========================================
-            Material tableMat = CreateOrGetPBRMaterial("Zen_TableMat", new Color(0.08f, 0.055f, 0.045f), 0.88f, 0.05f); // Lacado Urushi negro-caoba
-            Material tableApronMat = CreateOrGetPBRMaterial("Zen_TableApronMat", new Color(0.14f, 0.09f, 0.07f), 0.72f, 0.02f); // Palisandro Shitan tallado
-            Material potMat = CreateOrGetPBRMaterial("Zen_PotMat", new Color(0.11f, 0.17f, 0.21f), 0.90f, 0.10f);   // Cerámica Tokoname esmaltada azul-acero
-            Material soilMat = CreateOrGetPBRMaterial("Zen_SoilMat", new Color(0.14f, 0.10f, 0.07f), 0.10f, 0.0f);   // Sustrato Akadema / Kurotsuchi
-            Material mossDeepMat = CreateOrGetPBRMaterial("Zen_MossDeepMat", new Color(0.13f, 0.42f, 0.11f), 0.14f, 0.0f); // Musgo Kyoto verde profundo
-            Material mossLightMat = CreateOrGetPBRMaterial("Zen_MossLightMat", new Color(0.28f, 0.62f, 0.16f), 0.18f, 0.0f); // Musgo aterciopelado esmeralda
-            Material stoneMat = CreateOrGetPBRMaterial("Zen_StoneMat", new Color(0.22f, 0.24f, 0.27f), 0.55f, 0.08f); // Roca Suiseki mineral
+            Material tableMat = CreateOrGetPBRMaterial("Zen_TableMat", new Color(0.08f, 0.045f, 0.038f), 0.94f, 0.02f); // Lacado Urushi caoba brillante reflectante
+            Material tableApronMat = CreateOrGetPBRMaterial("Zen_TableApronMat", new Color(0.12f, 0.07f, 0.05f), 0.78f, 0.02f); // Palisandro Shitan tallado
+            Material potMat = CreateOrGetPBRMaterial("Zen_PotMat", new Color(0.09f, 0.18f, 0.35f), 0.92f, 0.06f);   // Cerámica Tokoname esmaltada azul cobalto real
+            Material soilMat = CreateOrGetPBRMaterial("Zen_SoilMat", new Color(0.12f, 0.09f, 0.06f), 0.10f, 0.0f);   // Sustrato Akadama
+            Material mossDeepMat = CreateOrGetPBRMaterial("Zen_MossDeepMat", new Color(0.12f, 0.38f, 0.10f), 0.14f, 0.0f); // Musgo Kyoto verde profundo
+            Material mossLightMat = CreateOrGetPBRMaterial("Zen_MossLightMat", new Color(0.24f, 0.58f, 0.14f), 0.20f, 0.0f); // Musgo aterciopelado esmeralda
+            Material stoneMat = CreateOrGetPBRMaterial("Zen_StoneMat", new Color(0.24f, 0.26f, 0.28f), 0.60f, 0.08f); // Roca Suiseki mineral
             Material waterMat = CreateOrGetPBRMaterial("Zen_WaterMat", new Color(0.18f, 0.72f, 0.90f, 0.85f), 0.96f, 0.05f);
             Material buttonMat = CreateOrGetPBRMaterial("Zen_ButtonMat", new Color(0.20f, 0.26f, 0.32f), 0.74f, 0.05f);
             Material infoButtonMat = CreateOrGetPBRMaterial("Zen_InfoButtonMat", new Color(0.18f, 0.44f, 0.52f), 0.78f, 0.08f);
-            Material goldMat = CreateOrGetPBRMaterial("Zen_GoldMat", new Color(0.90f, 0.74f, 0.26f), 0.85f, 0.65f);
+            Material goldMat = CreateOrGetPBRMaterial("Zen_GoldMat", new Color(0.92f, 0.76f, 0.28f), 0.88f, 0.70f);
 
             // Materiales botánicos de diseñador con textura procedural de corteza orgánica para cada especie
             Material sakuraBarkMat = CreateOrGetBarkMaterial("Zen_SakuraBarkMat",
-                new Color(0.32f, 0.17f, 0.13f), new Color(0.16f, 0.08f, 0.06f), new Color(0.52f, 0.34f, 0.25f), 0.34f, 1); // Cerezo con lenticelas horizontales
-            Material sakuraPetalPinkMat = CreateOrGetPBRMaterial("Zen_SakuraPetalPinkMat", new Color(1.0f, 0.72f, 0.83f), 0.45f, 0.0f); // Pétalo rosa Sakura
-            Material sakuraPetalWhiteMat = CreateOrGetPBRMaterial("Zen_SakuraPetalWhiteMat", new Color(0.99f, 0.94f, 0.96f), 0.48f, 0.0f); // Blanco nacarado Somei-Yoshino
-            Material sakuraLeafShootMat = CreateOrGetPBRMaterial("Zen_SakuraLeafShootMat", new Color(0.24f, 0.58f, 0.26f), 0.28f, 0.0f); // Follaje primaveral
+                new Color(0.28f, 0.18f, 0.14f), new Color(0.10f, 0.07f, 0.05f), new Color(0.44f, 0.32f, 0.25f), 0.38f, 1); // Castaño caoba envejecido con lenticelas
+            Material sakuraPetalPinkMat = CreateOrGetPBRMaterial("Zen_SakuraPetalPinkMat", new Color(1.0f, 0.70f, 0.82f), 0.52f, 0.0f); // Pétalo rosa florido
+            sakuraPetalPinkMat.EnableKeyword("_EMISSION");
+            if (sakuraPetalPinkMat.HasProperty("_EmissionColor")) sakuraPetalPinkMat.SetColor("_EmissionColor", new Color(0.22f, 0.08f, 0.12f)); // Luz filtrada translúcida
+
+            Material sakuraPetalWhiteMat = CreateOrGetPBRMaterial("Zen_SakuraPetalWhiteMat", new Color(0.99f, 0.93f, 0.96f), 0.55f, 0.0f); // Blanco nacarado Somei-Yoshino
+            sakuraPetalWhiteMat.EnableKeyword("_EMISSION");
+            if (sakuraPetalWhiteMat.HasProperty("_EmissionColor")) sakuraPetalWhiteMat.SetColor("_EmissionColor", new Color(0.16f, 0.12f, 0.14f));
+
+            Material sakuraLeafShootMat = CreateOrGetPBRMaterial("Zen_SakuraLeafShootMat", new Color(0.26f, 0.56f, 0.24f), 0.32f, 0.0f); // Brotes primaverales
 
             Material matsuBarkMat = CreateOrGetBarkMaterial("Zen_MatsuBarkMat",
                 new Color(0.22f, 0.15f, 0.11f), new Color(0.08f, 0.05f, 0.04f), new Color(0.38f, 0.28f, 0.21f), 0.16f, 2); // Pino Kuromatsu con placas escamosas
@@ -98,7 +104,8 @@ namespace ZenBonsai.Editor
 
             // Materiales de herramientas artesanas
             Material copperMat = CreateOrGetPBRMaterial("Zen_CopperMat", new Color(0.85f, 0.49f, 0.31f), 0.84f, 0.88f);
-            Material steelMat = CreateOrGetPBRMaterial("Zen_SteelMat", new Color(0.16f, 0.17f, 0.19f), 0.72f, 0.82f);
+            Material steelMat = CreateOrGetPBRMaterial("Zen_SteelMat", new Color(0.09f, 0.09f, 0.10f), 0.68f, 0.85f); // Acero al carbono forjado japonés pavonado
+            Material silverBladeMat = CreateOrGetPBRMaterial("Zen_SilverBladeMat", new Color(0.88f, 0.90f, 0.94f), 0.94f, 0.95f); // Filo pulido de tijeras
             Material bambooMat = CreateOrGetPBRMaterial("Zen_BambooMat", new Color(0.80f, 0.70f, 0.46f), 0.52f, 0.0f);
             Material bristleMat = CreateOrGetPBRMaterial("Zen_BristleMat", new Color(0.46f, 0.35f, 0.24f), 0.16f, 0.0f);
             Material trayWoodMat = CreateOrGetPBRMaterial("Zen_TrayWoodMat", new Color(0.32f, 0.22f, 0.15f), 0.55f, 0.0f);
@@ -136,7 +143,7 @@ namespace ZenBonsai.Editor
             // ==========================================
             // 5. EXPOSITOR DE HERRAMIENTAS ORIENTADO HACIA EL JUGADOR + KUSAMONO DECORATIVO DETRÁS
             // ==========================================
-            BuildToolTray(root.transform, trayWoodMat, tableMat, steelMat, copperMat, bambooMat, bristleMat, goldMat, potMat, mossLightMat, stoneMat, sakuraPetalPinkMat);
+            BuildToolTray(root.transform, trayWoodMat, tableMat, steelMat, silverBladeMat, copperMat, bambooMat, bristleMat, goldMat, potMat, mossLightMat, stoneMat, sakuraPetalPinkMat);
 
             // ==========================================
             // 6. FUENTE DE PIEDRA TSUKUBAI CON CAZO DE BAMBÚ INTERACTIVO DELANTE A LA IZQUIERDA (SIMÉTRICO A LAS HERRAMIENTAS)
@@ -153,10 +160,67 @@ namespace ZenBonsai.Editor
                 buttonMat, infoButtonMat,
                 organicTree);
 
+            SetupCinematicBonsaiLighting();
+
             AssetDatabase.SaveAssets();
             Selection.activeGameObject = root;
-            Undo.RegisterCreatedObjectUndo(root, "Setup Zen Bonsai Experience HD Masterpiece v21");
-            Debug.Log("<color=green>[Zen Bonsai]</color> ¡Experiencia Bonsai HD Masterpiece v21 montada con éxito!");
+            Undo.RegisterCreatedObjectUndo(root, "Setup Zen Bonsai Experience HD Masterpiece v22");
+            Debug.Log("<color=green>[Zen Bonsai]</color> ¡Experiencia Bonsai HD Masterpiece v22 montada con éxito!");
+        }
+
+        private static void SetupCinematicBonsaiLighting()
+        {
+            // Configurar o crear la luz de sol dorada de ángulo rasante (Rim Light) que perfila la copa y corteza
+            Light mainSun = null;
+            Light fillSky = null;
+
+            Light[] lights = Object.FindObjectsByType<Light>(FindObjectsInactive.Exclude);
+            foreach (var l in lights)
+            {
+                if (l.type == LightType.Directional)
+                {
+                    if (l.gameObject.name.Contains("Fill") || l.gameObject.name.Contains("Sky"))
+                    {
+                        fillSky = l;
+                    }
+                    else if (mainSun == null)
+                    {
+                        mainSun = l;
+                    }
+                }
+            }
+
+            if (mainSun == null)
+            {
+                GameObject sunObj = new GameObject("Zen_Sun_RimLight");
+                mainSun = sunObj.AddComponent<Light>();
+                mainSun.type = LightType.Directional;
+            }
+
+            mainSun.gameObject.name = "Zen_Sun_RimLight";
+            mainSun.transform.rotation = Quaternion.Euler(28f, -138f, 0f);
+            mainSun.color = new Color(1.0f, 0.93f, 0.82f); // Luz cálida dorada de hora mágica
+            mainSun.intensity = 1.25f;
+            mainSun.shadows = LightShadows.Soft;
+
+            if (fillSky == null)
+            {
+                GameObject fillObj = new GameObject("Zen_Sky_FillLight");
+                fillSky = fillObj.AddComponent<Light>();
+                fillSky.type = LightType.Directional;
+            }
+
+            fillSky.gameObject.name = "Zen_Sky_FillLight";
+            fillSky.transform.rotation = Quaternion.Euler(38f, 42f, 0f);
+            fillSky.color = new Color(0.72f, 0.82f, 0.98f); // Relleno celeste suave y nítido
+            fillSky.intensity = 0.42f;
+            fillSky.shadows = LightShadows.None;
+
+            // Configuración ambiental Trilight para iluminación envolvente suave
+            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
+            RenderSettings.ambientSkyColor = new Color(0.68f, 0.78f, 0.92f);
+            RenderSettings.ambientEquatorColor = new Color(0.75f, 0.70f, 0.65f);
+            RenderSettings.ambientGroundColor = new Color(0.24f, 0.20f, 0.18f);
         }
 
         private static void BuildZenPavilionSign(
@@ -1012,7 +1076,7 @@ namespace ZenBonsai.Editor
 
         #endregion
 
-        #region 1. SAKURA (Cerezo Imperial Florido - Corteza Realista con Vena Shari y Flores de 5 Pétalos)
+        #region 1. SAKURA (Cerezo Imperial Florido - Escultura Ancestral Moyogi, 8 Ramas y Lluvia de Pétalos)
 
         private static SpeciesTreeModel BuildSakuraTree(Transform parent, Material barkMat, Material shariMat, Material mossMat, Material petalPinkMat, Material petalWhiteMat, Material leafShootMat, Material goldMat)
         {
@@ -1027,78 +1091,110 @@ namespace ZenBonsai.Editor
             trunk.transform.SetParent(treeObj.transform, false);
             model.trunkBase = trunk.transform;
 
-            // Ramas orgánicas continuas con sub-ramificación
+            // 8 Ramas maestras arquitectónicas formando una cúpula imperial plena (Chokkan / Moyogi)
             BranchSpline[] sakuraBranches = new BranchSpline[]
             {
-                // Rama 1: Ichi-no-eda (Izquierda baja extendida)
+                // Rama 0: Ichi-no-eda (Izquierda baja prominente y extendida)
                 new BranchSpline(
-                    new Vector3(-0.010f, 0.115f, 0.005f),
-                    new Vector3(-0.048f, 0.125f, 0.012f),
-                    new Vector3(-0.085f, 0.132f, 0.015f),
-                    new Vector3(-0.118f, 0.145f, 0.018f),
+                    new Vector3(-0.014f, 0.112f, 0.006f),
+                    new Vector3(-0.055f, 0.122f, 0.014f),
+                    new Vector3(-0.098f, 0.130f, 0.018f),
+                    new Vector3(-0.138f, 0.142f, 0.022f),
+                    0.019f, 0.0065f),
+
+                // Rama 1: Ni-no-eda (Derecha-trasera elegante y equilibrada)
+                new BranchSpline(
+                    new Vector3(0.014f, 0.142f, -0.008f),
+                    new Vector3(0.058f, 0.154f, -0.015f),
+                    new Vector3(0.098f, 0.165f, -0.020f),
+                    new Vector3(0.135f, 0.178f, -0.022f),
+                    0.018f, 0.0060f),
+
+                // Rama 2: Ura-eda (Trasera de gran profundidad espacial 3D)
+                new BranchSpline(
+                    new Vector3(0.004f, 0.168f, 0.012f),
+                    new Vector3(0.002f, 0.182f, 0.048f),
+                    new Vector3(-0.008f, 0.196f, 0.082f),
+                    new Vector3(-0.012f, 0.212f, 0.110f),
                     0.016f, 0.0055f),
-                // Rama 2: Ni-no-eda (Derecha elegante)
+
+                // Rama 3: Mae-eda (Frontal-derecha enmarcando el tronco)
                 new BranchSpline(
-                    new Vector3(0.012f, 0.148f, -0.006f),
-                    new Vector3(0.052f, 0.158f, -0.012f),
-                    new Vector3(0.088f, 0.168f, -0.016f),
-                    new Vector3(0.115f, 0.182f, -0.018f),
+                    new Vector3(0.010f, 0.185f, -0.010f),
+                    new Vector3(0.038f, 0.198f, -0.032f),
+                    new Vector3(0.065f, 0.208f, -0.055f),
+                    new Vector3(0.088f, 0.218f, -0.072f),
                     0.015f, 0.0050f),
-                // Rama 3: Ura-eda (Trasera de profundidad)
+
+                // Rama 4: Chu-eda (Izquierda media-alta extendida)
                 new BranchSpline(
-                    new Vector3(0.004f, 0.178f, 0.010f),
-                    new Vector3(0.002f, 0.188f, 0.042f),
-                    new Vector3(-0.005f, 0.198f, 0.072f),
-                    new Vector3(-0.008f, 0.212f, 0.095f),
-                    0.013f, 0.0048f),
-                // Rama 4: Frontal-Izquierda superior
+                    new Vector3(-0.008f, 0.198f, -0.004f),
+                    new Vector3(-0.042f, 0.212f, -0.018f),
+                    new Vector3(-0.072f, 0.224f, -0.028f),
+                    new Vector3(-0.098f, 0.238f, -0.035f),
+                    0.015f, 0.0050f),
+
+                // Rama 5: Ko-eda (Trasera-izquierda superior de relleno)
                 new BranchSpline(
-                    new Vector3(-0.006f, 0.205f, -0.005f),
-                    new Vector3(-0.035f, 0.215f, -0.028f),
-                    new Vector3(-0.058f, 0.225f, -0.045f),
-                    new Vector3(-0.072f, 0.236f, -0.052f),
-                    0.011f, 0.0042f),
-                // Rama 5: Jushin (Ápice imperial florido)
+                    new Vector3(-0.004f, 0.215f, 0.008f),
+                    new Vector3(-0.024f, 0.228f, 0.034f),
+                    new Vector3(-0.044f, 0.240f, 0.058f),
+                    new Vector3(-0.058f, 0.252f, 0.076f),
+                    0.014f, 0.0048f),
+
+                // Rama 6: Mae-ko-eda (Frontal superior de cúpula)
                 new BranchSpline(
-                    new Vector3(0.005f, 0.225f, 0.006f),
-                    new Vector3(0.008f, 0.242f, 0.004f),
-                    new Vector3(0.010f, 0.258f, 0.002f),
-                    new Vector3(0.012f, 0.272f, 0.000f),
-                    0.012f, 0.0045f)
+                    new Vector3(0.006f, 0.230f, -0.005f),
+                    new Vector3(0.018f, 0.244f, -0.024f),
+                    new Vector3(0.028f, 0.256f, -0.042f),
+                    new Vector3(0.035f, 0.268f, -0.054f),
+                    0.013f, 0.0045f),
+
+                // Rama 7: Jushin (Ápice imperial, corona superior abovedada)
+                new BranchSpline(
+                    new Vector3(0.006f, 0.245f, 0.003f),
+                    new Vector3(0.008f, 0.262f, 0.002f),
+                    new Vector3(0.010f, 0.278f, 0.001f),
+                    new Vector3(0.012f, 0.294f, 0.000f),
+                    0.015f, 0.0050f)
             };
 
+            // Tronco maestro antiguo y nudoso con curvatura Moyogi y 10 raíces Nebari
             Mesh sakuraWoodMesh = ZenBonsaiProceduralMeshes.CreateMasterTreeWoodMesh(
                 "Mesh_Sakura_WoodMasterpiece",
                 new Vector3(0.000f, 0.026f, 0.000f),
-                new Vector3(-0.038f, 0.105f, 0.014f),
-                new Vector3(0.032f, 0.175f, -0.012f),
-                new Vector3(0.008f, 0.245f, 0.004f),
-                0.038f, 0.022f, 0.010f,
+                new Vector3(-0.045f, 0.108f, 0.016f),
+                new Vector3(0.038f, 0.185f, -0.014f),
+                new Vector3(0.008f, 0.255f, 0.004f),
+                0.052f, 0.029f, 0.013f,
                 sakuraBranches,
-                8, 0.85f, 0.14f, 6.5f, 101);
+                10, 1.05f, 0.18f, 7.2f, 101);
 
             trunk.AddComponent<MeshFilter>().sharedMesh = sakuraWoodMesh;
             trunk.AddComponent<MeshRenderer>().sharedMaterial = barkMat;
 
-            // Musgo aterciopelado abrazando las raíces superficiales Nebari del tronco único de cerezo
-            for (int m = 0; m < 4; m++)
+            // 6 Almohadillas de musgo aterciopelado abrazando el amplio perímetro Nebari
+            for (int m = 0; m < 6; m++)
             {
-                float ang = (m * 90f + 20f) * Mathf.Deg2Rad;
+                float ang = (m * 60f + 15f) * Mathf.Deg2Rad;
                 GameObject rootMoss = new GameObject($"Sakura_NebariMoss_{m}");
                 rootMoss.transform.SetParent(trunk.transform, false);
-                rootMoss.transform.localPosition = new Vector3(Mathf.Cos(ang) * 0.026f, 0.040f, Mathf.Sin(ang) * 0.026f);
+                rootMoss.transform.localPosition = new Vector3(Mathf.Cos(ang) * 0.034f, 0.040f, Mathf.Sin(ang) * 0.034f);
                 rootMoss.AddComponent<MeshFilter>().sharedMesh = ZenBonsaiProceduralMeshes.CreateSuisekiStoneMesh(
-                    $"Mesh_SakuraRootMoss_{m}", new Vector3(0.022f, 0.011f, 0.019f), 170 + m);
+                    $"Mesh_SakuraRootMoss_{m}", new Vector3(0.024f, 0.012f, 0.021f), 170 + m);
                 rootMoss.AddComponent<MeshRenderer>().sharedMaterial = mossMat;
             }
 
             Vector3[] padScales =
             {
-                new Vector3(0.125f, 0.048f, 0.105f),
-                new Vector3(0.120f, 0.046f, 0.102f),
-                new Vector3(0.108f, 0.042f, 0.095f),
-                new Vector3(0.098f, 0.040f, 0.088f),
-                new Vector3(0.115f, 0.050f, 0.105f)
+                new Vector3(0.145f, 0.052f, 0.125f),
+                new Vector3(0.140f, 0.050f, 0.120f),
+                new Vector3(0.130f, 0.048f, 0.115f),
+                new Vector3(0.118f, 0.044f, 0.105f),
+                new Vector3(0.128f, 0.046f, 0.112f),
+                new Vector3(0.118f, 0.044f, 0.108f),
+                new Vector3(0.122f, 0.045f, 0.110f),
+                new Vector3(0.138f, 0.054f, 0.128f)
             };
 
             List<Transform> nodes = new List<Transform>();
@@ -1112,11 +1208,11 @@ namespace ZenBonsai.Editor
                 foliagePad.transform.localPosition = padPos;
 
                 Mesh padMesh = ZenBonsaiProceduralMeshes.CreateFoliageCloudPadMesh(
-                    $"Mesh_Sakura_CloudPad_{i}", pScale, 14, 0.72f, 0.15f, 400 + i * 23);
+                    $"Mesh_Sakura_CloudPad_{i}", pScale, 16, 0.74f, 0.16f, 400 + i * 23);
 
                 foliagePad.AddComponent<MeshFilter>().sharedMesh = padMesh;
                 MeshRenderer padRen = foliagePad.AddComponent<MeshRenderer>();
-                padRen.sharedMaterial = (i % 2 == 0) ? petalPinkMat : leafShootMat;
+                padRen.sharedMaterial = (i % 3 == 0) ? leafShootMat : petalPinkMat;
 
                 SphereCollider fCol = foliagePad.AddComponent<SphereCollider>();
                 fCol.radius = pScale.x * 0.45f;
@@ -1133,14 +1229,15 @@ namespace ZenBonsai.Editor
                 model.prunableBranches.Add(pb);
                 nodes.Add(foliagePad.transform);
 
-                // Corolas reales de 5 pétalos de Sakura con estambres dorados sobre la nube
+                // Gran densidad de corolas de 5 pétalos (48 a 56 por nube, más de 400 flores en total)
+                int corollaCount = (i == 7 || i == 0 || i == 1) ? 56 : 48;
                 Mesh blossomMesh = ZenBonsaiProceduralMeshes.CreateSakuraBlossomCorollasMesh(
-                    $"Mesh_Sakura_Corollas_{i}", pScale, 24, 500 + i * 31, out Mesh stamenMesh);
+                    $"Mesh_Sakura_Corollas_{i}", pScale, corollaCount, 500 + i * 31, out Mesh stamenMesh);
 
                 GameObject corollasObj = new GameObject($"Sakura_Blossoms5Petal_{i}");
                 corollasObj.transform.SetParent(foliagePad.transform, false);
                 corollasObj.AddComponent<MeshFilter>().sharedMesh = blossomMesh;
-                corollasObj.AddComponent<MeshRenderer>().sharedMaterial = (i % 2 == 0) ? petalWhiteMat : petalPinkMat;
+                corollasObj.AddComponent<MeshRenderer>().sharedMaterial = (i % 2 == 0) ? petalPinkMat : petalWhiteMat;
 
                 GameObject stamensObj = new GameObject($"Sakura_GoldStamens_{i}");
                 stamensObj.transform.SetParent(foliagePad.transform, false);
@@ -1148,14 +1245,23 @@ namespace ZenBonsai.Editor
                 stamensObj.AddComponent<MeshRenderer>().sharedMaterial = goldMat;
             }
 
-            // Pétalos de cerezo de 5 puntas caídos sobre el musgo
+            // 1. Pétalos enteros sobre el manto de musgo de la maceta
             Mesh fallenBlossomsMesh = ZenBonsaiProceduralMeshes.CreateSakuraBlossomCorollasMesh(
-                "Mesh_Sakura_FallenPetals", new Vector3(0.22f, 0.008f, 0.16f), 14, 777, out Mesh _);
-            GameObject fallenObj = new GameObject("Sakura_FallenBlossoms_OnMoss");
-            fallenObj.transform.SetParent(treeObj.transform, false);
-            fallenObj.transform.localPosition = new Vector3(0f, 0.036f, 0f);
-            fallenObj.AddComponent<MeshFilter>().sharedMesh = fallenBlossomsMesh;
-            fallenObj.AddComponent<MeshRenderer>().sharedMaterial = petalPinkMat;
+                "Mesh_Sakura_FallenPetals_Moss", new Vector3(0.25f, 0.008f, 0.18f), 14, 777, out Mesh _);
+            GameObject fallenMossObj = new GameObject("Sakura_FallenBlossoms_OnMoss");
+            fallenMossObj.transform.SetParent(treeObj.transform, false);
+            fallenMossObj.transform.localPosition = new Vector3(0f, 0.038f, 0f);
+            fallenMossObj.AddComponent<MeshFilter>().sharedMesh = fallenBlossomsMesh;
+            fallenMossObj.AddComponent<MeshRenderer>().sharedMaterial = petalPinkMat;
+
+            // 2. Pétalos sueltos esparcidos poéticamente sobre el lacado brillante de la mesa Urushi
+            Mesh scatteredTablePetalsMesh = ZenBonsaiProceduralMeshes.CreateScatteredTablePetalsMesh(
+                "Mesh_Sakura_TablePetals", 24, 888);
+            GameObject tablePetalsObj = new GameObject("Sakura_FallenPetals_OnTable");
+            tablePetalsObj.transform.SetParent(treeObj.transform, false);
+            tablePetalsObj.transform.localPosition = new Vector3(0f, -0.046f, 0f);
+            tablePetalsObj.AddComponent<MeshFilter>().sharedMesh = scatteredTablePetalsMesh;
+            tablePetalsObj.AddComponent<MeshRenderer>().sharedMaterial = petalPinkMat;
 
             // Floración Plena (Recompensa Full Bloom)
             GameObject blossomRewardObj = new GameObject("Sakura_FullBloom_Reward");
@@ -1163,7 +1269,7 @@ namespace ZenBonsai.Editor
             for (int i = 0; i < sakuraBranches.Length; i++)
             {
                 Mesh extraBloom = ZenBonsaiProceduralMeshes.CreateSakuraBlossomCorollasMesh(
-                    $"Mesh_Sakura_FullBloom_{i}", padScales[i] * 1.12f, 18, 880 + i * 17, out Mesh _);
+                    $"Mesh_Sakura_FullBloom_{i}", padScales[i] * 1.15f, 26, 880 + i * 17, out Mesh _);
                 GameObject bloomLayer = new GameObject($"BloomCrown_{i}");
                 bloomLayer.transform.SetParent(blossomRewardObj.transform, false);
                 bloomLayer.transform.localPosition = sakuraBranches[i].p3 + new Vector3(0f, 0.014f, 0f);
@@ -1471,7 +1577,7 @@ namespace ZenBonsai.Editor
 
         #region 5. EXPOSITOR DE HERRAMIENTAS ORIENTADO AL JUGADOR + PLANTA DE ACENTO KUSAMONO DETRÁS
 
-        private static void BuildToolTray(Transform parent, Material trayMat, Material darkWoodMat, Material steelMat, Material copperMat, Material bambooMat, Material bristleMat, Material goldMat, Material potMat, Material mossMat, Material stoneMat, Material blossomMat)
+        private static void BuildToolTray(Transform parent, Material trayMat, Material darkWoodMat, Material steelMat, Material silverBladeMat, Material copperMat, Material bambooMat, Material bristleMat, Material goldMat, Material potMat, Material mossMat, Material stoneMat, Material blossomMat)
         {
             GameObject trayRoot = new GameObject("ZenToolTray");
             trayRoot.transform.SetParent(parent, false);
@@ -1525,10 +1631,10 @@ namespace ZenBonsai.Editor
             ZenBonsaiTool shearsTool = shearsObj.AddComponent<ZenBonsaiTool>();
             shearsTool.toolType = BonsaiToolType.Shears;
             shearsTool.traySlot = shearsSlot.transform;
-            shearsTool.grabDistance = 0.085f; // Radio ceñido para agarre intencional
+            shearsTool.grabDistance = 0.115f; // Radio amplio y ergonómico para agarre natural
             trayComp.shears = shearsTool;
 
-            // Mangos en bucle tradicional japonés
+            // Mangos en bucle tradicional japonés (acero pavonado oscuro)
             GameObject handleLoopL = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             handleLoopL.transform.SetParent(shearsObj.transform, false);
             handleLoopL.transform.localPosition = new Vector3(-0.02f, 0f, -0.05f);
@@ -1550,13 +1656,14 @@ namespace ZenBonsai.Editor
             pivot.GetComponent<Renderer>().sharedMaterial = goldMat;
             var cPiv = pivot.GetComponent<Collider>(); if (cPiv != null) DestroyImmediate(cPiv);
 
+            // Filos pulidos biselados plateados de alta definición
             GameObject bladeA = GameObject.CreatePrimitive(PrimitiveType.Cube);
             bladeA.name = "BladeA";
             bladeA.transform.SetParent(shearsObj.transform, false);
             bladeA.transform.localPosition = new Vector3(-0.008f, 0.002f, 0.045f);
             bladeA.transform.localScale = new Vector3(0.008f, 0.003f, 0.075f);
             bladeA.transform.localRotation = Quaternion.Euler(0f, 5f, 0f);
-            bladeA.GetComponent<Renderer>().sharedMaterial = steelMat;
+            bladeA.GetComponent<Renderer>().sharedMaterial = silverBladeMat;
             var cBA = bladeA.GetComponent<Collider>(); if (cBA != null) DestroyImmediate(cBA);
 
             GameObject bladeB = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -1565,7 +1672,7 @@ namespace ZenBonsai.Editor
             bladeB.transform.localPosition = new Vector3(0.008f, -0.002f, 0.045f);
             bladeB.transform.localScale = new Vector3(0.008f, 0.003f, 0.075f);
             bladeB.transform.localRotation = Quaternion.Euler(0f, -5f, 0f);
-            bladeB.GetComponent<Renderer>().sharedMaterial = steelMat;
+            bladeB.GetComponent<Renderer>().sharedMaterial = silverBladeMat;
             var cBB = bladeB.GetComponent<Collider>(); if (cBB != null) DestroyImmediate(cBB);
 
             shearsTool.movingPartA = bladeA.transform;
@@ -1603,7 +1710,7 @@ namespace ZenBonsai.Editor
             ZenBonsaiTool broomTool = broomObj.AddComponent<ZenBonsaiTool>();
             broomTool.toolType = BonsaiToolType.Broom;
             broomTool.traySlot = broomSlot.transform;
-            broomTool.grabDistance = 0.085f; // Radio ceñido para agarre intencional
+            broomTool.grabDistance = 0.115f; // Radio amplio y ergonómico para agarre natural
             trayComp.broom = broomTool;
 
             GameObject bambooStick = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
@@ -1700,22 +1807,22 @@ namespace ZenBonsai.Editor
         }
 
         /// <summary>
-        /// Genera un material PBR de diseñador con textura Albedo 512x512 + Mapa de Normales 512x512 (_BumpMap)
+        /// Genera un material PBR de diseñador con textura Albedo 1024x1024 + Mapa de Normales 1024x1024 (_BumpMap)
         /// para que cada tronco único tenga relieve 3D hiperrealista de corteza natural, musgo en la base y nudos.
         /// </summary>
         private static Material CreateOrGetBarkMaterial(string matName, Color baseColor, Color furrowColor, Color highlightColor, float smoothness, int barkStyle)
         {
             Material mat = CreateOrGetPBRMaterial(matName, Color.white, smoothness, 0.0f);
 
-            string texPath = $"Assets/ZenBonsai/Materials/{matName}_v17_Tex.png";
-            string normPath = $"Assets/ZenBonsai/Materials/{matName}_v17_Norm.png";
+            string texPath = $"Assets/ZenBonsai/Materials/{matName}_v22_Tex.png";
+            string normPath = $"Assets/ZenBonsai/Materials/{matName}_v22_Norm.png";
 
             Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>(texPath);
             Texture2D normTex = AssetDatabase.LoadAssetAtPath<Texture2D>(normPath);
 
             if (tex == null || normTex == null)
             {
-                int w = 512, h = 512;
+                int w = 1024, h = 1024;
                 Texture2D genAlbedo = new Texture2D(w, h, TextureFormat.RGBA32, true);
                 Texture2D genNorm = new Texture2D(w, h, TextureFormat.RGBA32, true);
                 Color[] pixels = new Color[w * h];
@@ -1785,7 +1892,7 @@ namespace ZenBonsai.Editor
                 }
 
                 // Calcular mapa de normales 3D a partir del mapa de alturas
-                float bumpStrength = 3.2f;
+                float bumpStrength = 3.8f;
                 for (int y = 0; y < h; y++)
                 {
                     int yUp = (y + 1) % h;
@@ -1829,7 +1936,7 @@ namespace ZenBonsai.Editor
             {
                 mat.EnableKeyword("_NORMALMAP");
                 if (mat.HasProperty("_BumpMap")) mat.SetTexture("_BumpMap", normTex);
-                if (mat.HasProperty("_BumpScale")) mat.SetFloat("_BumpScale", 1.35f);
+                if (mat.HasProperty("_BumpScale")) mat.SetFloat("_BumpScale", 1.50f);
             }
             // Garantizar opacidad absoluta 100%, escritura en ZBuffer y renderizado sólido sin caras huecas
             if (mat.HasProperty("_Surface")) mat.SetFloat("_Surface", 0f);
@@ -2454,6 +2561,78 @@ namespace ZenBonsai.Editor
             sTris.Add(sIdx + 0); sTris.Add(sIdx + 2); sTris.Add(sIdx + 3);
             sTris.Add(sIdx + 0); sTris.Add(sIdx + 3); sTris.Add(sIdx + 4);
             sTris.Add(sIdx + 0); sTris.Add(sIdx + 4); sTris.Add(sIdx + 1);
+        }
+
+        public static Mesh CreateScatteredTablePetalsMesh(string assetName, int count, int seed)
+        {
+            Random.State oldState = Random.state;
+            Random.InitState(seed);
+
+            List<Vector3> verts = new List<Vector3>();
+            List<int> tris = new List<int>();
+            List<Vector2> uvs = new List<Vector2>();
+
+            for (int i = 0; i < count; i++)
+            {
+                // Distribución en anillo elíptico alrededor de la maceta rectangular (ancho 0.34m, fondo 0.25m)
+                float ang = Random.Range(0f, Mathf.PI * 2f);
+                float dist = Random.Range(0.19f, 0.34f);
+                float x = Mathf.Cos(ang) * (dist * 1.15f);
+                float z = Mathf.Sin(ang) * (dist * 0.85f);
+                // Evitar el centro justo donde está la maceta
+                if (Mathf.Abs(x) < 0.17f && Mathf.Abs(z) < 0.13f)
+                {
+                    x += Mathf.Sign(x != 0 ? x : 1f) * 0.06f;
+                }
+
+                Vector3 pos = new Vector3(x, Random.Range(0.0005f, 0.0020f), z);
+                float yaw = Random.Range(0f, 360f);
+                float pitch = Random.Range(-5f, 5f);
+                Quaternion rot = Quaternion.Euler(pitch, yaw, 0f);
+                float scale = Random.Range(0.009f, 0.014f);
+
+                AppendSingleCurvedPetal(verts, tris, uvs, pos, rot, scale);
+            }
+
+            Random.state = oldState;
+
+            Mesh mesh = new Mesh();
+            mesh.SetVertices(verts);
+            mesh.SetTriangles(tris, 0);
+            mesh.SetUVs(0, uvs);
+            return SaveOrReplaceMesh(mesh, assetName);
+        }
+
+        private static void AppendSingleCurvedPetal(
+            List<Vector3> verts, List<int> tris, List<Vector2> uvs,
+            Vector3 center, Quaternion rot, float size)
+        {
+            int idx = verts.Count;
+            float w = size * 0.55f;
+            float l = size;
+
+            Vector3 v0 = center;
+            Vector3 v1 = center + rot * new Vector3(-w * 0.50f, 0.0006f, l * 0.35f);
+            Vector3 v2 = center + rot * new Vector3(-w * 0.35f, 0.0014f, l * 0.88f);
+            Vector3 v3 = center + rot * new Vector3(0f, 0.0018f, l * 0.76f);
+            Vector3 v4 = center + rot * new Vector3(w * 0.35f, 0.0014f, l * 0.88f);
+            Vector3 v5 = center + rot * new Vector3(w * 0.50f, 0.0006f, l * 0.35f);
+
+            verts.Add(v0); verts.Add(v1); verts.Add(v2);
+            verts.Add(v3); verts.Add(v4); verts.Add(v5);
+
+            for (int k = 0; k < 6; k++) uvs.Add(new Vector2(0.5f, 0.5f));
+
+            // Doble cara para que sea visible desde cualquier ángulo en VR
+            tris.Add(idx + 0); tris.Add(idx + 1); tris.Add(idx + 2);
+            tris.Add(idx + 0); tris.Add(idx + 2); tris.Add(idx + 3);
+            tris.Add(idx + 0); tris.Add(idx + 3); tris.Add(idx + 4);
+            tris.Add(idx + 0); tris.Add(idx + 4); tris.Add(idx + 5);
+
+            tris.Add(idx + 0); tris.Add(idx + 2); tris.Add(idx + 1);
+            tris.Add(idx + 0); tris.Add(idx + 3); tris.Add(idx + 2);
+            tris.Add(idx + 0); tris.Add(idx + 4); tris.Add(idx + 3);
+            tris.Add(idx + 0); tris.Add(idx + 5); tris.Add(idx + 4);
         }
 
         public static Mesh CreateMatsuNeedleClustersMesh(string assetName, Vector3 padSize, int tuftCount, int seed)
