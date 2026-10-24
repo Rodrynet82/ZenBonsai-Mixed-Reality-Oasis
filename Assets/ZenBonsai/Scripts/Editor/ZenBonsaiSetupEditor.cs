@@ -471,42 +471,88 @@ namespace ZenBonsai.Editor
             infoCard.SetActive(false);
 
             // =========================================================================
-            // 3. PANEL DE OPCIONES DEL SANTUARIO FRENTE AL JUGADOR
-            // Posicionado ergonómicamente delante del jugador sentado
+            // 3. PERGAMINO DE OPCIONES DEL SANTUARIO (KAKEMONO JAPONÉS) FRENTE AL JUGADOR
+            // Diseño unificado de pergamino colgante tradicional con barras Hinoki y remates Jiku dorados
             // =========================================================================
             GameObject optionsCard = new GameObject("OptionsPanel_Card");
             optionsCard.transform.SetParent(menuRoot.transform, false);
-            optionsCard.transform.localPosition = new Vector3(0.0f, 0.17f, -0.16f);
+            optionsCard.transform.localPosition = new Vector3(0.0f, 0.18f, -0.16f);
             optionsCard.transform.localRotation = Quaternion.Euler(14f, 0f, 0f);
             spatialMenu.optionsPanelBox = optionsCard;
 
+            // Marco exterior Urushi / Seda brocada de montaje
             GameObject optOuter = GameObject.CreatePrimitive(PrimitiveType.Cube);
             optOuter.name = "OptionsCard_OuterFrame";
             optOuter.transform.SetParent(optionsCard.transform, false);
             optOuter.transform.localPosition = Vector3.zero;
-            optOuter.transform.localScale = new Vector3(0.46f, 0.40f, 0.012f);
+            optOuter.transform.localScale = new Vector3(0.48f, 0.44f, 0.012f);
             optOuter.GetComponent<Renderer>().sharedMaterial = urushiMat;
             var ocCol = optOuter.GetComponent<Collider>(); if (ocCol != null) DestroyImmediate(ocCol);
 
+            // Tablero interior Washi / Seda palisandro
             GameObject optInner = GameObject.CreatePrimitive(PrimitiveType.Cube);
             optInner.name = "OptionsCard_InnerBoard";
             optInner.transform.SetParent(optionsCard.transform, false);
             optInner.transform.localPosition = new Vector3(0f, 0f, -0.003f);
-            optInner.transform.localScale = new Vector3(0.438f, 0.378f, 0.009f);
+            optInner.transform.localScale = new Vector3(0.456f, 0.416f, 0.009f);
             optInner.GetComponent<Renderer>().sharedMaterial = rosewoodMat;
             var oiCol = optInner.GetComponent<Collider>(); if (oiCol != null) DestroyImmediate(oiCol);
 
+            // Barra superior del pergamino de Opciones (Kakemono Ten) en madera Hinoki con remates dorados Jiku
+            GameObject optRodTop = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            optRodTop.name = "OptionsKakemono_TopRod";
+            optRodTop.transform.SetParent(optionsCard.transform, false);
+            optRodTop.transform.localPosition = new Vector3(0f, 0.224f, -0.007f);
+            optRodTop.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+            optRodTop.transform.localScale = new Vector3(0.014f, 0.246f, 0.014f);
+            optRodTop.GetComponent<Renderer>().sharedMaterial = hinokiMat;
+            var ortCol = optRodTop.GetComponent<Collider>(); if (ortCol != null) DestroyImmediate(ortCol);
+
+            float[] optJikuX = { -0.254f, 0.254f };
+            for (int j = 0; j < 2; j++)
+            {
+                GameObject oJikuT = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                oJikuT.name = $"OptionsKakemono_TopFinial_{j}";
+                oJikuT.transform.SetParent(optionsCard.transform, false);
+                oJikuT.transform.localPosition = new Vector3(optJikuX[j], 0.224f, -0.007f);
+                oJikuT.transform.localScale = Vector3.one * 0.020f;
+                oJikuT.GetComponent<Renderer>().sharedMaterial = goldMat;
+                var ojtCol = oJikuT.GetComponent<Collider>(); if (ojtCol != null) DestroyImmediate(ojtCol);
+            }
+
+            // Barra inferior contrapeso del pergamino de Opciones (Kakemono Chi)
+            GameObject optRodBottom = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            optRodBottom.name = "OptionsKakemono_BottomRod";
+            optRodBottom.transform.SetParent(optionsCard.transform, false);
+            optRodBottom.transform.localPosition = new Vector3(0f, -0.224f, -0.007f);
+            optRodBottom.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+            optRodBottom.transform.localScale = new Vector3(0.016f, 0.246f, 0.016f);
+            optRodBottom.GetComponent<Renderer>().sharedMaterial = hinokiMat;
+            var orbCol = optRodBottom.GetComponent<Collider>(); if (orbCol != null) DestroyImmediate(orbCol);
+
+            for (int j = 0; j < 2; j++)
+            {
+                GameObject oJikuB = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                oJikuB.name = $"OptionsKakemono_BottomFinial_{j}";
+                oJikuB.transform.SetParent(optionsCard.transform, false);
+                oJikuB.transform.localPosition = new Vector3(optJikuX[j], -0.224f, -0.007f);
+                oJikuB.transform.localScale = Vector3.one * 0.022f;
+                oJikuB.GetComponent<Renderer>().sharedMaterial = goldMat;
+                var ojbCol = oJikuB.GetComponent<Collider>(); if (ojbCol != null) DestroyImmediate(ojbCol);
+            }
+
+            // Filete dorado Maki-e bajo la cabecera del pergamino
             GameObject optGoldRim = GameObject.CreatePrimitive(PrimitiveType.Cube);
             optGoldRim.name = "OptionsCard_GoldBorder";
             optGoldRim.transform.SetParent(optionsCard.transform, false);
-            optGoldRim.transform.localPosition = new Vector3(0f, 0.180f, -0.008f);
-            optGoldRim.transform.localScale = new Vector3(0.425f, 0.006f, 0.005f);
+            optGoldRim.transform.localPosition = new Vector3(0f, 0.146f, -0.008f);
+            optGoldRim.transform.localScale = new Vector3(0.436f, 0.004f, 0.005f);
             optGoldRim.GetComponent<Renderer>().sharedMaterial = goldMat;
             var ogCol = optGoldRim.GetComponent<Collider>(); if (ogCol != null) DestroyImmediate(ogCol);
 
-            // Botón "✕ Cerrar" en la esquina superior derecha del panel de opciones
+            // Botón "✕ Cerrar" en la esquina superior derecha del pergamino de opciones
             spatialMenu.btnCloseOptions = Create3DTouchButton(optionsCard.transform, "Btn_CloseOptions", "✕ Cerrar",
-                new Vector3(0.180f, 0.155f, -0.014f), new Vector3(0.068f, 0.028f, 0.016f), buttonMat, new Color(1.0f, 0.85f, 0.85f), 10);
+                new Vector3(0.184f, 0.178f, -0.014f), new Vector3(0.070f, 0.028f, 0.016f), buttonMat, new Color(1.0f, 0.85f, 0.85f), 10);
 
             // Canvas en alta resolución (dynamicPixelsPerUnit = 5f, escala 0.00035f)
             GameObject optCanvasObj = new GameObject("OptionsCard_Canvas");
@@ -520,56 +566,67 @@ namespace ZenBonsai.Editor
 
             GameObject oTitleObj = new GameObject("OptionsTitle");
             oTitleObj.transform.SetParent(optCanvasObj.transform, false);
-            oTitleObj.transform.localPosition = new Vector3(-60f, 442f, 0f);
+            oTitleObj.transform.localPosition = new Vector3(-75f, 518f, 0f);
             Text oTitle = oTitleObj.AddComponent<Text>();
             oTitle.font = uiFont;
             oTitle.alignment = TextAnchor.MiddleLeft;
-            oTitle.fontSize = 32;
+            oTitle.fontSize = 29;
             oTitle.fontStyle = FontStyle.Bold;
-            oTitle.text = "⚙️ OPCIONES DEL SANTUARIO ZEN";
+            oTitle.text = "⚙️ PERGAMINO DE OPCIONES DEL SANTUARIO";
             oTitle.color = new Color(0.98f, 0.88f, 0.52f);
-            oTitleObj.GetComponent<RectTransform>().sizeDelta = new Vector2(850, 48);
+            oTitleObj.GetComponent<RectTransform>().sizeDelta = new Vector2(920, 44);
+            spatialMenu.optionsPanelTitle = oTitle;
 
             GameObject oSubtitleObj = new GameObject("OptionsSubtitle");
             oSubtitleObj.transform.SetParent(optCanvasObj.transform, false);
-            oSubtitleObj.transform.localPosition = new Vector3(0f, 380f, 0f);
+            oSubtitleObj.transform.localPosition = new Vector3(0f, 456f, 0f);
             Text oSubtitle = oSubtitleObj.AddComponent<Text>();
             oSubtitle.font = uiFont;
             oSubtitle.alignment = TextAnchor.MiddleCenter;
-            oSubtitle.fontSize = 18;
+            oSubtitle.fontSize = 17;
             oSubtitle.fontStyle = FontStyle.Normal;
-            oSubtitle.text = "Toca directamente con el dedo índice para ajustar el santuario y la mesa";
-            oSubtitle.color = new Color(0.80f, 0.90f, 0.98f, 0.85f);
-            oSubtitleObj.GetComponent<RectTransform>().sizeDelta = new Vector2(1100, 32);
+            oSubtitle.text = "Toca con el dedo índice para personalizar el idioma, música, entorno y ritmo de cuidado";
+            oSubtitle.color = new Color(0.84f, 0.92f, 0.99f, 0.90f);
+            oSubtitleObj.GetComponent<RectTransform>().sizeDelta = new Vector2(1200, 30);
+            spatialMenu.optionsPanelSubtitle = oSubtitle;
 
-            // Cuadrícula 2x4 de botones con detección exacta de la yema del índice (Columna Izq: x = -0.106m, Columna Der: x = +0.106m)
-            // Fila 1 (y = +0.076m): Mesa Fija vs Centrar Mesa
+            // Cuadrícula 2x5 de botones táctiles dentro del pergamino Kakemono (Columna Izq: x = -0.108m, Columna Der: x = +0.108m)
+            Vector3 optBtnSize = new Vector3(0.194f, 0.046f, 0.018f);
+
+            // Fila 1 (y = +0.104m): Mesa Fija vs Centrar Mesa
             spatialMenu.btnOptLockTable = Create3DTouchButton(optionsCard.transform, "Btn_OptLockTable", "🔓 Mesa:\nMóvil (2 Manos)",
-                new Vector3(-0.106f, 0.076f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), buttonMat, Color.white, 11);
+                new Vector3(-0.108f, 0.104f, -0.014f), optBtnSize, buttonMat, Color.white, 10.5f);
 
             spatialMenu.btnOptRecenter = Create3DTouchButton(optionsCard.transform, "Btn_OptRecenter", "🎯 Centrar\nMesa Frente a Mí",
-                new Vector3(0.106f, 0.076f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), infoButtonMat, new Color(0.92f, 0.99f, 1.0f), 11);
+                new Vector3(0.108f, 0.104f, -0.014f), optBtnSize, infoButtonMat, new Color(0.92f, 0.99f, 1.0f), 10.5f);
 
-            // Fila 2 (y = +0.016m): Iluminación vs Entorno Virtual (Santuario Fuji / MR)
+            // Fila 2 (y = +0.046m): Idioma (ES / EN / JA) vs Velocidad / Ritmo de Cuidado
+            spatialMenu.btnOptLanguage = Create3DTouchButton(optionsCard.transform, "Btn_OptLanguage", "🌐 Idioma:\nEspañol (ES)",
+                new Vector3(-0.108f, 0.046f, -0.014f), optBtnSize, infoButtonMat, new Color(1.0f, 0.94f, 0.72f), 10.5f);
+
+            spatialMenu.btnOptCareSpeed = Create3DTouchButton(optionsCard.transform, "Btn_OptCareSpeed", "⏳ Ritmo Cuidado:\nNormal (1.0x)",
+                new Vector3(0.108f, 0.046f, -0.014f), optBtnSize, buttonMat, new Color(0.78f, 1.0f, 0.88f), 10.5f);
+
+            // Fila 3 (y = -0.012m): Iluminación vs Entorno Virtual (Santuario Fuji / MR)
             spatialMenu.btnOptLighting = Create3DTouchButton(optionsCard.transform, "Btn_OptLighting", "🌅 Ambiente:\nDía Zen",
-                new Vector3(-0.106f, 0.016f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), buttonMat, new Color(1.0f, 0.92f, 0.68f), 11);
+                new Vector3(-0.108f, -0.012f, -0.014f), optBtnSize, buttonMat, new Color(1.0f, 0.92f, 0.68f), 10.5f);
 
             spatialMenu.btnOptEnvironment = Create3DTouchButton(optionsCard.transform, "Btn_OptEnvironment", "🥽 Entorno:\nPassthrough MR",
-                new Vector3(0.106f, 0.016f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), buttonMat, new Color(0.70f, 0.92f, 1.0f), 11);
+                new Vector3(0.108f, -0.012f, -0.014f), optBtnSize, buttonMat, new Color(0.70f, 0.92f, 1.0f), 10.5f);
 
-            // Fila 3 (y = -0.044m): Música Zen vs Enfoque de Cuidado
-            spatialMenu.btnOptMusic = Create3DTouchButton(optionsCard.transform, "Btn_OptMusic", "🎵 Música:\nShakuhachi",
-                new Vector3(-0.106f, -0.044f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), buttonMat, new Color(0.95f, 0.85f, 1.0f), 11);
+            // Fila 4 (y = -0.070m): Música Zen (7 pistas) vs Enfoque de Cuidado (1, 2 o 3 árboles)
+            spatialMenu.btnOptMusic = Create3DTouchButton(optionsCard.transform, "Btn_OptMusic", "🎵 Música:\nFlauta Shakuhachi",
+                new Vector3(-0.108f, -0.070f, -0.014f), optBtnSize, buttonMat, new Color(0.95f, 0.85f, 1.0f), 10.5f);
 
             spatialMenu.btnOptTreeFocus = Create3DTouchButton(optionsCard.transform, "Btn_OptTreeFocus", "🌿 Cuidado:\n3 Árboles (Tríada)",
-                new Vector3(0.106f, -0.044f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), buttonMat, new Color(0.82f, 0.98f, 0.82f), 11);
+                new Vector3(0.108f, -0.070f, -0.014f), optBtnSize, buttonMat, new Color(0.82f, 0.98f, 0.82f), 10.5f);
 
-            // Fila 4 (y = -0.104m): Volumen de Sonido vs Pétalos de Sakura
-            spatialMenu.btnOptSound = Create3DTouchButton(optionsCard.transform, "Btn_OptSound", "🔊 Sonido:\n100%",
-                new Vector3(-0.106f, -0.104f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), buttonMat, new Color(0.84f, 0.98f, 0.86f), 11);
+            // Fila 5 (y = -0.128m): Volumen de Sonido vs Lluvia de Pétalos de Sakura
+            spatialMenu.btnOptSound = Create3DTouchButton(optionsCard.transform, "Btn_OptSound", "🔊 Sonido:\n100% (Normal)",
+                new Vector3(-0.108f, -0.128f, -0.014f), optBtnSize, buttonMat, new Color(0.84f, 0.98f, 0.86f), 10.5f);
 
             spatialMenu.btnOptPetals = Create3DTouchButton(optionsCard.transform, "Btn_OptPetals", "🌸 Pétalos:\nActivados",
-                new Vector3(0.106f, -0.104f, -0.014f), new Vector3(0.184f, 0.052f, 0.018f), buttonMat, new Color(1.0f, 0.82f, 0.90f), 11);
+                new Vector3(0.108f, -0.128f, -0.014f), optBtnSize, buttonMat, new Color(1.0f, 0.82f, 0.90f), 10.5f);
 
             optionsCard.SetActive(false);
 
@@ -2153,22 +2210,24 @@ namespace ZenBonsai.Editor
             rb.useGravity = false;
 
             // Marco circular exterior dorado (Fukurin / Medallón de laca y oro estilo Kamon)
+            // Nota: Cylinder en Unity tiene altura 2 (-1 a +1), así que scale.y = 0.0035f ocupa de z = -0.0025f a +0.0045f
             GameObject outerRim = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             outerRim.name = "MedallionRim";
             outerRim.transform.SetParent(btnObj.transform, false);
-            outerRim.transform.localPosition = new Vector3(0f, 0f, 0.002f);
+            outerRim.transform.localPosition = new Vector3(0f, 0f, 0.001f);
             outerRim.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-            outerRim.transform.localScale = new Vector3(diameter * 1.08f, 0.005f, diameter * 1.08f);
-            outerRim.GetComponent<Renderer>().sharedMaterial = goldMat;
+            outerRim.transform.localScale = new Vector3(diameter * 1.08f, 0.0035f, diameter * 1.08f);
+            Material rimInstanceMat = CreateOrGetPBRMaterial($"Zen_Rim_{name}", goldMat.color, 0.88f, 0.70f);
+            outerRim.GetComponent<Renderer>().sharedMaterial = rimInstanceMat;
             var rimCol = outerRim.GetComponent<Collider>(); if (rimCol != null) DestroyImmediate(rimCol);
 
-            // Plato interactivo circular (se hunde suavemente al tocar con la yema del dedo)
+            // Plato interactivo circular (scale.y = 0.0045f -> cara frontal en z = -0.0045f)
             GameObject plate = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             plate.name = "Plate";
             plate.transform.SetParent(btnObj.transform, false);
             plate.transform.localPosition = Vector3.zero;
             plate.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-            plate.transform.localScale = new Vector3(diameter, 0.008f, diameter);
+            plate.transform.localScale = new Vector3(diameter, 0.0045f, diameter);
             Material btnInstanceMat = CreateOrGetPBRMaterial($"Zen_Btn_{name}", baseMat.color, 0.72f, 0.06f);
             plate.GetComponent<Renderer>().sharedMaterial = btnInstanceMat;
             var plateCol = plate.GetComponent<Collider>(); if (plateCol != null) DestroyImmediate(plateCol);
@@ -2176,12 +2235,12 @@ namespace ZenBonsai.Editor
             // Halo circular de neón (8 segmentos en arco que se iluminan cuando el árbol pide cuidado)
             Renderer[] neonRenderers = new Renderer[8];
             Material neonBaseMat = CreateOrGetPBRMaterial($"Zen_NeonRing_{name}", new Color(0.15f, 0.90f, 1.0f), 0.92f, 0.0f);
-            float segRadius = diameter * 0.52f;
+            float segRadius = diameter * 0.54f;
             float arcLength = (2f * Mathf.PI * segRadius / 8f) * 0.76f;
             for (int i = 0; i < 8; i++)
             {
                 float angle = i * (360f / 8f) * Mathf.Deg2Rad;
-                Vector3 segPos = new Vector3(Mathf.Cos(angle) * segRadius, Mathf.Sin(angle) * segRadius, -0.006f);
+                Vector3 segPos = new Vector3(Mathf.Cos(angle) * segRadius, Mathf.Sin(angle) * segRadius, -0.007f);
                 GameObject neonSeg = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 neonSeg.name = $"NeonSeg_{i}";
                 neonSeg.transform.SetParent(btnObj.transform, false);
@@ -2195,10 +2254,11 @@ namespace ZenBonsai.Editor
                 neonRenderers[i] = nr;
             }
 
-            // Canvas en alta resolución (dynamicPixelsPerUnit = 5f, escala 0.00035f para máxima nitidez en VR)
+            // Canvas en alta resolución situado claramente DELANTE de la cara frontal del cilindro (z = -0.011f frente a -0.0045f)
+            // para que el icono, Kanji, nombre del bonsái y subtítulo sean 100% visibles en todo momento
             GameObject canvasObj = new GameObject("MedallionCanvas");
             canvasObj.transform.SetParent(btnObj.transform, false);
-            canvasObj.transform.localPosition = new Vector3(0f, 0f, -(0.008f * 0.5f + 0.002f));
+            canvasObj.transform.localPosition = new Vector3(0f, 0f, -0.011f);
             canvasObj.transform.localScale = Vector3.one * 0.00035f;
 
             Canvas canvas = canvasObj.AddComponent<Canvas>();
@@ -2212,15 +2272,17 @@ namespace ZenBonsai.Editor
             // Símbolo e icono superior (🌸 桜 / 🌲 松 / 🍁 楓)
             GameObject iconObj = new GameObject("IconText");
             iconObj.transform.SetParent(canvasObj.transform, false);
-            iconObj.transform.localPosition = new Vector3(0f, 32f, 0f);
+            iconObj.transform.localPosition = new Vector3(0f, 34f, 0f);
             Text iconTxt = iconObj.AddComponent<Text>();
             iconTxt.font = uiFont;
             iconTxt.alignment = TextAnchor.MiddleCenter;
             iconTxt.fontStyle = FontStyle.Bold;
-            iconTxt.fontSize = 28;
+            iconTxt.fontSize = 27;
+            iconTxt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            iconTxt.verticalOverflow = VerticalWrapMode.Overflow;
             iconTxt.text = $"{symbolIcon} {kanjiBadge}";
             iconTxt.color = accentColor;
-            iconObj.GetComponent<RectTransform>().sizeDelta = new Vector2(210, 36);
+            iconObj.GetComponent<RectTransform>().sizeDelta = new Vector2(210, 38);
 
             // Nombre principal del árbol en letras latinas ("SAKURA", "MATSU", "MOMIJI")
             GameObject nameObj = new GameObject("NameText");
@@ -2231,30 +2293,35 @@ namespace ZenBonsai.Editor
             nameTxt.alignment = TextAnchor.MiddleCenter;
             nameTxt.fontStyle = FontStyle.Bold;
             nameTxt.fontSize = 22;
+            nameTxt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            nameTxt.verticalOverflow = VerticalWrapMode.Overflow;
             nameTxt.text = treeName.ToUpperInvariant();
             nameTxt.color = Color.white;
-            nameObj.GetComponent<RectTransform>().sizeDelta = new Vector2(210, 28);
+            nameObj.GetComponent<RectTransform>().sizeDelta = new Vector2(210, 32);
 
             // Subtítulo botánico ("Cerezo Flor", "Pino Negro", "Arce Rojo")
             GameObject subObj = new GameObject("SubText");
             subObj.transform.SetParent(canvasObj.transform, false);
-            subObj.transform.localPosition = new Vector3(0f, -28f, 0f);
+            subObj.transform.localPosition = new Vector3(0f, -30f, 0f);
             Text subTxt = subObj.AddComponent<Text>();
             subTxt.font = uiFont;
             subTxt.alignment = TextAnchor.MiddleCenter;
             subTxt.fontStyle = FontStyle.Normal;
             subTxt.fontSize = 13;
+            subTxt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            subTxt.verticalOverflow = VerticalWrapMode.Overflow;
             subTxt.text = subtitle;
-            subTxt.color = new Color(0.92f, 0.92f, 0.92f, 0.88f);
-            subObj.GetComponent<RectTransform>().sizeDelta = new Vector2(210, 20);
+            subTxt.color = new Color(0.95f, 0.95f, 0.95f, 0.92f);
+            subObj.GetComponent<RectTransform>().sizeDelta = new Vector2(210, 24);
 
             ZenTouchButton touchBtn = btnObj.AddComponent<ZenTouchButton>();
             touchBtn.visualPlate = plate.transform;
             touchBtn.neonBorderRenderers = neonRenderers;
             touchBtn.buttonLabelText = nameTxt;
+            touchBtn.buttonSubLabelText = subTxt;
             touchBtn.touchHalfSize = new Vector2(diameter * 0.52f, diameter * 0.52f);
             touchBtn.isCircular = true;
-            touchBtn.pressDisplacement = new Vector3(0f, 0f, 0.010f);
+            touchBtn.pressDisplacement = new Vector3(0f, 0f, 0.008f);
             return touchBtn;
         }
 
@@ -2299,7 +2366,8 @@ namespace ZenBonsai.Editor
             topBracket.transform.SetParent(btnObj.transform, false);
             topBracket.transform.localPosition = new Vector3(0f, size.y * 0.525f, -0.004f);
             topBracket.transform.localScale = new Vector3(size.x * 1.06f, 0.0035f, 0.006f);
-            topBracket.GetComponent<Renderer>().sharedMaterial = goldMat;
+            Material bracketMat = CreateOrGetPBRMaterial($"Zen_Rim_{name}", goldMat.color, 0.88f, 0.70f);
+            topBracket.GetComponent<Renderer>().sharedMaterial = bracketMat;
             var tbCol = topBracket.GetComponent<Collider>(); if (tbCol != null) DestroyImmediate(tbCol);
 
             // Plato interactivo interior que se hunde al presionar
@@ -2352,7 +2420,7 @@ namespace ZenBonsai.Editor
             // Canvas en alta resolución
             GameObject textCanvasObj = new GameObject("ThematicCanvas");
             textCanvasObj.transform.SetParent(btnObj.transform, false);
-            textCanvasObj.transform.localPosition = new Vector3(0f, 0f, -(size.z * 0.5f + 0.002f));
+            textCanvasObj.transform.localPosition = new Vector3(0f, 0f, -(size.z * 0.5f + 0.003f));
             textCanvasObj.transform.localScale = new Vector3(0.00035f, 0.00035f, 0.00035f);
 
             Canvas canvas = textCanvasObj.AddComponent<Canvas>();
@@ -2374,6 +2442,8 @@ namespace ZenBonsai.Editor
             kanjiTxt.alignment = TextAnchor.MiddleCenter;
             kanjiTxt.fontStyle = FontStyle.Bold;
             kanjiTxt.fontSize = 15;
+            kanjiTxt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            kanjiTxt.verticalOverflow = VerticalWrapMode.Overflow;
             kanjiTxt.text = $"【 {kanjiBadge} 】";
             kanjiTxt.color = new Color(0.98f, 0.85f, 0.40f);
             kanjiObj.GetComponent<RectTransform>().sizeDelta = new Vector2(cw, 22);
@@ -2387,6 +2457,8 @@ namespace ZenBonsai.Editor
             titleTxt.alignment = TextAnchor.MiddleCenter;
             titleTxt.fontStyle = FontStyle.Bold;
             titleTxt.fontSize = 22;
+            titleTxt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            titleTxt.verticalOverflow = VerticalWrapMode.Overflow;
             titleTxt.text = title;
             titleTxt.color = textColor;
             titleObj.GetComponent<RectTransform>().sizeDelta = new Vector2(cw, 32);
@@ -2400,6 +2472,8 @@ namespace ZenBonsai.Editor
             subTxt.alignment = TextAnchor.MiddleCenter;
             subTxt.fontStyle = FontStyle.Normal;
             subTxt.fontSize = 13;
+            subTxt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            subTxt.verticalOverflow = VerticalWrapMode.Overflow;
             subTxt.text = subtitle;
             subTxt.color = new Color(0.88f, 0.94f, 1.0f, 0.85f);
             subObj.GetComponent<RectTransform>().sizeDelta = new Vector2(cw, 20);
@@ -2408,6 +2482,7 @@ namespace ZenBonsai.Editor
             touchBtn.visualPlate = plate.transform;
             touchBtn.neonBorderRenderers = neonRenderers;
             touchBtn.buttonLabelText = titleTxt;
+            touchBtn.buttonSubLabelText = subTxt;
             touchBtn.touchHalfSize = new Vector2(size.x * 0.52f, size.y * 0.52f);
             touchBtn.isCircular = false;
             touchBtn.pressDisplacement = new Vector3(0f, 0f, 0.010f);

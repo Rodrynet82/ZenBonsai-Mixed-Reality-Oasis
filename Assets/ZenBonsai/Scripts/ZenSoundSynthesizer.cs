@@ -40,15 +40,15 @@ namespace ZenBonsai
 
         public void CycleMusicStyle()
         {
-            SetMusicStyle((currentMusicStyle + 1) % 4);
+            SetMusicStyle((currentMusicStyle + 1) % 7);
         }
 
         public void SetMusicStyle(int style)
         {
-            currentMusicStyle = Mathf.Clamp(style, 0, 3);
+            currentMusicStyle = Mathf.Clamp(style, 0, 6);
             if (ambientSource == null) return;
 
-            if (currentMusicStyle == 3)
+            if (currentMusicStyle == 6)
             {
                 ambientSource.Stop();
                 return;
@@ -62,12 +62,24 @@ namespace ZenBonsai
                     ambientSource.volume = 0.22f;
                     break;
                 case 1:
-                    clip = GenerateTibetanSingingBowls();
+                    clip = GenerateImperialKotoHarp();
                     ambientSource.volume = 0.24f;
                     break;
                 case 2:
+                    clip = GenerateTibetanSingingBowls();
+                    ambientSource.volume = 0.24f;
+                    break;
+                case 3:
+                    clip = GenerateKyotoRainAndShishiOdoshi();
+                    ambientSource.volume = 0.20f;
+                    break;
+                case 4:
                     clip = GenerateWaterfallNatureAmbience();
                     ambientSource.volume = 0.18f;
+                    break;
+                case 5:
+                    clip = GenerateTempleFurinAndGong();
+                    ambientSource.volume = 0.22f;
                     break;
             }
 
@@ -247,6 +259,129 @@ namespace ZenBonsai
             }
 
             AudioClip clip = AudioClip.Create("WaterfallNature", totalSamples, 1, sampleRate, false);
+            clip.SetData(samples, 0);
+            return clip;
+        }
+
+        private AudioClip GenerateImperialKotoHarp()
+        {
+            int sampleRate = 44100;
+            float duration = 12.0f;
+            int totalSamples = (int)(sampleRate * duration);
+            float[] samples = new float[totalSamples];
+
+            // Escala japonesa Hirajoshi (La, Si, Do, Mi, Fa, La octava): 220, 246.94, 261.63, 329.63, 349.23, 440, 493.88, 523.25
+            float[] kotoScale = { 220.00f, 246.94f, 261.63f, 329.63f, 349.23f, 440.00f, 493.88f, 523.25f };
+            float[] pluckTimes = { 0.2f, 1.0f, 1.8f, 2.8f, 3.8f, 4.6f, 5.4f, 6.6f, 7.6f, 8.4f, 9.4f, 10.6f };
+            int[] pluckNotes = { 0, 2, 3, 5, 4, 3, 2, 0, 3, 5, 7, 5 };
+
+            for (int i = 0; i < totalSamples; i++)
+            {
+                float t = (float)i / sampleRate;
+                float sample = Mathf.Sin(2f * Mathf.PI * 110.0f * t) * 0.04f; // Bordón grave de seda
+
+                for (int p = 0; p < pluckTimes.Length; p++)
+                {
+                    float start = pluckTimes[p];
+                    if (t >= start && t < start + 2.4f)
+                    {
+                        float lt = t - start;
+                        float f = kotoScale[pluckNotes[p]];
+                        // Cuerda pulsada con plectro de marfil (ataque rápido y caída resonante cálida)
+                        float env = Mathf.Exp(-2.6f * lt) * (1f - Mathf.Exp(-140f * lt));
+                        float wave = Mathf.Sin(2f * Mathf.PI * f * lt) * 0.65f +
+                                     Mathf.Sin(4f * Mathf.PI * f * lt) * 0.24f +
+                                     Mathf.Sin(6f * Mathf.PI * f * lt) * 0.11f;
+                        sample += wave * env * 0.24f;
+                    }
+                }
+                samples[i] = Mathf.Clamp(sample, -1f, 1f);
+            }
+
+            AudioClip clip = AudioClip.Create("ImperialKotoHarp", totalSamples, 1, sampleRate, false);
+            clip.SetData(samples, 0);
+            return clip;
+        }
+
+        private AudioClip GenerateKyotoRainAndShishiOdoshi()
+        {
+            int sampleRate = 44100;
+            float duration = 10.0f;
+            int totalSamples = (int)(sampleRate * duration);
+            float[] samples = new float[totalSamples];
+
+            float lp1 = 0f;
+            float lp2 = 0f;
+            float[] bambooStrikes = { 2.4f, 7.4f };
+
+            for (int i = 0; i < totalSamples; i++)
+            {
+                float t = (float)i / sampleRate;
+                // Lluvia suave filtrada sobre hojas y musgo
+                float noise = (Random.value * 2f - 1f);
+                lp1 = Mathf.Lerp(lp1, noise, 0.14f);
+                lp2 = Mathf.Lerp(lp2, lp1, 0.09f);
+                float rain = lp2 * 0.12f * (0.9f + 0.1f * Mathf.Sin(2f * Mathf.PI * 0.2f * t));
+
+                // Golpe hueco de bambú con agua (Shishi-odoshi)
+                float clack = 0f;
+                for (int b = 0; b < bambooStrikes.Length; b++)
+                {
+                    float st = bambooStrikes[b];
+                    if (t >= st && t < st + 0.35f)
+                    {
+                        float lt = t - st;
+                        float env = Mathf.Exp(-22f * lt);
+                        clack += (Mathf.Sin(2f * Mathf.PI * 390f * lt) * 0.7f +
+                                  Mathf.Sin(2f * Mathf.PI * 760f * lt) * 0.3f) * env * 0.22f;
+                    }
+                }
+
+                samples[i] = Mathf.Clamp(rain + clack, -1f, 1f);
+            }
+
+            AudioClip clip = AudioClip.Create("KyotoRainShishiOdoshi", totalSamples, 1, sampleRate, false);
+            clip.SetData(samples, 0);
+            return clip;
+        }
+
+        private AudioClip GenerateTempleFurinAndGong()
+        {
+            int sampleRate = 44100;
+            float duration = 10.0f;
+            int totalSamples = (int)(sampleRate * duration);
+            float[] samples = new float[totalSamples];
+
+            float[] furinTimes = { 0.8f, 2.5f, 4.7f, 6.3f, 8.2f };
+            float[] furinFreqs = { 1567.98f, 1760.00f, 2093.00f, 1567.98f, 2349.32f };
+
+            for (int i = 0; i < totalSamples; i++)
+            {
+                float t = (float)i / sampleRate;
+                // Gong budista grave de fondo (Bonsho)
+                float gongEnv = Mathf.Exp(-0.35f * (t % 5.0f)) * (1f - Mathf.Exp(-25f * (t % 5.0f)));
+                float gong = (Mathf.Sin(2f * Mathf.PI * 98.0f * t) * 0.6f +
+                              Mathf.Sin(2f * Mathf.PI * 147.0f * t) * 0.25f +
+                              Mathf.Sin(2f * Mathf.PI * 272.0f * t) * 0.15f) * gongEnv * 0.14f;
+
+                // Campanillas de viento de cristal japonés (Edo Furin)
+                float furin = 0f;
+                for (int f = 0; f < furinTimes.Length; f++)
+                {
+                    if (t >= furinTimes[f] && t < furinTimes[f] + 1.8f)
+                    {
+                        float lt = t - furinTimes[f];
+                        float freq = furinFreqs[f];
+                        float env = Mathf.Exp(-3.2f * lt);
+                        furin += (Mathf.Sin(2f * Mathf.PI * freq * lt) +
+                                  Mathf.Sin(2f * Mathf.PI * (freq * 2.41f) * lt) * 0.28f) * env * 0.08f;
+                    }
+                }
+
+                samples[i] = Mathf.Clamp(gong + furin, -1f, 1f);
+            }
+
+            AudioClip clip = AudioClip.Create("TempleFurinAndGong", totalSamples, 1, sampleRate, false);
             clip.SetData(samples, 0);
             return clip;
         }

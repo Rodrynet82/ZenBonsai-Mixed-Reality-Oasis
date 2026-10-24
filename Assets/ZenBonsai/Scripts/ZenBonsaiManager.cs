@@ -62,6 +62,26 @@ namespace ZenBonsai
         [Tooltip("1 = Solo el árbol activo evoluciona; 2 = Sakura y Matsu; 3 = Tríada completa")]
         public int treeFocusMode = 3;
 
+        [Header("Velocidad / Ritmo de Cuidado (Opciones)")]
+        [Tooltip("0 = Normal (1x), 1 = Rápido (2.2x), 2 = Muy Rápido (3.8x), 3 = Lento (0.45x)")]
+        public int careSpeedIndex = 0;
+
+        public float GetCareSpeedMultiplier()
+        {
+            switch (careSpeedIndex)
+            {
+                case 1: return 2.2f;  // Dinámico / Rápido
+                case 2: return 3.8f;  // Maestro / Muy Rápido
+                case 3: return 0.45f; // Meditación / Lento
+                default: return 1.0f; // Equilibrado / Normal
+            }
+        }
+
+        public void CycleCareSpeed()
+        {
+            careSpeedIndex = (careSpeedIndex + 1) % 4;
+        }
+
         public void CycleTreeFocusMode()
         {
             treeFocusMode++;
@@ -435,7 +455,7 @@ namespace ZenBonsai
         private void UpdateSingleSpeciesCare(TreeType species, SpeciesCareData data)
         {
             bool isActiveTree = (species == ActiveSpecies);
-            float dt = Time.deltaTime;
+            float dt = Time.deltaTime * GetCareSpeedMultiplier();
 
             // 1. Consumo lento y meditativo de hidratación (cada árbol a su ritmo natural)
             float bgFactor = isActiveTree ? 1.0f : backgroundHydrationFactor;
@@ -534,7 +554,7 @@ namespace ZenBonsai
             // Solo como máximo 1 oruga activa a la vez
             if (currentActivePest != null) return;
 
-            pestSpawnTimer -= Time.deltaTime;
+            pestSpawnTimer -= Time.deltaTime * GetCareSpeedMultiplier();
             if (pestSpawnTimer <= 0f)
             {
                 pestSpawnTimer = Random.Range(24f, 36f);
@@ -561,7 +581,7 @@ namespace ZenBonsai
             bugRb.useGravity = false;
 
             ZenPest pest = bugObj.AddComponent<ZenPest>();
-            pest.crawlSpeed = 0.036f; // Avance pausado (~28 segundos subiendo pegada a la corteza del tronco y rama)
+            pest.crawlSpeed = 0.036f * Mathf.Lerp(1f, GetCareSpeedMultiplier(), 0.45f); // Avance escalado suavemente según el ritmo elegido
             currentActivePest = pest;
 
             pest.InitializeOnTrunk(ActiveSpecies, targetLeaf.localPosition);
@@ -575,8 +595,9 @@ namespace ZenBonsai
         public void WaterTree(float amount)
         {
             SpeciesCareData data = GetCareData(ActiveSpecies);
-            data.hydration = Mathf.Clamp(data.hydration + amount, 0f, 100f);
-            data.harmony = Mathf.Clamp(data.harmony + amount * 0.12f, 0f, 100f);
+            float actionBoost = careSpeedIndex == 1 ? 1.25f : (careSpeedIndex == 2 ? 1.55f : 1.0f);
+            data.hydration = Mathf.Clamp(data.hydration + amount * actionBoost, 0f, 100f);
+            data.harmony = Mathf.Clamp(data.harmony + amount * 0.12f * actionBoost, 0f, 100f);
             SyncActiveStatsFromSpecies(ActiveSpecies);
         }
 

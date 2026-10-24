@@ -27,6 +27,7 @@ namespace ZenBonsai
         [Header("Marco de Neón (Aviso de Cuidado)")]
         public Renderer[] neonBorderRenderers;
         public UnityEngine.UI.Text buttonLabelText;
+        public UnityEngine.UI.Text buttonSubLabelText;
 
         [Header("Audio")]
         public bool playChimeSound = false;
@@ -35,6 +36,9 @@ namespace ZenBonsai
         private Vector3 initialLocalScale;
         private Vector3 targetLocalPos;
         private Renderer plateRenderer;
+        private Renderer outerRimRenderer;
+        private UnityEngine.UI.Text[] allButtonTexts;
+        private Color[] initialTextColors;
         private Color defaultColor = new Color(0.5f, 0.5f, 0.5f);
         private bool isHighlighted = false;
         private bool isInitialized = false;
@@ -68,6 +72,20 @@ namespace ZenBonsai
             if (plateRenderer != null && plateRenderer.sharedMaterial != null)
             {
                 defaultColor = plateRenderer.sharedMaterial.color;
+            }
+
+            Transform rimTr = transform.Find("MedallionRim");
+            if (rimTr == null) rimTr = transform.Find("ThematicGoldBracket");
+            if (rimTr != null) outerRimRenderer = rimTr.GetComponent<Renderer>();
+
+            allButtonTexts = GetComponentsInChildren<UnityEngine.UI.Text>(true);
+            if (allButtonTexts != null)
+            {
+                initialTextColors = new Color[allButtonTexts.Length];
+                for (int i = 0; i < allButtonTexts.Length; i++)
+                {
+                    initialTextColors[i] = allButtonTexts[i] != null ? allButtonTexts[i].color : Color.white;
+                }
             }
         }
 
@@ -295,6 +313,14 @@ namespace ZenBonsai
             }
         }
 
+        public void SetSubLabelText(string text)
+        {
+            if (buttonSubLabelText != null && buttonSubLabelText.text != text)
+            {
+                buttonSubLabelText.text = text;
+            }
+        }
+
         private void UpdateNeonVisuals(float pulseFactor)
         {
             if (!Application.isPlaying) return;
@@ -415,27 +441,79 @@ namespace ZenBonsai
             Material mat = plateRenderer.material;
             if (isHighlighted)
             {
-                // Botón activo: iluminado con brillo cálido e intenso y ligeramente elevado
-                Color litColor = Color.Lerp(defaultColor, Color.white, 0.38f);
-                Color emission = defaultColor * 0.65f + new Color(0.18f, 0.16f, 0.12f);
+                // Botón activo: iluminado con brillo cálido e intenso y texto 100% luminoso
+                Color litColor = Color.Lerp(defaultColor, Color.white, 0.42f);
+                Color emission = defaultColor * 1.15f + new Color(0.28f, 0.24f, 0.16f);
                 mat.color = litColor;
                 if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", litColor);
                 mat.EnableKeyword("_EMISSION");
                 if (mat.HasProperty("_EmissionColor")) mat.SetColor("_EmissionColor", emission);
 
+                if (outerRimRenderer != null && outerRimRenderer.material != null)
+                {
+                    Material rimMat = outerRimRenderer.material;
+                    Color brightGold = new Color(1.0f, 0.88f, 0.42f);
+                    rimMat.color = brightGold;
+                    if (rimMat.HasProperty("_BaseColor")) rimMat.SetColor("_BaseColor", brightGold);
+                    rimMat.EnableKeyword("_EMISSION");
+                    if (rimMat.HasProperty("_EmissionColor")) rimMat.SetColor("_EmissionColor", brightGold * 0.85f);
+                }
+
+                if (allButtonTexts != null && initialTextColors != null)
+                {
+                    for (int i = 0; i < allButtonTexts.Length; i++)
+                    {
+                        if (allButtonTexts[i] == null) continue;
+                        Color c = Color.Lerp(initialTextColors[i], Color.white, 0.25f);
+                        c.a = 1f;
+                        allButtonTexts[i].color = c;
+                    }
+                }
+
                 if (visualPlate != null)
                 {
-                    visualPlate.localScale = new Vector3(initialLocalScale.x * 1.06f, initialLocalScale.y * 1.06f, initialLocalScale.z * 1.22f);
+                    if (isCircular)
+                    {
+                        // En cilindros rotados 90° en X: X y Z son el diámetro circular; Y es el grosor (no escalar Y para no tapar el texto)
+                        visualPlate.localScale = new Vector3(initialLocalScale.x * 1.08f, initialLocalScale.y, initialLocalScale.z * 1.08f);
+                    }
+                    else
+                    {
+                        visualPlate.localScale = new Vector3(initialLocalScale.x * 1.04f, initialLocalScale.y * 1.04f, initialLocalScale.z * 1.12f);
+                    }
                 }
             }
             else
             {
-                // Botón en reposo: tono mate más apagado para que destaque claramente el botón iluminado
-                Color dimColor = defaultColor * 0.72f;
+                // Botón en reposo: tono más tenue (especialmente en los medallones de árboles no seleccionados para fuerte contraste)
+                float dimFactor = isCircular ? 0.36f : 0.65f;
+                Color dimColor = defaultColor * dimFactor;
                 dimColor.a = 1f;
                 mat.color = dimColor;
                 if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", dimColor);
                 if (mat.HasProperty("_EmissionColor")) mat.SetColor("_EmissionColor", Color.black);
+
+                if (outerRimRenderer != null && outerRimRenderer.material != null)
+                {
+                    Material rimMat = outerRimRenderer.material;
+                    Color mutedGold = isCircular ? new Color(0.45f, 0.36f, 0.16f) : new Color(0.72f, 0.58f, 0.24f);
+                    rimMat.color = mutedGold;
+                    if (rimMat.HasProperty("_BaseColor")) rimMat.SetColor("_BaseColor", mutedGold);
+                    if (rimMat.HasProperty("_EmissionColor")) rimMat.SetColor("_EmissionColor", Color.black);
+                }
+
+                if (allButtonTexts != null && initialTextColors != null)
+                {
+                    float textBrightness = isCircular ? 0.56f : 0.85f;
+                    float textAlpha = isCircular ? 0.72f : 0.92f;
+                    for (int i = 0; i < allButtonTexts.Length; i++)
+                    {
+                        if (allButtonTexts[i] == null) continue;
+                        Color c = initialTextColors[i] * textBrightness;
+                        c.a = textAlpha;
+                        allButtonTexts[i].color = c;
+                    }
+                }
 
                 if (visualPlate != null)
                 {
