@@ -10,7 +10,7 @@ namespace ZenBonsai.Editor
     [InitializeOnLoad]
     public class ZenBonsaiSceneAutoRunner : IPreprocessBuildWithReport
     {
-        private const string FlagKey = "ZenBonsai_BuildScene_HD_v24";
+        private const string FlagKey = "ZenBonsai_BuildScene_HD_v25";
 
         public int callbackOrder => 0;
 
@@ -36,13 +36,13 @@ namespace ZenBonsai.Editor
         private static void BuildAndSaveActiveScene()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode) return;
-            Debug.Log("<color=yellow>[AutoRunner]</color> Ejecutando montaje HD v24 en la escena activa...");
+            Debug.Log("<color=yellow>[AutoRunner]</color> Ejecutando montaje HD v25 en la escena activa...");
             ZenBonsaiSetupEditor.BuildZenBonsaiScene();
             var activeScene = EditorSceneManager.GetActiveScene();
             if (activeScene.IsValid())
             {
                 EditorSceneManager.SaveScene(activeScene);
-                Debug.Log("<color=green>[AutoRunner]</color> ¡Escena v24 guardada exitosamente!");
+                Debug.Log("<color=green>[AutoRunner]</color> ¡Escena v25 guardada exitosamente!");
             }
         }
     }

@@ -53,8 +53,10 @@ namespace ZenBonsai
 
         [Header("Entorno Virtual Zen (Opciones)")]
         public GameObject virtualSanctuaryBackdrop;
+        public GameObject[] virtualEnvironmentBackdrops;
         public GameObject sakuraPetalsRain;
-        private bool isVirtualEnvironmentActive = false;
+        private int environmentIndex = 0; // 0 = Passthrough MR, 1 = Jardín Monte Fuji, 2 = Pagoda y Lago Kioto, 3 = Templo Zen Bambú
+        private bool isVirtualEnvironmentActive => environmentIndex > 0;
         private bool isPetalRainActive = true;
 
         private bool isInfoOpen = false;
@@ -96,7 +98,7 @@ namespace ZenBonsai
 
             if (infoPanelBox != null) infoPanelBox.SetActive(isInfoOpen);
             if (optionsPanelBox != null) optionsPanelBox.SetActive(isOptionsOpen);
-            if (virtualSanctuaryBackdrop != null) virtualSanctuaryBackdrop.SetActive(isVirtualEnvironmentActive);
+            ApplyEnvironmentVisibility();
             if (sakuraPetalsRain != null) sakuraPetalsRain.SetActive(isPetalRainActive);
 
             UpdateUI();
@@ -213,13 +215,16 @@ namespace ZenBonsai
                 }
             }
 
-            // Animar cascada del Santuario Virtual si está activo
-            if (virtualSanctuaryBackdrop != null && isVirtualEnvironmentActive && virtualSanctuaryBackdrop.activeInHierarchy)
+            // Animar elementos vivos del entorno cultural activo (cascadas, carpas Koi, farolillos flotantes)
+            GameObject activeBackdrop = GetActiveEnvironmentObject();
+            if (activeBackdrop != null && isVirtualEnvironmentActive && activeBackdrop.activeInHierarchy)
             {
-                Transform wfGroup = virtualSanctuaryBackdrop.transform.Find("Sanctuary_WaterfallDrops");
+                float dt = Time.deltaTime;
+                float t = Time.time;
+
+                Transform wfGroup = activeBackdrop.transform.Find("Sanctuary_WaterfallDrops");
                 if (wfGroup != null)
                 {
-                    float dt = Time.deltaTime;
                     int c = wfGroup.childCount;
                     for (int i = 0; i < c; i++)
                     {
@@ -231,6 +236,42 @@ namespace ZenBonsai
                             p.y = 3.2f;
                         }
                         drop.localPosition = p;
+                    }
+                }
+
+                Transform koiGroup = activeBackdrop.transform.Find("Sanctuary_KoiSwimmers");
+                if (koiGroup != null)
+                {
+                    int kc = koiGroup.childCount;
+                    for (int k = 0; k < kc; k++)
+                    {
+                        Transform koi = koiGroup.GetChild(k);
+                        float ang = t * (0.32f + k * 0.06f) + k * 2.1f;
+                        float rX = 2.2f + (k % 2) * 1.1f;
+                        float rZ = 1.6f + (k % 2) * 0.8f;
+                        Vector3 center = new Vector3(1.2f, -0.78f, 6.8f);
+                        Vector3 newPos = center + new Vector3(Mathf.Cos(ang) * rX, 0f, Mathf.Sin(ang) * rZ);
+                        Vector3 vel = new Vector3(-Mathf.Sin(ang) * rX, 0f, Mathf.Cos(ang) * rZ);
+                        koi.localPosition = newPos;
+                        if (vel.sqrMagnitude > 0.001f)
+                        {
+                            koi.localRotation = Quaternion.LookRotation(vel.normalized, Vector3.up);
+                        }
+                    }
+                }
+
+                Transform floatingLanterns = activeBackdrop.transform.Find("Sanctuary_FloatingLanterns");
+                if (floatingLanterns != null)
+                {
+                    int lc = floatingLanterns.childCount;
+                    for (int l = 0; l < lc; l++)
+                    {
+                        Transform fl = floatingLanterns.GetChild(l);
+                        Vector3 lp = fl.localPosition;
+                        lp.y = -0.76f + Mathf.Sin(t * 1.6f + l * 1.3f) * 0.025f;
+                        lp.x += Mathf.Sin(t * 0.45f + l * 0.9f) * 0.04f * dt;
+                        fl.localPosition = lp;
+                        fl.Rotate(0f, 8f * dt, 0f, Space.Self);
                     }
                 }
             }
@@ -381,15 +422,45 @@ namespace ZenBonsai
             UpdateOptionsButtonsUI();
         }
 
+        private GameObject GetActiveEnvironmentObject()
+        {
+            if (environmentIndex <= 0) return null;
+            int idx = environmentIndex - 1;
+            if (virtualEnvironmentBackdrops != null && idx >= 0 && idx < virtualEnvironmentBackdrops.Length && virtualEnvironmentBackdrops[idx] != null)
+            {
+                return virtualEnvironmentBackdrops[idx];
+            }
+            return virtualSanctuaryBackdrop;
+        }
+
+        private void ApplyEnvironmentVisibility()
+        {
+            if (virtualEnvironmentBackdrops != null && virtualEnvironmentBackdrops.Length > 0)
+            {
+                for (int i = 0; i < virtualEnvironmentBackdrops.Length; i++)
+                {
+                    if (virtualEnvironmentBackdrops[i] != null)
+                    {
+                        virtualEnvironmentBackdrops[i].SetActive(environmentIndex == (i + 1));
+                    }
+                }
+            }
+            else if (virtualSanctuaryBackdrop != null)
+            {
+                virtualSanctuaryBackdrop.SetActive(environmentIndex > 0);
+            }
+        }
+
         public void ToggleEnvironment()
         {
-            isVirtualEnvironmentActive = !isVirtualEnvironmentActive;
-            if (virtualSanctuaryBackdrop != null)
-            {
-                virtualSanctuaryBackdrop.SetActive(isVirtualEnvironmentActive);
-            }
+            int envCount = (virtualEnvironmentBackdrops != null && virtualEnvironmentBackdrops.Length > 0)
+                ? (virtualEnvironmentBackdrops.Length + 1)
+                : 2;
+            environmentIndex = (environmentIndex + 1) % envCount;
 
-            // Cambiar entre Realidad Mixta Passthrough (habitación real) y Santuario Virtual 3D
+            ApplyEnvironmentVisibility();
+
+            // Cambiar entre Realidad Mixta Passthrough (habitación real) y Santuarios Culturales 3D
             var ptLayers = FindObjectsOfType<OVRPassthroughLayer>();
             foreach (var pt in ptLayers)
             {
@@ -494,8 +565,30 @@ namespace ZenBonsai
                 cams[c].backgroundColor = isVirtualEnvironmentActive ? skyBgColor : new Color(0f, 0f, 0f, 0f);
             }
 
-            // Si existe la cúpula celeste 360 del Santuario Virtual, actualizar su tono atmosférico
-            if (virtualSanctuaryBackdrop != null)
+            // Si existen las cúpulas celestes 360 de los Santuarios Virtuales, actualizar su tono atmosférico
+            if (virtualEnvironmentBackdrops != null && virtualEnvironmentBackdrops.Length > 0)
+            {
+                for (int i = 0; i < virtualEnvironmentBackdrops.Length; i++)
+                {
+                    if (virtualEnvironmentBackdrops[i] == null) continue;
+                    Transform skyDome = virtualEnvironmentBackdrops[i].transform.Find("Sanctuary_SkyDome");
+                    if (skyDome != null)
+                    {
+                        Renderer r = skyDome.GetComponent<Renderer>();
+                        if (r != null && r.material != null)
+                        {
+                            r.material.color = skyBgColor;
+                            if (r.material.HasProperty("_BaseColor")) r.material.SetColor("_BaseColor", skyBgColor);
+                            if (r.material.HasProperty("_EmissionColor"))
+                            {
+                                r.material.EnableKeyword("_EMISSION");
+                                r.material.SetColor("_EmissionColor", skyBgColor * 0.65f);
+                            }
+                        }
+                    }
+                }
+            }
+            else if (virtualSanctuaryBackdrop != null)
             {
                 Transform skyDome = virtualSanctuaryBackdrop.transform.Find("Sanctuary_SkyDome");
                 if (skyDome != null)
@@ -732,11 +825,35 @@ namespace ZenBonsai
             {
                 string envTxt;
                 if (languageIndex == 0)
-                    envTxt = isVirtualEnvironmentActive ? "⛩ Entorno:\nSantuario Fuji" : "🥽 Entorno:\nPassthrough MR";
+                {
+                    switch (environmentIndex)
+                    {
+                        case 0: envTxt = "🥽 Entorno:\nPassthrough MR"; break;
+                        case 1: envTxt = "🗻 Entorno:\nJardín Monte Fuji"; break;
+                        case 2: envTxt = "🏮 Entorno:\nPagoda de Kioto"; break;
+                        default: envTxt = "🎋 Entorno:\nTemplo Bambú Zen"; break;
+                    }
+                }
                 else if (languageIndex == 1)
-                    envTxt = isVirtualEnvironmentActive ? "⛩ Environment:\nMt. Fuji Sanctuary" : "🥽 Environment:\nPassthrough MR";
+                {
+                    switch (environmentIndex)
+                    {
+                        case 0: envTxt = "🥽 Environment:\nPassthrough MR"; break;
+                        case 1: envTxt = "🗻 Environment:\nMt. Fuji Veranda"; break;
+                        case 2: envTxt = "🏮 Environment:\nKyoto Lake Pagoda"; break;
+                        default: envTxt = "🎋 Environment:\nBamboo Zen Temple"; break;
+                    }
+                }
                 else
-                    envTxt = isVirtualEnvironmentActive ? "⛩ 背景環境:\n富士の聖域 (VR)" : "🥽 背景環境:\n複合現実 (MR)";
+                {
+                    switch (environmentIndex)
+                    {
+                        case 0: envTxt = "🥽 背景環境:\n複合現実 (MR)"; break;
+                        case 1: envTxt = "🗻 背景環境:\n富士と縁側庭園"; break;
+                        case 2: envTxt = "🏮 背景環境:\n京都・五重塔の湖"; break;
+                        default: envTxt = "🎋 背景環境:\n嵐山・枯山水禅寺"; break;
+                    }
+                }
 
                 btnOptEnvironment.SetLabelText(envTxt);
                 btnOptEnvironment.SetSelectedHighlight(isVirtualEnvironmentActive);
