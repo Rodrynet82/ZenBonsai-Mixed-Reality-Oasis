@@ -723,10 +723,12 @@ namespace ZenBonsai.Editor
 
             optionsCard.SetActive(false);
 
-            // Construir los 3 Entornos Culturales Japoneses 360° de Alta Definición (esculpidos, sin bloques primitivos)
-            Material mountainMat = CreateOrGetPBRMaterial("Zen_MountainMat", new Color(0.20f, 0.28f, 0.42f), 0.14f, 0.0f);
-            Material snowMat = CreateOrGetPBRMaterial("Zen_SnowMat", new Color(0.96f, 0.98f, 1.0f), 0.42f, 0.0f);
-            Material mistMat = CreateOrGetPBRMaterial("Zen_MistMat", new Color(0.82f, 0.87f, 0.95f), 0.10f, 0.0f);
+            // Construir los 3 Entornos Culturales Japoneses 360° de Alta Definición (PBR + Normales + 0 bloques primitivos)
+            Material mountainMat = CreateOrGetSurfaceTexturedMaterial("Zen_FujiVolcanicMat",
+                new Color(0.18f, 0.25f, 0.38f), new Color(0.10f, 0.14f, 0.24f), new Color(0.84f, 0.90f, 0.98f), 0.16f, 0.0f, 23);
+            Material snowMat = CreateOrGetSurfaceTexturedMaterial("Zen_SnowGlacierMat",
+                new Color(0.95f, 0.97f, 1.0f), new Color(0.76f, 0.84f, 0.94f), new Color(1.0f, 1.0f, 1.0f), 0.45f, 0.0f, 11);
+            Material mistMat = CreateOrGetPBRMaterial("Zen_MistMat", new Color(0.88f, 0.91f, 0.97f), 0.10f, 0.0f);
 
             GameObject envFujiVeranda = BuildFujiVerandaSanctuary(parent, mountainMat, snowMat, mistMat, urushiMat, rosewoodMat, hinokiMat, stoneMat, goldMat, sakuraMat, matsuMat);
             GameObject envKyotoPagoda = BuildKyotoLakePagodaSanctuary(parent, mountainMat, snowMat, urushiMat, hinokiMat, stoneMat, goldMat, sakuraMat, momijiMat);
@@ -742,9 +744,11 @@ namespace ZenBonsai.Editor
         }
 
         // =========================================================================
-        // ENTORNO 1: JARDÍN IMPERIAL DEL MONTE FUJI DESDE SALÓN ENGAWA (FIEL A LA IMAGEN DE PRESENTACIÓN)
-        // Incluye salón japonés con suelo de madera y tatami, lámpara Andon, estantería, muro Kawara,
-        // linternas Kasuga talladas, estanque con ondas y carpas Koi, pinos Niwaki, bambú con hojas, Torii curvo y Monte Fuji HD
+        // ENTORNO 1 (360° COMPLETO): JARDÍN IMPERIAL DEL MONTE FUJI Y SALÓN CHASHITSU / ENGAWA
+        // Recreación fotorrealista 360°: Salón de té completo alrededor del jugador (suelo de tablones PBR,
+        // tatamis con brocado, techo artesonado con farol Chōchin, Tokonoma con pergamino Sumi-e detrás del jugador,
+        // estantería Chigaidana y lámpara Andon talladas a la izquierda) + Jardín 360° con estanque Koi, flores de loto,
+        // cerezos Sakura y pinos Niwaki con follaje 3D, muros Kawara, Torii curvo, niebla volumétrica y Monte Fuji HD.
         // =========================================================================
         private static GameObject BuildFujiVerandaSanctuary(
             Transform parent,
@@ -756,93 +760,151 @@ namespace ZenBonsai.Editor
             sanctuaryRoot.transform.SetParent(parent, false);
             sanctuaryRoot.transform.localPosition = Vector3.zero;
 
-            Material skyDomeMat = CreateOrGetPBRMaterial("Zen_SanctuarySkyDomeMat", new Color(0.56f, 0.74f, 0.92f), 0.0f, 0.0f);
-            skyDomeMat.EnableKeyword("_EMISSION");
-            if (skyDomeMat.HasProperty("_EmissionColor")) skyDomeMat.SetColor("_EmissionColor", new Color(0.42f, 0.54f, 0.68f));
-            if (skyDomeMat.HasProperty("_Cull")) skyDomeMat.SetFloat("_Cull", 0f);
+            // Materiales PBR de alta definición con mapas de normales para arquitectura y paisaje
+            Material skyDomeMat = CreateOrGetPanoramicSkyDomeMaterial("Zen_SkyPanorama_FujiSunset",
+                new Color(0.24f, 0.46f, 0.78f), new Color(0.58f, 0.72f, 0.90f), new Color(0.98f, 0.76f, 0.58f),
+                new Color(1.0f, 0.92f, 0.80f), new Color(0.56f, 0.58f, 0.74f), new Color(0.22f, 0.30f, 0.46f), 101);
 
-            Material sunMat = CreateOrGetPBRMaterial("Zen_SanctuarySunMat", new Color(1.0f, 0.92f, 0.74f), 0.9f, 0.0f);
+            Material sunMat = CreateOrGetPBRMaterial("Zen_SanctuarySunMat", new Color(1.0f, 0.93f, 0.76f), 0.9f, 0.0f);
             sunMat.EnableKeyword("_EMISSION");
-            if (sunMat.HasProperty("_EmissionColor")) sunMat.SetColor("_EmissionColor", new Color(1.0f, 0.86f, 0.58f) * 1.8f);
+            if (sunMat.HasProperty("_EmissionColor")) sunMat.SetColor("_EmissionColor", new Color(1.0f, 0.86f, 0.56f) * 1.85f);
 
-            Material toriiRedMat = CreateOrGetPBRMaterial("Zen_ToriiVermilionMat", new Color(0.78f, 0.17f, 0.11f), 0.62f, 0.05f);
-            Material pondMat = CreateOrGetPBRMaterial("Zen_SanctuaryPondMat", new Color(0.11f, 0.34f, 0.44f), 0.96f, 0.14f);
+            Material toriiRedMat = CreateOrGetSurfaceTexturedMaterial("Zen_ToriiVermilionPBRMat",
+                new Color(0.80f, 0.16f, 0.10f), new Color(0.52f, 0.08f, 0.05f), new Color(0.95f, 0.32f, 0.20f), 0.68f, 0.06f, 17);
+            Material pondMat = CreateOrGetSurfaceTexturedMaterial("Zen_SanctuaryPondPBRMat",
+                new Color(0.09f, 0.32f, 0.42f), new Color(0.04f, 0.18f, 0.26f), new Color(0.32f, 0.62f, 0.72f), 0.96f, 0.22f, 24);
             Material bambooCulmMat = CreateOrGetSurfaceTexturedMaterial("Zen_BambooForestMat",
-                new Color(0.24f, 0.48f, 0.18f), new Color(0.14f, 0.32f, 0.10f), new Color(0.40f, 0.66f, 0.28f), 0.48f, 0.0f, 15);
+                new Color(0.24f, 0.48f, 0.18f), new Color(0.14f, 0.32f, 0.10f), new Color(0.40f, 0.66f, 0.28f), 0.52f, 0.0f, 15);
             Material mossGroundMat = CreateOrGetSurfaceTexturedMaterial("Zen_SanctuaryMossMat",
-                new Color(0.18f, 0.42f, 0.14f), new Color(0.09f, 0.24f, 0.07f), new Color(0.32f, 0.58f, 0.20f), 0.18f, 0.0f, 11);
-            Material kawaraTileMat = CreateOrGetPBRMaterial("Zen_KawaraTileMat", new Color(0.16f, 0.18f, 0.21f), 0.64f, 0.15f);
-            Material shikkuiWallMat = CreateOrGetPBRMaterial("Zen_ShikkuiPlasterMat", new Color(0.92f, 0.90f, 0.85f), 0.22f, 0.0f);
-            Material shojiPaperMat = CreateOrGetPBRMaterial("Zen_ShojiPaperMat", new Color(0.97f, 0.94f, 0.86f), 0.15f, 0.0f);
+                new Color(0.18f, 0.42f, 0.14f), new Color(0.09f, 0.24f, 0.07f), new Color(0.32f, 0.58f, 0.20f), 0.20f, 0.0f, 11);
+            Material kawaraTileMat = CreateOrGetSurfaceTexturedMaterial("Zen_KawaraTilePBRMat",
+                new Color(0.17f, 0.19f, 0.23f), new Color(0.08f, 0.09f, 0.12f), new Color(0.38f, 0.42f, 0.48f), 0.72f, 0.22f, 19);
+            Material shikkuiWallMat = CreateOrGetSurfaceTexturedMaterial("Zen_ShikkuiPlasterPBRMat",
+                new Color(0.93f, 0.91f, 0.86f), new Color(0.76f, 0.73f, 0.68f), new Color(0.98f, 0.97f, 0.94f), 0.24f, 0.0f, 22);
+            Material shojiPaperMat = CreateOrGetSurfaceTexturedMaterial("Zen_ShojiLatticePBRMat",
+                new Color(0.96f, 0.92f, 0.82f), new Color(0.28f, 0.17f, 0.10f), new Color(1.0f, 0.97f, 0.90f), 0.22f, 0.0f, 20);
             shojiPaperMat.EnableKeyword("_EMISSION");
-            if (shojiPaperMat.HasProperty("_EmissionColor")) shojiPaperMat.SetColor("_EmissionColor", new Color(0.32f, 0.28f, 0.22f));
+            if (shojiPaperMat.HasProperty("_EmissionColor")) shojiPaperMat.SetColor("_EmissionColor", new Color(0.36f, 0.30f, 0.22f));
 
-            // 1. Cúpula celeste envolvente y Sol dorado en el horizonte derecho (como en la imagen de referencia)
-            GameObject skyDome = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            skyDome.name = "Sanctuary_SkyDome";
+            Material plankFloorMat = CreateOrGetSurfaceTexturedMaterial("Zen_HinokiPlankFloorMat",
+                new Color(0.48f, 0.30f, 0.17f), new Color(0.26f, 0.15f, 0.08f), new Color(0.68f, 0.46f, 0.28f), 0.68f, 0.04f, 17);
+            Material tatamiMat = CreateOrGetSurfaceTexturedMaterial("Zen_TatamiWeavePBRMat",
+                new Color(0.58f, 0.56f, 0.32f), new Color(0.42f, 0.40f, 0.20f), new Color(0.74f, 0.70f, 0.44f), 0.28f, 0.0f, 18);
+            Material templeStoneMat = CreateOrGetSurfaceTexturedMaterial("Zen_TempleStoneMasonryMat",
+                new Color(0.42f, 0.43f, 0.45f), new Color(0.22f, 0.23f, 0.25f), new Color(0.62f, 0.64f, 0.66f), 0.25f, 0.05f, 21);
+            Material sumieScrollMat = CreateOrGetSurfaceTexturedMaterial("Zen_TokonomaSumieScrollMat",
+                new Color(0.92f, 0.89f, 0.82f), new Color(0.18f, 0.22f, 0.30f), new Color(0.98f, 0.96f, 0.90f), 0.25f, 0.0f, 25);
+            Material realBarkMat = CreateOrGetBarkMaterial("Zen_SakuraBark_Mat",
+                new Color(0.34f, 0.22f, 0.16f), new Color(0.16f, 0.10f, 0.07f), new Color(0.50f, 0.35f, 0.26f), 0.28f, 1);
+
+            // 1. CÚPULA CELESTE PANORÁMICA 360° (GEODÉSICA CON NUBES VOLUMÉTRICAS Y CORDILLERAS PINTADAS)
+            Mesh skySphereMesh = ZenBonsaiProceduralMeshes.CreatePanoramicSkySphereMesh("Mesh_PanoramicSkySphere_360", 42f, 64, 32);
+            GameObject skyDome = new GameObject("Sanctuary_SkyDome");
             skyDome.transform.SetParent(sanctuaryRoot.transform, false);
-            skyDome.transform.localScale = new Vector3(72f, 50f, 72f);
-            skyDome.GetComponent<Renderer>().sharedMaterial = skyDomeMat;
-            var sdc = skyDome.GetComponent<Collider>(); if (sdc != null) DestroyImmediate(sdc);
+            skyDome.AddComponent<MeshFilter>().sharedMesh = skySphereMesh;
+            skyDome.AddComponent<MeshRenderer>().sharedMaterial = skyDomeMat;
 
-            GameObject sunOrb = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            sunOrb.name = "Sanctuary_SunOrb";
-            sunOrb.transform.SetParent(sanctuaryRoot.transform, false);
-            sunOrb.transform.localPosition = new Vector3(6.8f, 5.8f, 25f);
-            sunOrb.transform.localScale = new Vector3(4.4f, 4.4f, 0.5f);
-            sunOrb.GetComponent<Renderer>().sharedMaterial = sunMat;
-            var soc = sunOrb.GetComponent<Collider>(); if (soc != null) DestroyImmediate(soc);
-
-            // 2. SALÓN JAPONÉS INTERIOR Y VERANDA ENGAWA ABIERTA (IGUAL QUE EN LA IMAGEN DE PRESENTACIÓN)
-            BuildJapaneseTeaRoomVerandaFrame(sanctuaryRoot.transform, urushiMat, rosewoodMat, hinokiMat, shikkuiWallMat, shojiPaperMat, sunMat, goldMat);
-
-            // 3. MURO TRADICIONAL JAPONÉS (TSUKIJI-BEI) CON TEJADO ESCULPIDO KAWARA EN EL LADO IZQUIERDO
-            GameObject gardenWall = new GameObject("Sanctuary_LeftGardenWall");
-            gardenWall.transform.SetParent(sanctuaryRoot.transform, false);
-            gardenWall.transform.localPosition = new Vector3(-4.6f, -0.78f, 5.2f);
-            gardenWall.transform.localRotation = Quaternion.Euler(0f, 16f, 0f);
-
-            GameObject wallBase = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            wallBase.transform.SetParent(gardenWall.transform, false);
-            wallBase.transform.localPosition = new Vector3(0f, 0.25f, 0f);
-            wallBase.transform.localScale = new Vector3(0.32f, 0.50f, 8.5f);
-            wallBase.GetComponent<Renderer>().sharedMaterial = stoneMat;
-            DestroyImmediate(wallBase.GetComponent<Collider>());
-
-            GameObject wallPlaster = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            wallPlaster.transform.SetParent(gardenWall.transform, false);
-            wallPlaster.transform.localPosition = new Vector3(0f, 1.05f, 0f);
-            wallPlaster.transform.localScale = new Vector3(0.24f, 1.15f, 8.4f);
-            wallPlaster.GetComponent<Renderer>().sharedMaterial = shikkuiWallMat;
-            DestroyImmediate(wallPlaster.GetComponent<Collider>());
-
-            Mesh wallRoofMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_WallKawaraRoof", 0.68f, 8.8f, 0.34f, 0.08f);
-            GameObject wallRoof = new GameObject("Wall_KawaraRoof");
-            wallRoof.transform.SetParent(gardenWall.transform, false);
-            wallRoof.transform.localPosition = new Vector3(0f, 1.62f, 0f);
-            wallRoof.AddComponent<MeshFilter>().sharedMesh = wallRoofMesh;
-            wallRoof.AddComponent<MeshRenderer>().sharedMaterial = kawaraTileMat;
-
-            // 4. TERRENO DE MUSGO ESCULPIDO, ESTANQUE REFLECTANTE CON ONDAS 3D Y CARPAS KOI NADANDO
-            Mesh gardenTerrainMesh = ZenBonsaiProceduralMeshes.CreateOrganicMossMoundMesh("Mesh_FujiGarden_MossGround", 34f, 28f, -0.84f, 0.12f);
-            GameObject mossGround = new GameObject("Sanctuary_MossLandscape");
+            // 2. TERRENO CONTINUO 360° DE MUSGO Y COLINAS JAPONESAS (76m x 76m, CERO HUECOS EN NINGUNA DIRECCIÓN)
+            Mesh terrain360Mesh = ZenBonsaiProceduralMeshes.CreateFull360SanctuaryTerrainMesh(
+                "Mesh_FujiSanctuary_Terrain360", 76f, -0.82f, new Vector2(1.2f, 7.2f), new Vector2(6.4f, 4.8f), 0.42f, 101);
+            GameObject mossGround = new GameObject("Sanctuary_MossLandscape360");
             mossGround.transform.SetParent(sanctuaryRoot.transform, false);
-            mossGround.transform.localPosition = new Vector3(0f, 0f, 10f);
-            mossGround.AddComponent<MeshFilter>().sharedMesh = gardenTerrainMesh;
+            mossGround.AddComponent<MeshFilter>().sharedMesh = terrain360Mesh;
             mossGround.AddComponent<MeshRenderer>().sharedMaterial = mossGroundMat;
 
-            // Estanque espejo de agua en la mitad derecha/central como en la foto
-            GameObject koiPond = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            koiPond.name = "Sanctuary_ReflectivePond";
-            koiPond.transform.SetParent(sanctuaryRoot.transform, false);
-            koiPond.transform.localPosition = new Vector3(1.2f, -0.78f, 6.8f);
-            koiPond.transform.localScale = new Vector3(9.8f, 0.02f, 7.6f);
-            koiPond.GetComponent<Renderer>().sharedMaterial = pondMat;
-            DestroyImmediate(koiPond.GetComponent<Collider>());
+            // 3. ANILLO MONTAÑOSO 360° ALREDEDOR DE TODO EL HORIZONTE + MONTE FUJI HD + BANCOS DE NIEBLA
+            Mesh horizonRingMesh = ZenBonsaiProceduralMeshes.Create360MountainHorizonRingMesh(
+                "Mesh_FujiSanctuary_HorizonRing360", 23f, 38f, 6.8f, 0.68f, 105);
+            GameObject horizonRing = new GameObject("Sanctuary_360MountainRing");
+            horizonRing.transform.SetParent(sanctuaryRoot.transform, false);
+            horizonRing.AddComponent<MeshFilter>().sharedMesh = horizonRingMesh;
+            horizonRing.AddComponent<MeshRenderer>().sharedMaterial = mountainMat;
 
-            // Ondas concéntricas esculpidas en el agua + pétalos flotantes
+            Mesh fujiRockMesh = ZenBonsaiProceduralMeshes.CreateDetailedMountFujiMesh("Mesh_HD_MountFuji_Volcano", 22f, 2.8f, 11.2f, out Mesh fujiSnowCapMesh);
+            GameObject fujiBody = new GameObject("Distant_MountFuji_HD");
+            fujiBody.transform.SetParent(sanctuaryRoot.transform, false);
+            fujiBody.transform.localPosition = new Vector3(1.2f, -0.90f, 27.5f);
+            fujiBody.AddComponent<MeshFilter>().sharedMesh = fujiRockMesh;
+            fujiBody.AddComponent<MeshRenderer>().sharedMaterial = mountainMat;
+
+            GameObject fujiSnow = new GameObject("Distant_MountFuji_SnowRidges");
+            fujiSnow.transform.SetParent(fujiBody.transform, false);
+            fujiSnow.AddComponent<MeshFilter>().sharedMesh = fujiSnowCapMesh;
+            fujiSnow.AddComponent<MeshRenderer>().sharedMaterial = snowMat;
+
+            Mesh mistBankMesh = ZenBonsaiProceduralMeshes.CreateVolumetricCloudBankMesh("Mesh_Fuji_MistCloudRing", 19.5f, 0.35f, 18, 111);
+            GameObject mistRing = new GameObject("Sanctuary_MistCloudRing");
+            mistRing.transform.SetParent(sanctuaryRoot.transform, false);
+            mistRing.AddComponent<MeshFilter>().sharedMesh = mistBankMesh;
+            mistRing.AddComponent<MeshRenderer>().sharedMaterial = mistMat;
+
+            // 4. PABELLÓN DE TÉ JAPONÉS 360° COMPLETO (ENGAWA + SALÓN CHASHITSU + TOKONOMA DETRÁS DEL JUGADOR)
+            BuildJapaneseTeaRoomVerandaFrame(
+                sanctuaryRoot.transform, urushiMat, plankFloorMat, tatamiMat, shikkuiWallMat,
+                shojiPaperMat, kawaraTileMat, templeStoneMat, sumieScrollMat, sunMat, goldMat, sakuraMat);
+
+            // 5. MUROS DE JARDÍN IMPERIAL (TSUKIJI-BEI) CON MAMPOSTERÍA ISHIGAKI Y TEJADOS CURVOS KAWARA EN 360°
+            Vector3[] wallPositions =
+            {
+                new Vector3(-5.2f, -0.82f, 6.2f),
+                new Vector3(6.4f, -0.82f, 6.2f),
+                new Vector3(-6.2f, -0.82f, -4.8f),
+                new Vector3(6.2f, -0.82f, -4.8f)
+            };
+            float[] wallRotY = { 14f, -14f, 45f, -45f };
+            Mesh wallRoofMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_WallKawaraRoof", 0.82f, 8.8f, 0.38f, 0.10f);
+            Mesh wallStoneMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_WallStonePlinth", 0.46f, 8.5f, 0.52f, 0.0f);
+            Mesh wallPlasterMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_WallPlasterBody", 0.32f, 8.4f, 1.15f, 0.0f);
+
+            for (int w = 0; w < wallPositions.Length; w++)
+            {
+                GameObject gWall = new GameObject($"Sanctuary_GardenWall_{w}");
+                gWall.transform.SetParent(sanctuaryRoot.transform, false);
+                gWall.transform.localPosition = wallPositions[w];
+                gWall.transform.localRotation = Quaternion.Euler(0f, wallRotY[w], 0f);
+
+                GameObject wBase = new GameObject("Wall_IshigakiBase");
+                wBase.transform.SetParent(gWall.transform, false);
+                wBase.AddComponent<MeshFilter>().sharedMesh = wallStoneMesh;
+                wBase.AddComponent<MeshRenderer>().sharedMaterial = templeStoneMat;
+
+                GameObject wPlaster = new GameObject("Wall_ShikkuiBody");
+                wPlaster.transform.SetParent(gWall.transform, false);
+                wPlaster.transform.localPosition = new Vector3(0f, 0.48f, 0f);
+                wPlaster.AddComponent<MeshFilter>().sharedMesh = wallPlasterMesh;
+                wPlaster.AddComponent<MeshRenderer>().sharedMaterial = shikkuiWallMat;
+
+                GameObject wRoof = new GameObject("Wall_KawaraRoof");
+                wRoof.transform.SetParent(gWall.transform, false);
+                wRoof.transform.localPosition = new Vector3(0f, 1.56f, 0f);
+                wRoof.AddComponent<MeshFilter>().sharedMesh = wallRoofMesh;
+                wRoof.AddComponent<MeshRenderer>().sharedMaterial = kawaraTileMat;
+            }
+
+            // 6. ESTANQUE ESPEJO KOI CON ONDAS, HOJAS Y FLORES DE LOTO 3D, SENDEROS TOBI-ISHI Y CARPAS KOI
+            Mesh pondSurfaceMesh = ZenBonsaiProceduralMeshes.CreateOrganicMossMoundMesh("Mesh_FujiPond_WaterSheet", 13.5f, 10.2f, -0.78f, 0.004f);
+            GameObject koiPond = new GameObject("Sanctuary_ReflectivePond");
+            koiPond.transform.SetParent(sanctuaryRoot.transform, false);
+            koiPond.transform.localPosition = new Vector3(1.2f, 0f, 7.2f);
+            koiPond.AddComponent<MeshFilter>().sharedMesh = pondSurfaceMesh;
+            koiPond.AddComponent<MeshRenderer>().sharedMaterial = pondMat;
+
+            // Hojas y flores de loto flotando sobre el estanque
+            Mesh lotusPadsMesh = ZenBonsaiProceduralMeshes.CreateSculptedLotusPadAndFlowerMesh("Mesh_Pond_LotusPads", 14, 303, out Mesh lotusFlowersMesh);
+            GameObject lotusPadsObj = new GameObject("Pond_LotusPads");
+            lotusPadsObj.transform.SetParent(sanctuaryRoot.transform, false);
+            lotusPadsObj.transform.localPosition = new Vector3(1.2f, -0.775f, 6.8f);
+            lotusPadsObj.AddComponent<MeshFilter>().sharedMesh = lotusPadsMesh;
+            lotusPadsObj.AddComponent<MeshRenderer>().sharedMaterial = pineNeedleMat;
+
+            GameObject lotusFlowersObj = new GameObject("Pond_LotusBlossoms");
+            lotusFlowersObj.transform.SetParent(lotusPadsObj.transform, false);
+            lotusFlowersObj.AddComponent<MeshFilter>().sharedMesh = lotusFlowersMesh;
+            lotusFlowersObj.AddComponent<MeshRenderer>().sharedMaterial = sakuraMat;
+
+            // Ondas concéntricas esculpidas en el agua
             Mesh rippleMesh = ZenBonsaiProceduralMeshes.CreateWaterRippleRingsMesh("Mesh_Pond_Ripples", 1.8f, 5);
-            Vector3[] rippleCenters = { new Vector3(0.8f, -0.765f, 5.2f), new Vector3(2.1f, -0.765f, 6.9f) };
+            Vector3[] rippleCenters = { new Vector3(0.5f, -0.768f, 5.2f), new Vector3(2.2f, -0.768f, 7.4f), new Vector3(-0.4f, -0.768f, 8.1f) };
             for (int r = 0; r < rippleCenters.Length; r++)
             {
                 GameObject rip = new GameObject($"Pond_Ripple_{r}");
@@ -852,53 +914,55 @@ namespace ZenBonsai.Editor
                 rip.AddComponent<MeshRenderer>().sharedMaterial = snowMat;
             }
 
-            // Carpas Nishikigoi nadando suavemente en el estanque
-            Material koiOrangeMat = CreateOrGetPBRMaterial("Zen_KoiOrangeMat", new Color(0.96f, 0.36f, 0.08f), 0.85f, 0.0f);
+            // 7 Carpas Nishikigoi con aletas esculpidas nadando en el estanque
+            Material koiOrangeMat = CreateOrGetPBRMaterial("Zen_KoiOrangeMat", new Color(0.96f, 0.34f, 0.08f), 0.88f, 0.0f);
+            Material koiGoldMat = CreateOrGetPBRMaterial("Zen_KoiGoldMat", new Color(0.98f, 0.74f, 0.16f), 0.88f, 0.0f);
             Mesh koiMesh = ZenBonsaiProceduralMeshes.CreateSculptedKoiFishMesh("Mesh_Sanctuary_KoiFish");
             GameObject koiGroup = new GameObject("Sanctuary_KoiSwimmers");
             koiGroup.transform.SetParent(sanctuaryRoot.transform, false);
-            for (int k = 0; k < 5; k++)
+            for (int k = 0; k < 7; k++)
             {
                 GameObject koi = new GameObject($"KoiCarp_{k}");
                 koi.transform.SetParent(koiGroup.transform, false);
-                koi.transform.localPosition = new Vector3(0.6f + k * 0.55f, -0.78f, 5.4f + (k % 2) * 1.1f);
+                koi.transform.localPosition = new Vector3(0.4f + k * 0.45f, -0.79f, 5.4f + (k % 3) * 0.9f);
                 koi.AddComponent<MeshFilter>().sharedMesh = koiMesh;
-                koi.AddComponent<MeshRenderer>().sharedMaterial = koiOrangeMat;
+                koi.AddComponent<MeshRenderer>().sharedMaterial = (k % 2 == 0) ? koiOrangeMat : koiGoldMat;
             }
 
-            // Colinas de musgo y rocas Suiseki talladas bordeando el estanque
+            // Camino de piedras de paso (Tobi-ishi) y rocas ribereñas Suiseki alrededor de los 360°
             Vector3[] boulderPos =
             {
-                new Vector3(-2.6f, -0.58f, 3.8f),
-                new Vector3(-1.8f, -0.64f, 5.2f),
-                new Vector3(3.2f, -0.48f, 5.6f),
-                new Vector3(4.1f, -0.35f, 6.8f),
-                new Vector3(2.4f, -0.62f, 4.4f),
-                new Vector3(-2.4f, -0.52f, 8.4f)
-            };
-            Vector3[] boulderRadii =
-            {
-                new Vector3(1.1f, 0.42f, 0.9f),
-                new Vector3(0.75f, 0.28f, 0.65f),
-                new Vector3(1.35f, 0.62f, 1.15f),
-                new Vector3(1.65f, 0.85f, 1.40f),
-                new Vector3(0.68f, 0.26f, 0.58f),
-                new Vector3(1.40f, 0.55f, 1.20f)
+                new Vector3(-2.6f, -0.58f, 3.8f), new Vector3(-1.8f, -0.64f, 5.2f),
+                new Vector3(3.2f, -0.48f, 5.6f),  new Vector3(4.2f, -0.35f, 6.8f),
+                new Vector3(2.4f, -0.62f, 4.4f),  new Vector3(-2.4f, -0.52f, 8.4f),
+                new Vector3(-4.8f, -0.55f, -2.5f), new Vector3(4.8f, -0.52f, -2.8f),
+                new Vector3(-3.2f, -0.58f, -6.5f), new Vector3(3.5f, -0.55f, -6.8f),
+                new Vector3(0.0f, -0.76f, 2.35f),  new Vector3(-0.35f, -0.76f, 3.05f), new Vector3(0.15f, -0.76f, 3.70f)
             };
             for (int i = 0; i < boulderPos.Length; i++)
             {
+                bool isSteppingStone = (i >= 10);
+                Vector3 rad = isSteppingStone
+                    ? new Vector3(0.38f, 0.08f, 0.32f)
+                    : new Vector3(0.95f + (i % 3) * 0.35f, 0.38f + (i % 2) * 0.26f, 0.82f + (i % 3) * 0.28f);
                 GameObject rock = new GameObject($"Sanctuary_SculptedBoulder_{i}");
                 rock.transform.SetParent(sanctuaryRoot.transform, false);
                 rock.transform.localPosition = boulderPos[i];
                 rock.AddComponent<MeshFilter>().sharedMesh = ZenBonsaiProceduralMeshes.CreateSuisekiStoneMesh(
-                    $"Mesh_SanctuaryBoulder_{i}", boulderRadii[i], 1200 + i * 31);
-                rock.AddComponent<MeshRenderer>().sharedMaterial = (i % 2 == 0) ? mossGroundMat : stoneMat;
+                    $"Mesh_FujiBoulder_{i}", rad, 1200 + i * 31);
+                rock.AddComponent<MeshRenderer>().sharedMaterial = (!isSteppingStone && i % 2 == 0) ? mossGroundMat : templeStoneMat;
             }
 
-            // 5. LINTERNAS DE PIEDRA TALLADAS KASUGA TŌRŌ (IZQUIERDA CERCA Y DERECHA JUNTO AL AGUA, COMO EN LA IMAGEN)
+            // 7. LINTERNAS DE PIEDRA TALLADAS KASUGA TŌRŌ EN EL JARDÍN FRONTAL Y PATIOS LATERALES/TRASERO (360°)
             Mesh lanternStoneMesh = ZenBonsaiProceduralMeshes.CreateSculptedStoneLanternMesh("Mesh_KasugaStoneLantern", out Mesh lanternLightMesh);
-            Vector3[] lanternPositions = { new Vector3(-2.15f, -0.76f, 3.35f), new Vector3(2.85f, -0.68f, 6.45f) };
-            float[] lanternScales = { 1.05f, 0.88f };
+            Vector3[] lanternPositions =
+            {
+                new Vector3(-2.15f, -0.76f, 3.35f),
+                new Vector3(2.85f, -0.68f, 6.45f),
+                new Vector3(-4.2f, -0.76f, -3.6f),
+                new Vector3(4.2f, -0.76f, -3.6f)
+            };
+            float[] lanternScales = { 1.05f, 0.90f, 0.95f, 0.95f };
             for (int l = 0; l < lanternPositions.Length; l++)
             {
                 GameObject lantern = new GameObject($"Sanctuary_KasugaLantern_{l}");
@@ -906,7 +970,7 @@ namespace ZenBonsai.Editor
                 lantern.transform.localPosition = lanternPositions[l];
                 lantern.transform.localScale = Vector3.one * lanternScales[l];
                 lantern.AddComponent<MeshFilter>().sharedMesh = lanternStoneMesh;
-                lantern.AddComponent<MeshRenderer>().sharedMaterial = stoneMat;
+                lantern.AddComponent<MeshRenderer>().sharedMaterial = templeStoneMat;
 
                 GameObject lGlow = new GameObject("Lantern_FireBoxGlow");
                 lGlow.transform.SetParent(lantern.transform, false);
@@ -914,20 +978,24 @@ namespace ZenBonsai.Editor
                 lGlow.AddComponent<MeshRenderer>().sharedMaterial = sunMat;
             }
 
-            // 6. PINO DE JARDÍN ESCULPIDO (NIWAKI) EN LA ORILLA DERECHA DEL ESTANQUE
+            // 8. ÁRBOLES MONUMENTALES DE JARDÍN CON CORTEZA PBR Y FLORES/ACÍCULAS 3D EN 360°
             BuildGardenLandscapeTree(sanctuaryRoot.transform, "Sanctuary_RightNiwakiPine",
-                new Vector3(3.6f, -0.55f, 6.2f), 2.8f, rosewoodMat, pineNeedleMat, 1410);
+                new Vector3(3.8f, -0.65f, 6.2f), 2.9f, realBarkMat, pineNeedleMat, goldMat, TreeType.Matsu, 1410);
+            BuildGardenLandscapeTree(sanctuaryRoot.transform, "Sanctuary_LeftSakuraTree",
+                new Vector3(-3.6f, -0.72f, 5.8f), 3.1f, realBarkMat, sakuraMat, goldMat, TreeType.Sakura, 1420);
+            BuildGardenLandscapeTree(sanctuaryRoot.transform, "Sanctuary_RearLeftSakuraTree",
+                new Vector3(-4.5f, -0.75f, -5.8f), 3.0f, realBarkMat, sakuraMat, goldMat, TreeType.Sakura, 1430);
+            BuildGardenLandscapeTree(sanctuaryRoot.transform, "Sanctuary_RearRightPineTree",
+                new Vector3(4.6f, -0.75f, -5.6f), 2.8f, realBarkMat, pineNeedleMat, goldMat, TreeType.Matsu, 1440);
 
-            // 7. BOSQUECILLO DE BAMBÚ ARASHIYAMA CON TALLOS NUDOSOS Y FOLLAJE PLUMOSO A AMBOS LADOS
+            // 9. BOSQUECILLOS DE BAMBÚ ARASHIYAMA ENVOLVIENDO LOS LATERALES Y EL PATIO TRASERO (360°)
             Mesh bambooClusterMesh = ZenBonsaiProceduralMeshes.CreateBambooGroveClusterMesh("Mesh_BambooGroveCluster", out Mesh bambooLeavesMesh);
             Vector3[] grovePositions =
             {
-                new Vector3(-3.3f, -0.78f, 3.8f),
-                new Vector3(-3.8f, -0.78f, 6.2f),
-                new Vector3(-3.4f, -0.78f, 8.8f),
-                new Vector3(4.2f, -0.78f, 4.4f),
-                new Vector3(4.6f, -0.78f, 7.4f),
-                new Vector3(4.1f, -0.78f, 10.2f)
+                new Vector3(-3.5f, -0.78f, 3.8f),  new Vector3(-4.2f, -0.78f, 6.5f),  new Vector3(-3.8f, -0.78f, 9.4f),
+                new Vector3(4.5f, -0.78f, 4.4f),   new Vector3(5.0f, -0.78f, 7.6f),   new Vector3(4.4f, -0.78f, 10.6f),
+                new Vector3(-5.4f, -0.78f, -1.2f), new Vector3(5.4f, -0.78f, -1.2f),
+                new Vector3(-3.6f, -0.78f, -7.8f), new Vector3(0.0f, -0.78f, -8.5f),  new Vector3(3.6f, -0.78f, -7.8f)
             };
             for (int g = 0; g < grovePositions.Length; g++)
             {
@@ -944,11 +1012,11 @@ namespace ZenBonsai.Editor
                 leaves.AddComponent<MeshRenderer>().sharedMaterial = pineNeedleMat;
             }
 
-            // 8. PUERTA SAGRADA MYŌJIN TORII ESCULPIDA CON DINTEL CURVO KASAGI (SIN BLOQUES CUADRADOS)
+            // 10. PUERTA SAGRADA MYŌJIN TORII ESCULPIDA EN EL ESTANQUE FRONTAL
             Mesh toriiRedMesh = ZenBonsaiProceduralMeshes.CreateSculptedMyojinToriiMesh("Mesh_MyojinTorii_Main", out Mesh toriiDarkCapsMesh);
             GameObject toriiObj = new GameObject("Sanctuary_SculptedToriiGate");
             toriiObj.transform.SetParent(sanctuaryRoot.transform, false);
-            toriiObj.transform.localPosition = new Vector3(1.35f, -0.78f, 10.6f);
+            toriiObj.transform.localPosition = new Vector3(1.35f, -0.78f, 10.8f);
             toriiObj.transform.localRotation = Quaternion.Euler(0f, -6f, 0f);
             toriiObj.AddComponent<MeshFilter>().sharedMesh = toriiRedMesh;
             toriiObj.AddComponent<MeshRenderer>().sharedMaterial = toriiRedMat;
@@ -958,126 +1026,194 @@ namespace ZenBonsai.Editor
             toriiCaps.AddComponent<MeshFilter>().sharedMesh = toriiDarkCapsMesh;
             toriiCaps.AddComponent<MeshRenderer>().sharedMaterial = urushiMat;
 
-            // 9. MONTE FUJI ESCULPIDO DE ALTA DEFINICIÓN CON BARRANCOS VOLCÁNICOS Y CRESTAS DE NIEVE
-            Mesh fujiRockMesh = ZenBonsaiProceduralMeshes.CreateDetailedMountFujiMesh("Mesh_HD_MountFuji_Volcano", 21f, 2.7f, 10.2f, out Mesh fujiSnowCapMesh);
-            GameObject fujiBody = new GameObject("Distant_MountFuji_HD");
-            fujiBody.transform.SetParent(sanctuaryRoot.transform, false);
-            fujiBody.transform.localPosition = new Vector3(1.2f, -0.85f, 26.5f);
-            fujiBody.AddComponent<MeshFilter>().sharedMesh = fujiRockMesh;
-            fujiBody.AddComponent<MeshRenderer>().sharedMaterial = mountainMat;
-
-            GameObject fujiSnow = new GameObject("Distant_MountFuji_SnowRidges");
-            fujiSnow.transform.SetParent(fujiBody.transform, false);
-            fujiSnow.transform.localPosition = Vector3.zero;
-            fujiSnow.AddComponent<MeshFilter>().sharedMesh = fujiSnowCapMesh;
-            fujiSnow.AddComponent<MeshRenderer>().sharedMaterial = snowMat;
-
-            // Cordilleras laterales suaves en el horizonte
-            Mesh hillMesh = ZenBonsaiProceduralMeshes.CreateConicalMountainMesh("Mesh_Sanctuary_SideHill", 13f, 2.0f, 4.8f, 32);
-            Vector3[] hillPositions = { new Vector3(-14f, -0.85f, 23f), new Vector3(15f, -0.85f, 22f) };
-            for (int h = 0; h < hillPositions.Length; h++)
-            {
-                GameObject hill = new GameObject($"Sanctuary_HorizonRidge_{h}");
-                hill.transform.SetParent(sanctuaryRoot.transform, false);
-                hill.transform.localPosition = hillPositions[h];
-                hill.AddComponent<MeshFilter>().sharedMesh = hillMesh;
-                hill.AddComponent<MeshRenderer>().sharedMaterial = mountainMat;
-            }
-
             sanctuaryRoot.SetActive(false);
             return sanctuaryRoot;
         }
 
         private static void BuildJapaneseTeaRoomVerandaFrame(
             Transform parent,
-            Material urushiMat, Material rosewoodMat, Material hinokiMat, Material wallMat, Material shojiPaperMat, Material lampMat, Material goldMat)
+            Material urushiMat, Material plankFloorMat, Material tatamiMat, Material wallMat,
+            Material shojiPaperMat, Material kawaraRoofMat, Material stonePlinthMat, Material sumieScrollMat,
+            Material lampMat, Material goldMat, Material sakuraMat)
         {
-            GameObject roomRoot = new GameObject("TeaRoom_EngawaPortal");
+            GameObject roomRoot = new GameObject("TeaRoom_EngawaPortal360");
             roomRoot.transform.SetParent(parent, false);
             roomRoot.transform.localPosition = Vector3.zero;
 
-            // Suelo interior de tablones de madera noble y estera Tatami bajo el jugador
-            GameObject woodFloor = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            woodFloor.name = "TeaRoom_HardwoodFloor";
+            // 1. SUELO ARTESANAL DE TABLONES DE CIPRÉS HINOKI (ENGAWA PERIMETRAL 360°) Y ESTERAS TATAMI CON BROCADO
+            Mesh floorDeckMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_TeaRoom_HardwoodFloor", 6.8f, 5.6f, 0.04f, 0.0f);
+            GameObject woodFloor = new GameObject("TeaRoom_HardwoodFloor");
             woodFloor.transform.SetParent(roomRoot.transform, false);
-            woodFloor.transform.localPosition = new Vector3(0f, -0.76f, -0.25f);
-            woodFloor.transform.localScale = new Vector3(5.6f, 0.06f, 3.8f);
-            woodFloor.GetComponent<Renderer>().sharedMaterial = rosewoodMat;
-            DestroyImmediate(woodFloor.GetComponent<Collider>());
+            woodFloor.transform.localPosition = new Vector3(0f, -0.76f, -0.65f);
+            woodFloor.AddComponent<MeshFilter>().sharedMesh = floorDeckMesh;
+            woodFloor.AddComponent<MeshRenderer>().sharedMaterial = plankFloorMat;
 
-            // Alfombra / Tatami tejido bajo la mesa del bonsái (como en la imagen de referencia)
-            GameObject tatamiRug = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            tatamiRug.name = "TeaRoom_WovenTatamiRug";
-            tatamiRug.transform.SetParent(roomRoot.transform, false);
-            tatamiRug.transform.localPosition = new Vector3(0f, -0.725f, -0.05f);
-            tatamiRug.transform.localScale = new Vector3(2.4f, 0.015f, 1.85f);
-            tatamiRug.GetComponent<Renderer>().sharedMaterial = hinokiMat;
-            DestroyImmediate(tatamiRug.GetComponent<Collider>());
-
-            // Pilares maestros de cedro Hinoki y dintel superior Kamoi que enmarcan el ventanal panorámico al jardín
-            float[] framePillarX = { -2.45f, 2.45f };
-            for (int p = 0; p < 2; p++)
+            Mesh tatamiMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_TeaRoom_TatamiMat", 1.85f, 0.92f, 0.018f, 0.0f);
+            Vector3[] tatamiPos =
             {
-                GameObject pillar = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                pillar.name = $"Veranda_HinokiPillar_{p}";
-                pillar.transform.SetParent(roomRoot.transform, false);
-                pillar.transform.localPosition = new Vector3(framePillarX[p], 0.85f, 1.55f);
-                pillar.transform.localScale = new Vector3(0.18f, 3.2f, 0.18f);
-                pillar.GetComponent<Renderer>().sharedMaterial = hinokiMat;
-                DestroyImmediate(pillar.GetComponent<Collider>());
-
-                // Panel corredero Shoji con celosía Kumiko abierto en los laterales del ventanal
-                GameObject shojiScreen = new GameObject($"Veranda_OpenShojiScreen_{p}");
-                shojiScreen.transform.SetParent(roomRoot.transform, false);
-                float screenX = (p == 0) ? -2.95f : 2.95f;
-                shojiScreen.transform.localPosition = new Vector3(screenX, 0.85f, 1.55f);
-
-                GameObject shojiPaper = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                shojiPaper.transform.SetParent(shojiScreen.transform, false);
-                shojiPaper.transform.localScale = new Vector3(0.88f, 3.0f, 0.03f);
-                shojiPaper.GetComponent<Renderer>().sharedMaterial = shojiPaperMat;
-                DestroyImmediate(shojiPaper.GetComponent<Collider>());
-
-                for (int r = -3; r <= 3; r++)
-                {
-                    GameObject lath = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    lath.transform.SetParent(shojiScreen.transform, false);
-                    lath.transform.localPosition = new Vector3(0f, r * 0.38f, -0.02f);
-                    lath.transform.localScale = new Vector3(0.90f, 0.022f, 0.04f);
-                    lath.GetComponent<Renderer>().sharedMaterial = rosewoodMat;
-                    DestroyImmediate(lath.GetComponent<Collider>());
-                }
+                new Vector3(-0.95f, -0.725f, 0.05f),  new Vector3(0.95f, -0.725f, 0.05f),
+                new Vector3(-0.95f, -0.725f, -0.90f), new Vector3(0.95f, -0.725f, -0.90f),
+                new Vector3(-0.95f, -0.725f, -1.85f), new Vector3(0.95f, -0.725f, -1.85f)
+            };
+            for (int t = 0; t < tatamiPos.Length; t++)
+            {
+                GameObject tatami = new GameObject($"TeaRoom_WovenTatami_{t}");
+                tatami.transform.SetParent(roomRoot.transform, false);
+                tatami.transform.localPosition = tatamiPos[t];
+                tatami.AddComponent<MeshFilter>().sharedMesh = tatamiMesh;
+                tatami.AddComponent<MeshRenderer>().sharedMaterial = tatamiMat;
             }
 
-            // Viga superior Kamoi del ventanal panorámico
-            GameObject topBeam = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            topBeam.name = "Veranda_KamoiTopBeam";
-            topBeam.transform.SetParent(roomRoot.transform, false);
-            topBeam.transform.localPosition = new Vector3(0f, 2.42f, 1.55f);
-            topBeam.transform.localScale = new Vector3(6.8f, 0.22f, 0.24f);
-            topBeam.GetComponent<Renderer>().sharedMaterial = hinokiMat;
-            DestroyImmediate(topBeam.GetComponent<Collider>());
+            // 2. COLUMNAS TORNEADAS DE CEDRO HINOKI EN LOS 360° DEL SALÓN (CON BASAS DE PIEDRA SOSEKI Y MÉNSULAS KUMIMONO)
+            Mesh pillarMesh = ZenBonsaiProceduralMeshes.CreateSculptedTurnedPillarMesh(
+                "Mesh_TeaRoom_TurnedPillar", 0.095f, 3.15f, out Mesh plinthMesh, out Mesh corbelMesh);
 
-            // Mueble bajo japonés Chigaidana y lámpara cálida de papel Andon a la izquierda (igual que en la imagen)
-            GameObject leftCabinet = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            leftCabinet.name = "TeaRoom_LeftWoodenShelf";
+            Vector3[] pillarCoords =
+            {
+                new Vector3(-2.45f, -0.74f, 1.55f),  new Vector3(2.45f, -0.74f, 1.55f),   // Frente (Ventanal al Monte Fuji)
+                new Vector3(-3.15f, -0.74f, 1.55f),  new Vector3(3.15f, -0.74f, 1.55f),   // Esquinas delanteras Engawa
+                new Vector3(-3.15f, -0.74f, -0.65f), new Vector3(3.15f, -0.74f, -0.65f),  // Laterales medios
+                new Vector3(-3.15f, -0.74f, -2.85f), new Vector3(3.15f, -0.74f, -2.85f),  // Esquinas traseras
+                new Vector3(-1.15f, -0.74f, -2.85f), new Vector3(1.15f, -0.74f, -2.85f)   // Pilares del Tokonoma trasero
+            };
+            for (int p = 0; p < pillarCoords.Length; p++)
+            {
+                GameObject pObj = new GameObject($"TeaRoom_TurnedPillar_{p}");
+                pObj.transform.SetParent(roomRoot.transform, false);
+                pObj.transform.localPosition = pillarCoords[p];
+                pObj.AddComponent<MeshFilter>().sharedMesh = pillarMesh;
+                pObj.AddComponent<MeshRenderer>().sharedMaterial = plankFloorMat;
+
+                GameObject plinth = new GameObject("Pillar_StonePlinth");
+                plinth.transform.SetParent(pObj.transform, false);
+                plinth.AddComponent<MeshFilter>().sharedMesh = plinthMesh;
+                plinth.AddComponent<MeshRenderer>().sharedMaterial = stonePlinthMat;
+
+                GameObject corbel = new GameObject("Pillar_KumimonoCorbel");
+                corbel.transform.SetParent(pObj.transform, false);
+                corbel.AddComponent<MeshFilter>().sharedMesh = corbelMesh;
+                corbel.AddComponent<MeshRenderer>().sharedMaterial = urushiMat;
+            }
+
+            // 3. PANELES CORREDEROS SHOJI ESCULPIDOS EN 3D (ABIERTOS EN EL FRENTE Y ENMARCANDO LATERALES Y FONDO 360°)
+            Mesh shojiFrameMesh = ZenBonsaiProceduralMeshes.CreateSculptedShojiScreenMesh(
+                "Mesh_TeaRoom_ShojiScreen", 1.12f, 2.85f, 4, 7, out Mesh shojiPaperMesh);
+
+            Vector3[] shojiPositions =
+            {
+                new Vector3(-2.82f, -0.60f, 1.55f),  new Vector3(2.82f, -0.60f, 1.55f),   // Frente abiertos hacia los lados
+                new Vector3(-3.15f, -0.60f, 0.55f),  new Vector3(3.15f, -0.60f, 0.55f),   // Laterales delanteros
+                new Vector3(-3.15f, -0.60f, -1.75f), new Vector3(3.15f, -0.60f, -1.75f),  // Laterales traseros
+                new Vector3(-2.15f, -0.60f, -2.85f), new Vector3(2.15f, -0.60f, -2.85f)   // Traseros flanqueando el Tokonoma
+            };
+            float[] shojiRotY = { 0f, 0f, 90f, 90f, 90f, 90f, 0f, 0f };
+            for (int s = 0; s < shojiPositions.Length; s++)
+            {
+                GameObject shoji = new GameObject($"TeaRoom_SculptedShoji_{s}");
+                shoji.transform.SetParent(roomRoot.transform, false);
+                shoji.transform.localPosition = shojiPositions[s];
+                shoji.transform.localRotation = Quaternion.Euler(0f, shojiRotY[s], 0f);
+                shoji.AddComponent<MeshFilter>().sharedMesh = shojiFrameMesh;
+                shoji.AddComponent<MeshRenderer>().sharedMaterial = urushiMat;
+
+                GameObject paper = new GameObject("Shoji_WashiInsert");
+                paper.transform.SetParent(shoji.transform, false);
+                paper.AddComponent<MeshFilter>().sharedMesh = shojiPaperMesh;
+                paper.AddComponent<MeshRenderer>().sharedMaterial = shojiPaperMat;
+            }
+
+            // 4. ALCOBA SAGRADA TOKONOMA DETRÁS DEL JUGADOR (z = -2.85m, PARA QUE AL GIRAR 180° VEA UN INTERIOR JAPONÉS REAL)
+            GameObject tokonomaRoot = new GameObject("TeaRoom_RearTokonomaAlcove");
+            tokonomaRoot.transform.SetParent(roomRoot.transform, false);
+            tokonomaRoot.transform.localPosition = new Vector3(0f, -0.68f, -2.85f);
+
+            Mesh backWallMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_Tokonoma_BackWall", 2.35f, 0.12f, 2.95f, 0.0f);
+            GameObject tokoWall = new GameObject("Tokonoma_ShikkuiWall");
+            tokoWall.transform.SetParent(tokonomaRoot.transform, false);
+            tokoWall.AddComponent<MeshFilter>().sharedMesh = backWallMesh;
+            tokoWall.AddComponent<MeshRenderer>().sharedMaterial = wallMat;
+
+            // Pergamino colgante Kakemono pintado con tinta Sumi-e del Monte Fuji en el centro del Tokonoma
+            Mesh scrollFrameMesh = ZenBonsaiProceduralMeshes.CreateSculptedShojiScreenMesh(
+                "Mesh_Tokonoma_Kakemono", 0.78f, 1.65f, 1, 1, out Mesh scrollPaintingMesh);
+            GameObject kakemono = new GameObject("Tokonoma_HangingSumieScroll");
+            kakemono.transform.SetParent(tokonomaRoot.transform, false);
+            kakemono.transform.localPosition = new Vector3(0f, 0.68f, 0.08f);
+            kakemono.AddComponent<MeshFilter>().sharedMesh = scrollFrameMesh;
+            kakemono.AddComponent<MeshRenderer>().sharedMaterial = goldMat;
+
+            GameObject kPainting = new GameObject("Kakemono_SumieArtwork");
+            kPainting.transform.SetParent(kakemono.transform, false);
+            kPainting.AddComponent<MeshFilter>().sharedMesh = scrollPaintingMesh;
+            kPainting.AddComponent<MeshRenderer>().sharedMaterial = sumieScrollMat;
+
+            // 5. TECHO ARTESONADO JAPONÉS (GŌTENJŌ), TEJADO CURVO KAWARA Y FAROLILLOS COLGANTES CHŌCHIN
+            Mesh pavilionRoofMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_TeaRoom_MainRoof", 7.8f, 6.8f, 1.35f, 0.34f);
+            GameObject mainRoof = new GameObject("TeaRoom_OverhangingKawaraRoof");
+            mainRoof.transform.SetParent(roomRoot.transform, false);
+            mainRoof.transform.localPosition = new Vector3(0f, 2.40f, -0.65f);
+            mainRoof.AddComponent<MeshFilter>().sharedMesh = pavilionRoofMesh;
+            mainRoof.AddComponent<MeshRenderer>().sharedMaterial = kawaraRoofMat;
+
+            Mesh chochinFrameMesh = ZenBonsaiProceduralMeshes.CreateSculptedHangingChochinLanternMesh("Mesh_HangingChochin", out Mesh chochinGlowMesh);
+            GameObject hangingRoot = new GameObject("Sanctuary_HangingLanterns");
+            hangingRoot.transform.SetParent( parent, false);
+            Vector3[] chochinPos =
+            {
+                new Vector3(-1.85f, 2.38f, 1.35f),
+                new Vector3(1.85f, 2.38f, 1.35f),
+                new Vector3(-1.65f, 2.38f, -2.15f),
+                new Vector3(1.65f, 2.38f, -2.15f)
+            };
+            for (int c = 0; c < chochinPos.Length; c++)
+            {
+                GameObject hl = new GameObject($"HangingChochin_{c}");
+                hl.transform.SetParent(hangingRoot.transform, false);
+                hl.transform.localPosition = chochinPos[c];
+                hl.AddComponent<MeshFilter>().sharedMesh = chochinFrameMesh;
+                hl.AddComponent<MeshRenderer>().sharedMaterial = urushiMat;
+
+                GameObject hGlow = new GameObject("Chochin_SilkGlow");
+                hGlow.transform.SetParent(hl.transform, false);
+                hGlow.AddComponent<MeshFilter>().sharedMesh = chochinGlowMesh;
+                hGlow.AddComponent<MeshRenderer>().sharedMaterial = lampMat;
+            }
+
+            // 6. ESTANTERÍA ESCALONADA CHIGAIDANA Y LÁMPARA DE PAPEL ANDON TALLADAS A LA IZQUIERDA (COMO EN LA IMAGEN)
+            Mesh chigaidanaMesh = ZenBonsaiProceduralMeshes.CreateSculptedChigaidanaCabinetMesh("Mesh_TeaRoom_Chigaidana", out Mesh chigaidanaBrassMesh);
+            GameObject leftCabinet = new GameObject("TeaRoom_LeftChigaidanaShelf");
             leftCabinet.transform.SetParent(roomRoot.transform, false);
-            leftCabinet.transform.localPosition = new Vector3(-2.35f, -0.32f, 0.45f);
-            leftCabinet.transform.localScale = new Vector3(0.45f, 0.82f, 1.35f);
-            leftCabinet.GetComponent<Renderer>().sharedMaterial = rosewoodMat;
-            DestroyImmediate(leftCabinet.GetComponent<Collider>());
+            leftCabinet.transform.localPosition = new Vector3(-2.35f, -0.72f, 0.42f);
+            leftCabinet.AddComponent<MeshFilter>().sharedMesh = chigaidanaMesh;
+            leftCabinet.AddComponent<MeshRenderer>().sharedMaterial = urushiMat;
 
-            GameObject andonLamp = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            andonLamp.name = "TeaRoom_WarmAndonLamp";
-            andonLamp.transform.SetParent(roomRoot.transform, false);
-            andonLamp.transform.localPosition = new Vector3(-2.32f, 0.30f, 0.65f);
-            andonLamp.transform.localScale = new Vector3(0.24f, 0.20f, 0.24f);
-            andonLamp.GetComponent<Renderer>().sharedMaterial = lampMat;
-            DestroyImmediate(andonLamp.GetComponent<Collider>());
+            GameObject cabBrass = new GameObject("Chigaidana_BrassAndVase");
+            cabBrass.transform.SetParent(leftCabinet.transform, false);
+            cabBrass.AddComponent<MeshFilter>().sharedMesh = chigaidanaBrassMesh;
+            cabBrass.AddComponent<MeshRenderer>().sharedMaterial = goldMat;
+
+            Mesh andonFrameMesh = ZenBonsaiProceduralMeshes.CreateSculptedAndonLampMesh("Mesh_TeaRoom_AndonLamp", out Mesh andonGlowMesh);
+            Vector3[] andonPositions = { new Vector3(-2.32f, 0.14f, 0.65f), new Vector3(2.35f, -0.72f, -2.25f) };
+            for (int a = 0; a < andonPositions.Length; a++)
+            {
+                GameObject andon = new GameObject($"TeaRoom_SculptedAndonLamp_{a}");
+                andon.transform.SetParent(roomRoot.transform, false);
+                andon.transform.localPosition = andonPositions[a];
+                andon.AddComponent<MeshFilter>().sharedMesh = andonFrameMesh;
+                andon.AddComponent<MeshRenderer>().sharedMaterial = urushiMat;
+
+                GameObject aGlow = new GameObject("Andon_WashiCore");
+                aGlow.transform.SetParent(andon.transform, false);
+                aGlow.AddComponent<MeshFilter>().sharedMesh = andonGlowMesh;
+                aGlow.AddComponent<MeshRenderer>().sharedMaterial = lampMat;
+            }
         }
 
         // =========================================================================
-        // ENTORNO 2: LAGO SAGRADO DE KIOTO, PAGODA DE 5 PISOS (GOJŪ-NO-TŌ) Y PUENTE TAIKO-BASHI
+        // ENTORNO 2 (360° COMPLETO): PABELLÓN FLOTANTE DE KIOTO, LAGO ESPEJO 360° Y PAGODA DE 5 PISOS
+        // El jugador está dentro de un pabellón imperial sobre el agua (Tsuri-dono) con columnas torneadas,
+        // barandillas bermellón Kōran con remates de bronce Giboshi, techo curvo Kawara, farolillos colgantes
+        // y pasarela sagrada trasera con puerta Karamon, rodeado en 360° por el lago, islas, cerezos y arces.
         // =========================================================================
         private static GameObject BuildKyotoLakePagodaSanctuary(
             Transform parent,
@@ -1089,76 +1225,202 @@ namespace ZenBonsai.Editor
             root.transform.SetParent(parent, false);
             root.transform.localPosition = Vector3.zero;
 
-            Material skyDomeMat = CreateOrGetPBRMaterial("Zen_KyotoSkyDomeMat", new Color(0.52f, 0.70f, 0.90f), 0.0f, 0.0f);
-            skyDomeMat.EnableKeyword("_EMISSION");
-            if (skyDomeMat.HasProperty("_EmissionColor")) skyDomeMat.SetColor("_EmissionColor", new Color(0.38f, 0.50f, 0.66f));
-            if (skyDomeMat.HasProperty("_Cull")) skyDomeMat.SetFloat("_Cull", 0f);
+            Material skyDomeMat = CreateOrGetPanoramicSkyDomeMaterial("Zen_SkyPanorama_KyotoTwilight",
+                new Color(0.20f, 0.36f, 0.68f), new Color(0.56f, 0.58f, 0.82f), new Color(0.98f, 0.64f, 0.48f),
+                new Color(1.0f, 0.86f, 0.72f), new Color(0.48f, 0.44f, 0.64f), new Color(0.20f, 0.24f, 0.38f), 202);
 
             Material sunMat = CreateOrGetPBRMaterial("Zen_SanctuarySunMat", new Color(1.0f, 0.90f, 0.70f), 0.9f, 0.0f);
             sunMat.EnableKeyword("_EMISSION");
-            if (sunMat.HasProperty("_EmissionColor")) sunMat.SetColor("_EmissionColor", new Color(1.0f, 0.82f, 0.50f) * 1.7f);
+            if (sunMat.HasProperty("_EmissionColor")) sunMat.SetColor("_EmissionColor", new Color(1.0f, 0.82f, 0.50f) * 1.75f);
 
-            Material toriiRedMat = CreateOrGetPBRMaterial("Zen_ToriiVermilionMat", new Color(0.78f, 0.17f, 0.11f), 0.62f, 0.05f);
-            Material lakeMat = CreateOrGetPBRMaterial("Zen_KyotoLakeMat", new Color(0.09f, 0.30f, 0.42f), 0.97f, 0.18f);
-            Material kawaraMat = CreateOrGetPBRMaterial("Zen_KawaraTileMat", new Color(0.15f, 0.17f, 0.20f), 0.66f, 0.15f);
+            Material toriiRedMat = CreateOrGetSurfaceTexturedMaterial("Zen_ToriiVermilionPBRMat",
+                new Color(0.80f, 0.16f, 0.10f), new Color(0.52f, 0.08f, 0.05f), new Color(0.95f, 0.32f, 0.20f), 0.68f, 0.06f, 17);
+            Material lakeMat = CreateOrGetSurfaceTexturedMaterial("Zen_SanctuaryPondPBRMat",
+                new Color(0.09f, 0.32f, 0.42f), new Color(0.04f, 0.18f, 0.26f), new Color(0.32f, 0.62f, 0.72f), 0.96f, 0.22f, 24);
+            Material kawaraMat = CreateOrGetSurfaceTexturedMaterial("Zen_KawaraTilePBRMat",
+                new Color(0.17f, 0.19f, 0.23f), new Color(0.08f, 0.09f, 0.12f), new Color(0.38f, 0.42f, 0.48f), 0.72f, 0.22f, 19);
             Material mossMat = CreateOrGetSurfaceTexturedMaterial("Zen_SanctuaryMossMat",
-                new Color(0.18f, 0.42f, 0.14f), new Color(0.09f, 0.24f, 0.07f), new Color(0.32f, 0.58f, 0.20f), 0.18f, 0.0f, 11);
+                new Color(0.18f, 0.42f, 0.14f), new Color(0.09f, 0.24f, 0.07f), new Color(0.32f, 0.58f, 0.20f), 0.20f, 0.0f, 11);
+            Material plankFloorMat = CreateOrGetSurfaceTexturedMaterial("Zen_HinokiPlankFloorMat",
+                new Color(0.48f, 0.30f, 0.17f), new Color(0.26f, 0.15f, 0.08f), new Color(0.68f, 0.46f, 0.28f), 0.68f, 0.04f, 17);
+            Material shojiPaperMat = CreateOrGetSurfaceTexturedMaterial("Zen_ShojiLatticePBRMat",
+                new Color(0.96f, 0.92f, 0.82f), new Color(0.28f, 0.17f, 0.10f), new Color(1.0f, 0.97f, 0.90f), 0.22f, 0.0f, 20);
+            shojiPaperMat.EnableKeyword("_EMISSION");
+            if (shojiPaperMat.HasProperty("_EmissionColor")) shojiPaperMat.SetColor("_EmissionColor", new Color(0.42f, 0.34f, 0.22f));
+            Material templeStoneMat = CreateOrGetSurfaceTexturedMaterial("Zen_TempleStoneMasonryMat",
+                new Color(0.42f, 0.43f, 0.45f), new Color(0.22f, 0.23f, 0.25f), new Color(0.62f, 0.64f, 0.66f), 0.25f, 0.05f, 21);
+            Material realBarkMat = CreateOrGetBarkMaterial("Zen_SakuraBark_Mat",
+                new Color(0.34f, 0.22f, 0.16f), new Color(0.16f, 0.10f, 0.07f), new Color(0.50f, 0.35f, 0.26f), 0.28f, 1);
 
-            // 1. Cúpula celeste y lago sagrado reflectante 360°
-            GameObject skyDome = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            skyDome.name = "Sanctuary_SkyDome";
+            // 1. CÚPULA CELESTE PANORÁMICA 360° + TERRENO RIBEREÑO 360° + LAGO SAGRADO REFLECTANTE 360°
+            Mesh skySphereMesh = ZenBonsaiProceduralMeshes.CreatePanoramicSkySphereMesh("Mesh_PanoramicSkySphere_360", 42f, 64, 32);
+            GameObject skyDome = new GameObject("Sanctuary_SkyDome");
             skyDome.transform.SetParent(root.transform, false);
-            skyDome.transform.localScale = new Vector3(72f, 50f, 72f);
-            skyDome.GetComponent<Renderer>().sharedMaterial = skyDomeMat;
-            DestroyImmediate(skyDome.GetComponent<Collider>());
+            skyDome.AddComponent<MeshFilter>().sharedMesh = skySphereMesh;
+            skyDome.AddComponent<MeshRenderer>().sharedMaterial = skyDomeMat;
 
-            GameObject sacredLake = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            sacredLake.name = "Kyoto_SacredMirrorLake";
+            Mesh kyotoTerrainMesh = ZenBonsaiProceduralMeshes.CreateFull360SanctuaryTerrainMesh(
+                "Mesh_KyotoSanctuary_Terrain360", 76f, -0.78f, new Vector2(0f, 5.5f), new Vector2(18f, 16f), 0.38f, 202);
+            GameObject kyotoShore = new GameObject("Kyoto_ShoreLandscape360");
+            kyotoShore.transform.SetParent(root.transform, false);
+            kyotoShore.AddComponent<MeshFilter>().sharedMesh = kyotoTerrainMesh;
+            kyotoShore.AddComponent<MeshRenderer>().sharedMaterial = mossMat;
+
+            Mesh lakeSheetMesh = ZenBonsaiProceduralMeshes.CreateOrganicMossMoundMesh("Mesh_Kyoto_LakeWaterSheet360", 54f, 54f, -0.82f, 0.005f);
+            GameObject sacredLake = new GameObject("Kyoto_SacredMirrorLake360");
             sacredLake.transform.SetParent(root.transform, false);
-            sacredLake.transform.localPosition = new Vector3(0f, -0.82f, 8.0f);
-            sacredLake.transform.localScale = new Vector3(44f, 0.02f, 44f);
-            sacredLake.GetComponent<Renderer>().sharedMaterial = lakeMat;
-            DestroyImmediate(sacredLake.GetComponent<Collider>());
+            sacredLake.transform.localPosition = Vector3.zero;
+            sacredLake.AddComponent<MeshFilter>().sharedMesh = lakeSheetMesh;
+            sacredLake.AddComponent<MeshRenderer>().sharedMaterial = lakeMat;
 
-            // Terraza flotante del pabellón sobre el agua con barandilla lacada
-            GameObject pavilionDeck = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            pavilionDeck.name = "Kyoto_WaterPavilionDeck";
-            pavilionDeck.transform.SetParent(root.transform, false);
-            pavilionDeck.transform.localPosition = new Vector3(0f, -0.76f, -0.2f);
-            pavilionDeck.transform.localScale = new Vector3(4.4f, 0.08f, 3.6f);
-            pavilionDeck.GetComponent<Renderer>().sharedMaterial = hinokiMat;
-            DestroyImmediate(pavilionDeck.GetComponent<Collider>());
+            Mesh kyotoMountainsMesh = ZenBonsaiProceduralMeshes.Create360MountainHorizonRingMesh(
+                "Mesh_KyotoSanctuary_HorizonRing360", 24f, 39f, 7.2f, 0.15f, 209);
+            GameObject kyotoHorizon = new GameObject("Kyoto_360MountainRing");
+            kyotoHorizon.transform.SetParent(root.transform, false);
+            kyotoHorizon.AddComponent<MeshFilter>().sharedMesh = kyotoMountainsMesh;
+            kyotoHorizon.AddComponent<MeshRenderer>().sharedMaterial = mountainMat;
 
-            // 2. PAGODA TRADICIONAL JAPONESA DE 5 PISOS (GOJŪ-NO-TŌ) CON TEJADOS CURVOS IRIMOYA Y AGUJA SŌRIN DORADA
+            // 2. PABELLÓN FLOTANTE IMPERIAL 360° (TSURI-DONO) ALREDEDOR DEL JUGADOR (CON BARANDILLAS KŌRAN Y TECHO CURVO)
+            GameObject pavilionRoot = new GameObject("Kyoto_OverwaterPavilion360");
+            pavilionRoot.transform.SetParent(root.transform, false);
+
+            Mesh deckMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_Kyoto_PavilionDeck", 5.6f, 5.2f, 0.06f, 0.0f);
+            GameObject pavilionDeck = new GameObject("Kyoto_WaterPavilionDeck");
+            pavilionDeck.transform.SetParent(pavilionRoot.transform, false);
+            pavilionDeck.transform.localPosition = new Vector3(0f, -0.76f, -0.45f);
+            pavilionDeck.AddComponent<MeshFilter>().sharedMesh = deckMesh;
+            pavilionDeck.AddComponent<MeshRenderer>().sharedMaterial = plankFloorMat;
+
+            // Columnas torneadas en bermellón y piedra sumergida + Techo imperial Irimoya sobre el jugador
+            Mesh pillarMesh = ZenBonsaiProceduralMeshes.CreateSculptedTurnedPillarMesh(
+                "Mesh_TeaRoom_TurnedPillar", 0.095f, 3.15f, out Mesh plinthMesh, out Mesh corbelMesh);
+            Vector3[] pavPillars =
+            {
+                new Vector3(-2.45f, -0.74f, 1.85f),  new Vector3(2.45f, -0.74f, 1.85f),
+                new Vector3(-2.45f, -0.74f, -2.75f), new Vector3(2.45f, -0.74f, -2.75f),
+                new Vector3(-1.10f, -0.74f, -2.75f), new Vector3(1.10f, -0.74f, -2.75f)
+            };
+            for (int p = 0; p < pavPillars.Length; p++)
+            {
+                GameObject col = new GameObject($"Pavilion_VermilionPillar_{p}");
+                col.transform.SetParent(pavilionRoot.transform, false);
+                col.transform.localPosition = pavPillars[p];
+                col.AddComponent<MeshFilter>().sharedMesh = pillarMesh;
+                col.AddComponent<MeshRenderer>().sharedMaterial = toriiRedMat;
+
+                GameObject pl = new GameObject("Pillar_Plinth");
+                pl.transform.SetParent(col.transform, false);
+                pl.AddComponent<MeshFilter>().sharedMesh = plinthMesh;
+                pl.AddComponent<MeshRenderer>().sharedMaterial = templeStoneMat;
+
+                GameObject cb = new GameObject("Pillar_Corbel");
+                cb.transform.SetParent(col.transform, false);
+                cb.AddComponent<MeshFilter>().sharedMesh = corbelMesh;
+                cb.AddComponent<MeshRenderer>().sharedMaterial = goldMat;
+            }
+
+            // Barandillas tradicionales Kōran con remates de bronce Giboshi en los laterales y trasera del pabellón
+            Mesh koranSideMesh = ZenBonsaiProceduralMeshes.CreateSculptedKoranBalustradeMesh(
+                "Mesh_Kyoto_KoranSide", 4.5f, 0.56f, 5, out Mesh giboshiSideMesh);
+            Vector3[] railPositions = { new Vector3(-2.55f, -0.72f, -0.45f), new Vector3(2.55f, -0.72f, -0.45f) };
+            for (int r = 0; r < 2; r++)
+            {
+                GameObject rail = new GameObject($"Pavilion_KoranBalustrade_{r}");
+                rail.transform.SetParent(pavilionRoot.transform, false);
+                rail.transform.localPosition = railPositions[r];
+                rail.transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
+                rail.AddComponent<MeshFilter>().sharedMesh = koranSideMesh;
+                rail.AddComponent<MeshRenderer>().sharedMaterial = toriiRedMat;
+
+                GameObject gib = new GameObject("Koran_GoldenGiboshi");
+                gib.transform.SetParent(rail.transform, false);
+                gib.AddComponent<MeshFilter>().sharedMesh = giboshiSideMesh;
+                gib.AddComponent<MeshRenderer>().sharedMaterial = goldMat;
+            }
+
+            // Santuario y Puerta Karamon iluminada detrás del jugador (z = -2.75m, vista trasera 180° espectacular)
+            Mesh shojiFrameMesh = ZenBonsaiProceduralMeshes.CreateSculptedShojiScreenMesh(
+                "Mesh_TeaRoom_ShojiScreen", 1.12f, 2.85f, 4, 7, out Mesh shojiPaperMesh);
+            float[] rearShojiX = { -1.78f, 0.0f, 1.78f };
+            for (int s = 0; s < rearShojiX.Length; s++)
+            {
+                GameObject shoji = new GameObject($"Pavilion_RearShoji_{s}");
+                shoji.transform.SetParent(pavilionRoot.transform, false);
+                shoji.transform.localPosition = new Vector3(rearShojiX[s], -0.68f, -2.75f);
+                shoji.AddComponent<MeshFilter>().sharedMesh = shojiFrameMesh;
+                shoji.AddComponent<MeshRenderer>().sharedMaterial = toriiRedMat;
+
+                GameObject paper = new GameObject("Shoji_Glow");
+                paper.transform.SetParent(shoji.transform, false);
+                paper.AddComponent<MeshFilter>().sharedMesh = shojiPaperMesh;
+                paper.AddComponent<MeshRenderer>().sharedMaterial = shojiPaperMat;
+            }
+
+            Mesh pavRoofMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_Kyoto_PavilionRoof", 6.8f, 6.4f, 1.45f, 0.38f);
+            GameObject pavRoof = new GameObject("Pavilion_IrimoyaRoof");
+            pavRoof.transform.SetParent(pavilionRoot.transform, false);
+            pavRoof.transform.localPosition = new Vector3(0f, 2.40f, -0.45f);
+            pavRoof.AddComponent<MeshFilter>().sharedMesh = pavRoofMesh;
+            pavRoof.AddComponent<MeshRenderer>().sharedMaterial = kawaraMat;
+
+            // Farolillos imperiales Chōchin colgando de las 4 esquinas del pabellón
+            Mesh chochinFrameMesh = ZenBonsaiProceduralMeshes.CreateSculptedHangingChochinLanternMesh("Mesh_HangingChochin", out Mesh chochinGlowMesh);
+            GameObject hangingRoot = new GameObject("Sanctuary_HangingLanterns");
+            hangingRoot.transform.SetParent(root.transform, false);
+            Vector3[] chochinPos =
+            {
+                new Vector3(-2.15f, 2.38f, 1.65f),  new Vector3(2.15f, 2.38f, 1.65f),
+                new Vector3(-2.15f, 2.38f, -2.35f), new Vector3(2.15f, 2.38f, -2.35f)
+            };
+            for (int c = 0; c < chochinPos.Length; c++)
+            {
+                GameObject hl = new GameObject($"Kyoto_HangingChochin_{c}");
+                hl.transform.SetParent(hangingRoot.transform, false);
+                hl.transform.localPosition = chochinPos[c];
+                hl.AddComponent<MeshFilter>().sharedMesh = chochinFrameMesh;
+                hl.AddComponent<MeshRenderer>().sharedMaterial = goldMat;
+
+                GameObject hGlow = new GameObject("Chochin_Glow");
+                hGlow.transform.SetParent(hl.transform, false);
+                hGlow.AddComponent<MeshFilter>().sharedMesh = chochinGlowMesh;
+                hGlow.AddComponent<MeshRenderer>().sharedMaterial = sunMat;
+            }
+
+            // 3. ISLAS ROCOSAS ESCULPIDAS Y PAGODA DE 5 PISOS (GOJŪ-NO-TŌ) CON COLUMNAS, BALCONES Y AGUJA DE 9 ANILLOS
             GameObject pagodaIsland = new GameObject("Kyoto_PagodaRockyPromontory");
             pagodaIsland.transform.SetParent(root.transform, false);
-            pagodaIsland.transform.localPosition = new Vector3(-3.8f, -0.55f, 12.5f);
+            pagodaIsland.transform.localPosition = new Vector3(-4.2f, -0.52f, 12.8f);
             pagodaIsland.AddComponent<MeshFilter>().sharedMesh = ZenBonsaiProceduralMeshes.CreateSuisekiStoneMesh(
-                "Mesh_PagodaPromontory", new Vector3(3.8f, 1.1f, 3.2f), 2101);
+                "Mesh_PagodaPromontory", new Vector3(4.2f, 1.15f, 3.6f), 2101);
             pagodaIsland.AddComponent<MeshRenderer>().sharedMaterial = mossMat;
 
-            BuildFiveStoryJapanesePagoda(root.transform, new Vector3(-3.8f, 0.15f, 12.5f), kawaraMat, toriiRedMat, hinokiMat, sunMat, goldMat);
+            BuildFiveStoryJapanesePagoda(root.transform, new Vector3(-4.2f, 0.18f, 12.8f), kawaraMat, toriiRedMat, templeStoneMat, shojiPaperMat, goldMat);
 
-            // 3. PUENTE DE TAMBOR ARQUEado EN BERMELLÓN (TAIKO-BASHI) CRUZANDO EL LAGO
-            Mesh bridgeBeamMesh = ZenBonsaiProceduralMeshes.CreateArchedTaikoBridgeMesh("Mesh_Kyoto_TaikoBridge", 7.2f, 1.55f, 1.35f, out Mesh bridgeDeckMesh);
-            GameObject bridgeObj = new GameObject("Kyoto_ArchedTaikoBridge");
-            bridgeObj.transform.SetParent(root.transform, false);
-            bridgeObj.transform.localPosition = new Vector3(3.4f, -0.78f, 8.2f);
-            bridgeObj.transform.localRotation = Quaternion.Euler(0f, -24f, 0f);
-            bridgeObj.AddComponent<MeshFilter>().sharedMesh = bridgeBeamMesh;
-            bridgeObj.AddComponent<MeshRenderer>().sharedMaterial = toriiRedMat;
+            // 4. PUENTES ARQUEADOS DE TAMBOR (TAIKO-BASHI) EN EL FRENTE Y EN EL LADO TRASERO
+            Mesh bridgeBeamMesh = ZenBonsaiProceduralMeshes.CreateArchedTaikoBridgeMesh("Mesh_Kyoto_TaikoBridge", 7.4f, 1.60f, 1.38f, out Mesh bridgeDeckMesh);
+            Vector3[] bridgeCoords = { new Vector3(3.6f, -0.78f, 8.4f), new Vector3(-5.8f, -0.78f, -3.2f) };
+            float[] bridgeRotY = { -24f, 62f };
+            for (int b = 0; b < bridgeCoords.Length; b++)
+            {
+                GameObject bridgeObj = new GameObject($"Kyoto_ArchedTaikoBridge_{b}");
+                bridgeObj.transform.SetParent(root.transform, false);
+                bridgeObj.transform.localPosition = bridgeCoords[b];
+                bridgeObj.transform.localRotation = Quaternion.Euler(0f, bridgeRotY[b], 0f);
+                bridgeObj.AddComponent<MeshFilter>().sharedMesh = bridgeBeamMesh;
+                bridgeObj.AddComponent<MeshRenderer>().sharedMaterial = toriiRedMat;
 
-            GameObject bridgeDeck = new GameObject("TaikoBridge_HinokiDeck");
-            bridgeDeck.transform.SetParent(bridgeObj.transform, false);
-            bridgeDeck.AddComponent<MeshFilter>().sharedMesh = bridgeDeckMesh;
-            bridgeDeck.AddComponent<MeshRenderer>().sharedMaterial = hinokiMat;
+                GameObject bDeck = new GameObject("TaikoBridge_HinokiDeck");
+                bDeck.transform.SetParent(bridgeObj.transform, false);
+                bDeck.AddComponent<MeshFilter>().sharedMesh = bridgeDeckMesh;
+                bDeck.AddComponent<MeshRenderer>().sharedMaterial = plankFloorMat;
+            }
 
-            // 4. PUERTA TORII FLOTANTE DE MIYAJIMA / ITSUKUSHIMA SOBRE EL AGUA
+            // 5. GRAN TORII FLOTANTE DE MIYAJIMA SOBRE EL AGUA
             Mesh toriiRedMesh = ZenBonsaiProceduralMeshes.CreateSculptedMyojinToriiMesh("Mesh_MyojinTorii_Main", out Mesh toriiDarkCapsMesh);
             GameObject floatingTorii = new GameObject("Kyoto_FloatingToriiGate");
             floatingTorii.transform.SetParent(root.transform, false);
-            floatingTorii.transform.localPosition = new Vector3(0.4f, -0.82f, 11.8f);
-            floatingTorii.transform.localScale = Vector3.one * 1.18f;
+            floatingTorii.transform.localPosition = new Vector3(0.4f, -0.82f, 12.2f);
+            floatingTorii.transform.localScale = Vector3.one * 1.22f;
             floatingTorii.AddComponent<MeshFilter>().sharedMesh = toriiRedMesh;
             floatingTorii.AddComponent<MeshRenderer>().sharedMaterial = toriiRedMat;
 
@@ -1167,53 +1429,50 @@ namespace ZenBonsai.Editor
             floatingToriiCaps.AddComponent<MeshFilter>().sharedMesh = toriiDarkCapsMesh;
             floatingToriiCaps.AddComponent<MeshRenderer>().sharedMaterial = urushiMat;
 
-            // 5. FAROLILLOS DE PAPEL FLOTANTES (TŌRŌ NAGASHI) MECIDOS EN EL AGUA
+            // 6. 14 FAROLILLOS FLOTANTES ESCULPIDOS (TŌRŌ NAGASHI) Y FLORES DE LOTO EN 360° ALREDEDOR DEL PABELLÓN
+            Mesh toroWoodMesh = ZenBonsaiProceduralMeshes.CreateSculptedToroNagashiMesh("Mesh_SculptedToroNagashi", out Mesh toroGlowMesh);
             GameObject floatingLanternsRoot = new GameObject("Sanctuary_FloatingLanterns");
             floatingLanternsRoot.transform.SetParent(root.transform, false);
             Vector3[] flPos =
             {
-                new Vector3(-1.8f, -0.76f, 4.2f),
-                new Vector3(-0.4f, -0.76f, 5.5f),
-                new Vector3(1.5f, -0.76f, 4.8f),
-                new Vector3(2.4f, -0.76f, 6.4f),
-                new Vector3(-2.6f, -0.76f, 7.2f),
-                new Vector3(0.8f, -0.76f, 7.8f)
+                new Vector3(-1.8f, -0.80f, 4.2f),  new Vector3(-0.4f, -0.80f, 5.5f),
+                new Vector3(1.5f, -0.80f, 4.8f),   new Vector3(2.4f, -0.80f, 6.4f),
+                new Vector3(-2.6f, -0.80f, 7.2f),  new Vector3(0.8f, -0.80f, 7.8f),
+                new Vector3(-4.2f, -0.80f, 2.2f),  new Vector3(4.2f, -0.80f, 2.4f),
+                new Vector3(-4.8f, -0.80f, -1.5f), new Vector3(4.8f, -0.80f, -1.8f),
+                new Vector3(-3.2f, -0.80f, -5.4f), new Vector3(0.2f, -0.80f, -6.2f),
+                new Vector3(3.4f, -0.80f, -5.2f),  new Vector3(-1.5f, -0.80f, 9.6f)
             };
             for (int f = 0; f < flPos.Length; f++)
             {
                 GameObject fLantern = new GameObject($"ToroNagashi_{f}");
                 fLantern.transform.SetParent(floatingLanternsRoot.transform, false);
                 fLantern.transform.localPosition = flPos[f];
+                fLantern.transform.localRotation = Quaternion.Euler(0f, f * 31f, 0f);
+                fLantern.AddComponent<MeshFilter>().sharedMesh = toroWoodMesh;
+                fLantern.AddComponent<MeshRenderer>().sharedMaterial = urushiMat;
 
-                GameObject flBase = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                flBase.transform.SetParent(fLantern.transform, false);
-                flBase.transform.localScale = new Vector3(0.28f, 0.03f, 0.28f);
-                flBase.GetComponent<Renderer>().sharedMaterial = hinokiMat;
-                DestroyImmediate(flBase.GetComponent<Collider>());
-
-                GameObject flBody = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                flBody.transform.SetParent(fLantern.transform, false);
-                flBody.transform.localPosition = new Vector3(0f, 0.14f, 0f);
-                flBody.transform.localScale = new Vector3(0.18f, 0.24f, 0.18f);
-                flBody.GetComponent<Renderer>().sharedMaterial = sunMat;
-                DestroyImmediate(flBody.GetComponent<Collider>());
+                GameObject flGlow = new GameObject("Toro_PaperGlow");
+                flGlow.transform.SetParent(fLantern.transform, false);
+                flGlow.AddComponent<MeshFilter>().sharedMesh = toroGlowMesh;
+                flGlow.AddComponent<MeshRenderer>().sharedMaterial = sunMat;
             }
 
-            // 6. CEREZOS SAKURA Y ARCES ROJOS MOMIJI EN LAS ORILLAS DEL LAGO Y MONTAÑAS DE KIOTO
-            BuildGardenLandscapeTree(root.transform, "Kyoto_ShoreSakuraTree",
-                new Vector3(-4.2f, -0.65f, 6.2f), 3.1f, urushiMat, sakuraMat, 2201);
-            BuildGardenLandscapeTree(root.transform, "Kyoto_ShoreMomijiTree",
-                new Vector3(4.8f, -0.65f, 10.5f), 2.9f, urushiMat, momijiMat, 2202);
-
-            Mesh kyotoMtnMesh = ZenBonsaiProceduralMeshes.CreateConicalMountainMesh("Mesh_Kyoto_MistyMountain", 16f, 3.2f, 6.8f, 32);
-            Vector3[] mtnPositions = { new Vector3(-11f, -0.85f, 24f), new Vector3(2f, -0.85f, 27f), new Vector3(13f, -0.85f, 23f) };
-            for (int m = 0; m < mtnPositions.Length; m++)
+            // 7. CEREZOS SAKURA Y ARCES OTOÑALES MOMIJI CON FOLLAJE 3D EN LAS ISLAS Y ORILLAS 360°
+            Vector3[] treePositions =
             {
-                GameObject mtn = new GameObject($"Kyoto_DistantMountain_{m}");
-                mtn.transform.SetParent(root.transform, false);
-                mtn.transform.localPosition = mtnPositions[m];
-                mtn.AddComponent<MeshFilter>().sharedMesh = kyotoMtnMesh;
-                mtn.AddComponent<MeshRenderer>().sharedMaterial = mountainMat;
+                new Vector3(-4.6f, -0.65f, 6.4f),  new Vector3(5.2f, -0.65f, 10.8f),
+                new Vector3(5.8f, -0.65f, 4.2f),   new Vector3(-6.4f, -0.65f, 1.2f),
+                new Vector3(6.4f, -0.65f, -2.6f),  new Vector3(-5.2f, -0.65f, -6.8f),
+                new Vector3(4.8f, -0.65f, -7.2f),  new Vector3(0.0f, -0.65f, -9.2f)
+            };
+            for (int t = 0; t < treePositions.Length; t++)
+            {
+                bool isSakura = (t % 2 == 0);
+                BuildGardenLandscapeTree(
+                    root.transform, $"Kyoto_ShoreTree_{t}", treePositions[t], 3.0f + (t % 3) * 0.25f,
+                    realBarkMat, isSakura ? sakuraMat : momijiMat, goldMat,
+                    isSakura ? TreeType.Sakura : TreeType.Momiji, 2200 + t * 17);
             }
 
             root.SetActive(false);
@@ -1221,7 +1480,10 @@ namespace ZenBonsai.Editor
         }
 
         // =========================================================================
-        // ENTORNO 3: TEMPLO ZEN KARESANSUI DE ARASHIYAMA (JARDÍN SECO DE ROCA Y BOSQUE DE BAMBÚ SAGRADO)
+        // ENTORNO 3 (360° COMPLETO): MONASTERIO ZEN KARESANSUI Y CATEDRAL DE BAMBÚ DE ARASHIYAMA 360°
+        // El jugador está en el claustro Hōjō de un templo Zen (suelo de tablones, tatamis, altar budista con estatua
+        // tallada de Buda/Jizō detrás del jugador, techo artesonado y faroles), rodeado en 360° por el mar de grava
+        // rastrillada Karesansui, muros de claustro con puerta Sanmon y más de 32 bosquecillos gigantes de bambú en 360°.
         // =========================================================================
         private static GameObject BuildArashiyamaBambooTempleSanctuary(
             Transform parent,
@@ -1232,45 +1494,153 @@ namespace ZenBonsai.Editor
             root.transform.SetParent(parent, false);
             root.transform.localPosition = Vector3.zero;
 
-            Material skyDomeMat = CreateOrGetPBRMaterial("Zen_ArashiyamaSkyDomeMat", new Color(0.50f, 0.72f, 0.88f), 0.0f, 0.0f);
-            skyDomeMat.EnableKeyword("_EMISSION");
-            if (skyDomeMat.HasProperty("_EmissionColor")) skyDomeMat.SetColor("_EmissionColor", new Color(0.36f, 0.52f, 0.62f));
-            if (skyDomeMat.HasProperty("_Cull")) skyDomeMat.SetFloat("_Cull", 0f);
+            Material skyDomeMat = CreateOrGetPanoramicSkyDomeMaterial("Zen_SkyPanorama_ArashiyamaZen",
+                new Color(0.22f, 0.48f, 0.72f), new Color(0.54f, 0.74f, 0.86f), new Color(0.86f, 0.92f, 0.82f),
+                new Color(0.98f, 0.98f, 0.92f), new Color(0.52f, 0.64f, 0.68f), new Color(0.18f, 0.32f, 0.28f), 303);
 
             Material sunMat = CreateOrGetPBRMaterial("Zen_SanctuarySunMat", new Color(1.0f, 0.92f, 0.74f), 0.9f, 0.0f);
             sunMat.EnableKeyword("_EMISSION");
-            if (sunMat.HasProperty("_EmissionColor")) sunMat.SetColor("_EmissionColor", new Color(1.0f, 0.86f, 0.58f) * 1.6f);
+            if (sunMat.HasProperty("_EmissionColor")) sunMat.SetColor("_EmissionColor", new Color(1.0f, 0.86f, 0.58f) * 1.65f);
 
             Material rakedSandMat = CreateOrGetSurfaceTexturedMaterial("Zen_RakedKaresansuiMat",
                 new Color(0.88f, 0.86f, 0.82f), new Color(0.70f, 0.68f, 0.64f), new Color(0.96f, 0.95f, 0.92f), 0.14f, 0.0f, 16);
             Material bambooCulmMat = CreateOrGetSurfaceTexturedMaterial("Zen_BambooForestMat",
-                new Color(0.24f, 0.48f, 0.18f), new Color(0.14f, 0.32f, 0.10f), new Color(0.40f, 0.66f, 0.28f), 0.48f, 0.0f, 15);
+                new Color(0.24f, 0.48f, 0.18f), new Color(0.14f, 0.32f, 0.10f), new Color(0.40f, 0.66f, 0.28f), 0.52f, 0.0f, 15);
             Material mossMat = CreateOrGetSurfaceTexturedMaterial("Zen_SanctuaryMossMat",
-                new Color(0.18f, 0.42f, 0.14f), new Color(0.09f, 0.24f, 0.07f), new Color(0.32f, 0.58f, 0.20f), 0.18f, 0.0f, 11);
-            Material kawaraMat = CreateOrGetPBRMaterial("Zen_KawaraTileMat", new Color(0.16f, 0.18f, 0.21f), 0.64f, 0.15f);
-            Material shikkuiMat = CreateOrGetPBRMaterial("Zen_ShikkuiPlasterMat", new Color(0.92f, 0.90f, 0.85f), 0.22f, 0.0f);
+                new Color(0.18f, 0.42f, 0.14f), new Color(0.09f, 0.24f, 0.07f), new Color(0.32f, 0.58f, 0.20f), 0.20f, 0.0f, 11);
+            Material kawaraMat = CreateOrGetSurfaceTexturedMaterial("Zen_KawaraTilePBRMat",
+                new Color(0.17f, 0.19f, 0.23f), new Color(0.08f, 0.09f, 0.12f), new Color(0.38f, 0.42f, 0.48f), 0.72f, 0.22f, 19);
+            Material shikkuiMat = CreateOrGetSurfaceTexturedMaterial("Zen_ShikkuiPlasterPBRMat",
+                new Color(0.93f, 0.91f, 0.86f), new Color(0.76f, 0.73f, 0.68f), new Color(0.98f, 0.97f, 0.94f), 0.24f, 0.0f, 22);
+            Material plankFloorMat = CreateOrGetSurfaceTexturedMaterial("Zen_HinokiPlankFloorMat",
+                new Color(0.48f, 0.30f, 0.17f), new Color(0.26f, 0.15f, 0.08f), new Color(0.68f, 0.46f, 0.28f), 0.68f, 0.04f, 17);
+            Material tatamiMat = CreateOrGetSurfaceTexturedMaterial("Zen_TatamiWeavePBRMat",
+                new Color(0.58f, 0.56f, 0.32f), new Color(0.42f, 0.40f, 0.20f), new Color(0.74f, 0.70f, 0.44f), 0.28f, 0.0f, 18);
+            Material shojiPaperMat = CreateOrGetSurfaceTexturedMaterial("Zen_ShojiLatticePBRMat",
+                new Color(0.96f, 0.92f, 0.82f), new Color(0.28f, 0.17f, 0.10f), new Color(1.0f, 0.97f, 0.90f), 0.22f, 0.0f, 20);
+            shojiPaperMat.EnableKeyword("_EMISSION");
+            if (shojiPaperMat.HasProperty("_EmissionColor")) shojiPaperMat.SetColor("_EmissionColor", new Color(0.36f, 0.32f, 0.24f));
+            Material templeStoneMat = CreateOrGetSurfaceTexturedMaterial("Zen_TempleStoneMasonryMat",
+                new Color(0.42f, 0.43f, 0.45f), new Color(0.22f, 0.23f, 0.25f), new Color(0.62f, 0.64f, 0.66f), 0.25f, 0.05f, 21);
 
-            // 1. Cúpula celeste y Terraza de Templo Zen
-            GameObject skyDome = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            skyDome.name = "Sanctuary_SkyDome";
+            // 1. CÚPULA CELESTE 360° + TERRENO DE BOSQUE DE MUSGO 360° + ANILLO MONTAÑOSO 360°
+            Mesh skySphereMesh = ZenBonsaiProceduralMeshes.CreatePanoramicSkySphereMesh("Mesh_PanoramicSkySphere_360", 42f, 64, 32);
+            GameObject skyDome = new GameObject("Sanctuary_SkyDome");
             skyDome.transform.SetParent(root.transform, false);
-            skyDome.transform.localScale = new Vector3(72f, 50f, 72f);
-            skyDome.GetComponent<Renderer>().sharedMaterial = skyDomeMat;
-            DestroyImmediate(skyDome.GetComponent<Collider>());
+            skyDome.AddComponent<MeshFilter>().sharedMesh = skySphereMesh;
+            skyDome.AddComponent<MeshRenderer>().sharedMaterial = skyDomeMat;
 
-            GameObject templeDeck = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            templeDeck.name = "Temple_EngawaDeck";
-            templeDeck.transform.SetParent(root.transform, false);
-            templeDeck.transform.localPosition = new Vector3(0f, -0.76f, -0.25f);
-            templeDeck.transform.localScale = new Vector3(4.8f, 0.08f, 3.6f);
-            templeDeck.GetComponent<Renderer>().sharedMaterial = hinokiMat;
-            DestroyImmediate(templeDeck.GetComponent<Collider>());
+            Mesh forestTerrainMesh = ZenBonsaiProceduralMeshes.CreateFull360SanctuaryTerrainMesh(
+                "Mesh_Arashiyama_Terrain360", 76f, -0.82f, Vector2.zero, Vector2.zero, 0f, 303);
+            GameObject forestGround = new GameObject("Temple_MossForestGround360");
+            forestGround.transform.SetParent(root.transform, false);
+            forestGround.AddComponent<MeshFilter>().sharedMesh = forestTerrainMesh;
+            forestGround.AddComponent<MeshRenderer>().sharedMaterial = mossMat;
 
-            // 2. MAR DE GRAVA BLANCA RASTRILLADA CON ONDAS 3D (KARESANSUI DE RYŌAN-JI) Y 7 ISLAS DE ROCA Y MUSGO
+            Mesh horizonRingMesh = ZenBonsaiProceduralMeshes.Create360MountainHorizonRingMesh(
+                "Mesh_Arashiyama_HorizonRing360", 24f, 38f, 6.5f, 0.10f, 309);
+            GameObject horizonRing = new GameObject("Temple_360MountainRing");
+            horizonRing.transform.SetParent(root.transform, false);
+            horizonRing.AddComponent<MeshFilter>().sharedMesh = horizonRingMesh;
+            horizonRing.AddComponent<MeshRenderer>().sharedMaterial = mountainMat;
+
+            // 2. CLAUSTRO DE MEDITACIÓN ZEN 360° (HŌJŌ) CON ALTAR DE BUDA TALLADO EN PIEDRA DETRÁS DEL JUGADOR
+            GameObject hojoRoot = new GameObject("Temple_HojoMeditationHall360");
+            hojoRoot.transform.SetParent(root.transform, false);
+
+            Mesh deckMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_Temple_EngawaDeck", 6.8f, 5.4f, 0.05f, 0.0f);
+            GameObject templeDeck = new GameObject("Temple_EngawaDeck");
+            templeDeck.transform.SetParent(hojoRoot.transform, false);
+            templeDeck.transform.localPosition = new Vector3(0f, -0.76f, -0.60f);
+            templeDeck.AddComponent<MeshFilter>().sharedMesh = deckMesh;
+            templeDeck.AddComponent<MeshRenderer>().sharedMaterial = plankFloorMat;
+
+            Mesh tatamiMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_TeaRoom_TatamiMat", 1.85f, 0.92f, 0.018f, 0.0f);
+            Vector3[] tatamiPos =
+            {
+                new Vector3(-0.95f, -0.725f, 0.0f),   new Vector3(0.95f, -0.725f, 0.0f),
+                new Vector3(-0.95f, -0.725f, -0.95f), new Vector3(0.95f, -0.725f, -0.95f),
+                new Vector3(-0.95f, -0.725f, -1.90f), new Vector3(0.95f, -0.725f, -1.90f)
+            };
+            for (int t = 0; t < tatamiPos.Length; t++)
+            {
+                GameObject tat = new GameObject($"Hojo_Tatami_{t}");
+                tat.transform.SetParent(hojoRoot.transform, false);
+                tat.transform.localPosition = tatamiPos[t];
+                tat.AddComponent<MeshFilter>().sharedMesh = tatamiMesh;
+                tat.AddComponent<MeshRenderer>().sharedMaterial = tatamiMat;
+            }
+
+            // Columnas torneadas del monasterio + Techo curvo Kawara
+            Mesh pillarMesh = ZenBonsaiProceduralMeshes.CreateSculptedTurnedPillarMesh(
+                "Mesh_TeaRoom_TurnedPillar", 0.095f, 3.15f, out Mesh plinthMesh, out Mesh corbelMesh);
+            Vector3[] hojoPillars =
+            {
+                new Vector3(-2.65f, -0.74f, 1.65f),  new Vector3(2.65f, -0.74f, 1.65f),
+                new Vector3(-2.65f, -0.74f, -2.75f), new Vector3(2.65f, -0.74f, -2.75f),
+                new Vector3(-1.15f, -0.74f, -2.75f), new Vector3(1.15f, -0.74f, -2.75f)
+            };
+            for (int p = 0; p < hojoPillars.Length; p++)
+            {
+                GameObject col = new GameObject($"Hojo_CedarPillar_{p}");
+                col.transform.SetParent(hojoRoot.transform, false);
+                col.transform.localPosition = hojoPillars[p];
+                col.AddComponent<MeshFilter>().sharedMesh = pillarMesh;
+                col.AddComponent<MeshRenderer>().sharedMaterial = urushiMat;
+
+                GameObject pl = new GameObject("Pillar_Plinth");
+                pl.transform.SetParent(col.transform, false);
+                pl.AddComponent<MeshFilter>().sharedMesh = plinthMesh;
+                pl.AddComponent<MeshRenderer>().sharedMaterial = templeStoneMat;
+
+                GameObject cb = new GameObject("Pillar_Corbel");
+                cb.transform.SetParent(col.transform, false);
+                cb.AddComponent<MeshFilter>().sharedMesh = corbelMesh;
+                cb.AddComponent<MeshRenderer>().sharedMaterial = plankFloorMat;
+            }
+
+            Mesh hojoRoofMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_Hojo_MainRoof", 7.6f, 6.6f, 1.40f, 0.35f);
+            GameObject hojoRoof = new GameObject("Hojo_KawaraRoof");
+            hojoRoof.transform.SetParent(hojoRoot.transform, false);
+            hojoRoof.transform.localPosition = new Vector3(0f, 2.40f, -0.55f);
+            hojoRoof.AddComponent<MeshFilter>().sharedMesh = hojoRoofMesh;
+            hojoRoof.AddComponent<MeshRenderer>().sharedMaterial = kawaraMat;
+
+            // Altar Zen trasero (Butsudan) con estatua tallada de Buda en loto y paneles Shoji iluminados detrás del jugador
+            Mesh shojiFrameMesh = ZenBonsaiProceduralMeshes.CreateSculptedShojiScreenMesh(
+                "Mesh_TeaRoom_ShojiScreen", 1.12f, 2.85f, 4, 7, out Mesh shojiPaperMesh);
+            float[] rearX = { -1.90f, 1.90f };
+            for (int s = 0; s < rearX.Length; s++)
+            {
+                GameObject shoji = new GameObject($"Hojo_RearShoji_{s}");
+                shoji.transform.SetParent(hojoRoot.transform, false);
+                shoji.transform.localPosition = new Vector3(rearX[s], -0.68f, -2.75f);
+                shoji.AddComponent<MeshFilter>().sharedMesh = shojiFrameMesh;
+                shoji.AddComponent<MeshRenderer>().sharedMaterial = urushiMat;
+
+                GameObject paper = new GameObject("Shoji_Glow");
+                paper.transform.SetParent(shoji.transform, false);
+                paper.AddComponent<MeshFilter>().sharedMesh = shojiPaperMesh;
+                paper.AddComponent<MeshRenderer>().sharedMaterial = shojiPaperMat;
+            }
+
+            Mesh buddhaMesh = ZenBonsaiProceduralMeshes.CreateSculptedZenStatueMesh("Mesh_ZenBuddhaStatue", out Mesh lotusPedestalMesh);
+            GameObject rearStatue = new GameObject("Hojo_RearZenBuddhaAltar");
+            rearStatue.transform.SetParent(hojoRoot.transform, false);
+            rearStatue.transform.localPosition = new Vector3(0f, -0.62f, -2.45f);
+            rearStatue.AddComponent<MeshFilter>().sharedMesh = buddhaMesh;
+            rearStatue.AddComponent<MeshRenderer>().sharedMaterial = templeStoneMat;
+
+            GameObject statuePedestal = new GameObject("Buddha_LotusPedestal");
+            statuePedestal.transform.SetParent(rearStatue.transform, false);
+            statuePedestal.AddComponent<MeshFilter>().sharedMesh = lotusPedestalMesh;
+            statuePedestal.AddComponent<MeshRenderer>().sharedMaterial = goldMat;
+
+            // 3. MAR DE GRAVA BLANCA RASTRILLADA CON SURCOS CONCÉNTRICOS 3D (KARESANSUI) Y 7 ISLAS DE ROCA SUISEKI
             Mesh karesansuiMesh = ZenBonsaiProceduralMeshes.CreateRakedKaresansuiGardenMesh("Mesh_Ryoanji_KaresansuiSand", 18f, 14f);
             GameObject sandCourt = new GameObject("Temple_KaresansuiSandSea");
             sandCourt.transform.SetParent(root.transform, false);
-            sandCourt.transform.localPosition = new Vector3(0f, -0.80f, 7.2f);
+            sandCourt.transform.localPosition = new Vector3(0f, -0.79f, 7.2f);
             sandCourt.AddComponent<MeshFilter>().sharedMesh = karesansuiMesh;
             sandCourt.AddComponent<MeshRenderer>().sharedMaterial = rakedSandMat;
 
@@ -1298,38 +1668,60 @@ namespace ZenBonsai.Editor
                 zRock.transform.localPosition = zenRockPos[r];
                 zRock.AddComponent<MeshFilter>().sharedMesh = ZenBonsaiProceduralMeshes.CreateSuisekiStoneMesh(
                     $"Mesh_KaresansuiRock_{r}", new Vector3(0.82f, 0.58f + (r % 3) * 0.18f, 0.68f), 3200 + r * 17);
-                zRock.AddComponent<MeshRenderer>().sharedMaterial = stoneMat;
+                zRock.AddComponent<MeshRenderer>().sharedMaterial = templeStoneMat;
             }
 
-            // 3. MUROS CLAUSTRO DEL TEMPLO (KAIRŌ) Y PUERTA KARAMON CON TEJADOS CURVOS KAWARA
-            Mesh backWallRoofMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_TempleBackWallRoof", 16f, 1.1f, 0.55f, 0.14f);
-            GameObject backWall = new GameObject("Temple_BackCloisterWall");
-            backWall.transform.SetParent(root.transform, false);
-            backWall.transform.localPosition = new Vector3(0f, -0.78f, 13.8f);
+            // 4. MUROS DEL CLAUSTRO (TSUKIJI-BEI) RODEANDO EL JARDÍN SECO CON TEJADOS CURVOS KAWARA (0 CUBOS PRIMITIVOS)
+            Mesh wallRoofMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_TempleBackWallRoof", 16.4f, 1.15f, 0.52f, 0.14f);
+            Mesh wallBodyMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_TempleWallBody", 15.8f, 0.36f, 1.45f, 0.0f);
+            Mesh wallStoneBaseMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_TempleWallStoneBase", 16.0f, 0.48f, 0.48f, 0.0f);
 
-            GameObject bwPlaster = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            bwPlaster.transform.SetParent(backWall.transform, false);
-            bwPlaster.transform.localPosition = new Vector3(0f, 1.0f, 0f);
-            bwPlaster.transform.localScale = new Vector3(15.2f, 1.6f, 0.32f);
-            bwPlaster.GetComponent<Renderer>().sharedMaterial = shikkuiMat;
-            DestroyImmediate(bwPlaster.GetComponent<Collider>());
+            Vector3[] cloisterWalls =
+            {
+                new Vector3(0f, -0.80f, 14.2f),
+                new Vector3(-8.8f, -0.80f, 6.8f),
+                new Vector3(8.8f, -0.80f, 6.8f)
+            };
+            float[] cloisterRotY = { 0f, 90f, 90f };
+            for (int cw = 0; cw < cloisterWalls.Length; cw++)
+            {
+                GameObject cWall = new GameObject($"Temple_CloisterWall_{cw}");
+                cWall.transform.SetParent(root.transform, false);
+                cWall.transform.localPosition = cloisterWalls[cw];
+                cWall.transform.localRotation = Quaternion.Euler(0f, cloisterRotY[cw], 0f);
 
-            GameObject bwRoof = new GameObject("BackWall_KawaraRoof");
-            bwRoof.transform.SetParent(backWall.transform, false);
-            bwRoof.transform.localPosition = new Vector3(0f, 1.82f, 0f);
-            bwRoof.AddComponent<MeshFilter>().sharedMesh = backWallRoofMesh;
-            bwRoof.AddComponent<MeshRenderer>().sharedMaterial = kawaraMat;
+                GameObject cwStone = new GameObject("Cloister_IshigakiBase");
+                cwStone.transform.SetParent(cWall.transform, false);
+                cwStone.AddComponent<MeshFilter>().sharedMesh = wallStoneBaseMesh;
+                cwStone.AddComponent<MeshRenderer>().sharedMaterial = templeStoneMat;
 
-            // Linternas Kasuga talladas flanqueando el jardín seco
+                GameObject cwPlaster = new GameObject("Cloister_ShikkuiWall");
+                cwPlaster.transform.SetParent(cWall.transform, false);
+                cwPlaster.transform.localPosition = new Vector3(0f, 0.42f, 0f);
+                cwPlaster.AddComponent<MeshFilter>().sharedMesh = wallBodyMesh;
+                cwPlaster.AddComponent<MeshRenderer>().sharedMaterial = shikkuiMat;
+
+                GameObject cwRoof = new GameObject("Cloister_KawaraRoof");
+                cwRoof.transform.SetParent(cWall.transform, false);
+                cwRoof.transform.localPosition = new Vector3(0f, 1.82f, 0f);
+                cwRoof.AddComponent<MeshFilter>().sharedMesh = wallRoofMesh;
+                cwRoof.AddComponent<MeshRenderer>().sharedMaterial = kawaraMat;
+            }
+
+            // Linternas Kasuga talladas en los 4 puntos cardinales del claustro
             Mesh lanternStoneMesh = ZenBonsaiProceduralMeshes.CreateSculptedStoneLanternMesh("Mesh_KasugaStoneLantern", out Mesh lanternLightMesh);
-            float[] tLanternX = { -4.2f, 4.2f };
-            for (int l = 0; l < 2; l++)
+            Vector3[] tLanternPos =
+            {
+                new Vector3(-4.2f, -0.76f, 4.2f),  new Vector3(4.2f, -0.76f, 4.2f),
+                new Vector3(-4.2f, -0.76f, -3.8f), new Vector3(4.2f, -0.76f, -3.8f)
+            };
+            for (int l = 0; l < tLanternPos.Length; l++)
             {
                 GameObject lantern = new GameObject($"Temple_StoneLantern_{l}");
                 lantern.transform.SetParent(root.transform, false);
-                lantern.transform.localPosition = new Vector3(tLanternX[l], -0.76f, 4.2f);
+                lantern.transform.localPosition = tLanternPos[l];
                 lantern.AddComponent<MeshFilter>().sharedMesh = lanternStoneMesh;
-                lantern.AddComponent<MeshRenderer>().sharedMaterial = stoneMat;
+                lantern.AddComponent<MeshRenderer>().sharedMaterial = templeStoneMat;
 
                 GameObject lGlow = new GameObject("Lantern_Glow");
                 lGlow.transform.SetParent(lantern.transform, false);
@@ -1337,20 +1729,25 @@ namespace ZenBonsai.Editor
                 lGlow.AddComponent<MeshRenderer>().sharedMaterial = sunMat;
             }
 
-            // 4. GRAN BOSQUE SAGRADO DE BAMBÚ DE ARASHIYAMA RODEANDO EL TEMPLO EN 180°
+            // 5. CATEDRAL DE BAMBÚ SAGRADO DE ARASHIYAMA EN 360° COMPLETOS (32 AGRUPACIONES RODEANDO TODO EL TEMPLO)
             Mesh bambooClusterMesh = ZenBonsaiProceduralMeshes.CreateBambooGroveClusterMesh("Mesh_BambooGroveCluster", out Mesh bambooLeavesMesh);
-            for (int b = 0; b < 14; b++)
+            int totalBambooClusters = 32;
+            for (int b = 0; b < totalBambooClusters; b++)
             {
-                float ang = Mathf.Lerp(-80f, 80f, b / 13f) * Mathf.Deg2Rad;
-                float dist = (b % 2 == 0) ? 14.8f : 16.5f;
-                Vector3 bPos = new Vector3(Mathf.Sin(ang) * dist * 0.85f, -0.78f, Mathf.Cos(ang) * dist);
-                if (Mathf.Abs(bPos.x) < 6.5f && bPos.z < 13.5f) bPos.z = 14.8f;
+                float ang = (b / (float)totalBambooClusters) * Mathf.PI * 2f;
+                float dist = (b % 2 == 0) ? 14.5f : 17.2f;
+                Vector3 bPos = new Vector3(Mathf.Sin(ang) * dist, -0.78f, Mathf.Cos(ang) * dist);
+                // Despejar el patio central del jardín seco y el salón Hōjō
+                if (Mathf.Abs(bPos.x) < 9.2f && bPos.z > -4.5f && bPos.z < 14.8f)
+                {
+                    bPos.x = (bPos.x >= 0f) ? 10.2f : -10.2f;
+                }
 
-                GameObject clump = new GameObject($"Arashiyama_SacredBamboo_{b}");
+                GameObject clump = new GameObject($"Arashiyama_SacredBamboo360_{b}");
                 clump.transform.SetParent(root.transform, false);
                 clump.transform.localPosition = bPos;
                 clump.transform.localRotation = Quaternion.Euler(0f, b * 37f, 0f);
-                clump.transform.localScale = Vector3.one * 1.25f;
+                clump.transform.localScale = Vector3.one * (1.22f + (b % 3) * 0.14f);
                 clump.AddComponent<MeshFilter>().sharedMesh = bambooClusterMesh;
                 clump.AddComponent<MeshRenderer>().sharedMaterial = bambooCulmMat;
 
@@ -1366,72 +1763,74 @@ namespace ZenBonsai.Editor
 
         private static void BuildFiveStoryJapanesePagoda(
             Transform parent, Vector3 localPos,
-            Material kawaraRoofMat, Material vermilionMat, Material hinokiMat, Material windowGlowMat, Material goldMat)
+            Material kawaraRoofMat, Material vermilionMat, Material stoneBaseMat, Material shojiWindowMat, Material goldMat)
         {
             GameObject pagoda = new GameObject("Kyoto_FiveStoryPagoda_GojuNoTo");
             pagoda.transform.SetParent(parent, false);
             pagoda.transform.localPosition = localPos;
             pagoda.transform.localRotation = Quaternion.Euler(0f, 18f, 0f);
 
-            // Base de piedra del templo (Kidan)
-            GameObject stoneBase = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            // Podio de mampostería de piedra tallada (Kidan) sin bloques primitivos
+            Mesh podiumMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh("Mesh_Pagoda_StoneKidan", 3.1f, 3.1f, 0.52f, 0.02f);
+            GameObject stoneBase = new GameObject("Pagoda_StoneKidanBase");
             stoneBase.transform.SetParent(pagoda.transform, false);
-            stoneBase.transform.localPosition = new Vector3(0f, 0.25f, 0f);
-            stoneBase.transform.localScale = new Vector3(2.8f, 0.50f, 2.8f);
-            stoneBase.GetComponent<Renderer>().sharedMaterial = hinokiMat;
-            DestroyImmediate(stoneBase.GetComponent<Collider>());
+            stoneBase.AddComponent<MeshFilter>().sharedMesh = podiumMesh;
+            stoneBase.AddComponent<MeshRenderer>().sharedMaterial = stoneBaseMat;
 
             float currY = 0.50f;
             for (int tier = 0; tier < 5; tier++)
             {
-                float scale = 1.0f - tier * 0.11f;
-                float coreW = 1.85f * scale;
-                float storyH = 0.78f * scale;
-                float roofW = 3.15f * scale;
-                float roofH = 0.42f * scale;
+                float scale = 1.0f - tier * 0.105f;
+                float coreW = 1.88f * scale;
+                float storyH = 0.82f * scale;
+                float roofW = 3.25f * scale;
+                float roofH = 0.44f * scale;
 
-                // Cuerpo de madera bermellón del piso
-                GameObject core = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                core.name = $"Pagoda_TierCore_{tier}";
-                core.transform.SetParent(pagoda.transform, false);
-                core.transform.localPosition = new Vector3(0f, currY + storyH * 0.5f, 0f);
-                core.transform.localScale = new Vector3(coreW, storyH, coreW);
-                core.GetComponent<Renderer>().sharedMaterial = vermilionMat;
-                DestroyImmediate(core.GetComponent<Collider>());
+                // 4 Fachadas esculpidas con celosía Shoji iluminada y columnas esquineras de madera bermellón
+                Mesh tierWallMesh = ZenBonsaiProceduralMeshes.CreateSculptedShojiScreenMesh(
+                    $"Mesh_PagodaTierWall_{tier}", coreW, storyH, 3, 2, out Mesh tierGlowMesh);
 
-                // Ventana Shoji iluminada cálidamente
-                GameObject win = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                win.transform.SetParent(pagoda.transform, false);
-                win.transform.localPosition = new Vector3(0f, currY + storyH * 0.5f, 0f);
-                win.transform.localScale = new Vector3(coreW * 1.02f, storyH * 0.45f, coreW * 1.02f);
-                win.GetComponent<Renderer>().sharedMaterial = windowGlowMat;
-                DestroyImmediate(win.GetComponent<Collider>());
+                for (int side = 0; side < 4; side++)
+                {
+                    float ang = side * 90f;
+                    Vector3 dir = Quaternion.Euler(0f, ang, 0f) * Vector3.forward;
+                    GameObject facade = new GameObject($"Pagoda_Tier_{tier}_Facade_{side}");
+                    facade.transform.SetParent(pagoda.transform, false);
+                    facade.transform.localPosition = new Vector3(0f, currY, 0f) + dir * (coreW * 0.48f);
+                    facade.transform.localRotation = Quaternion.Euler(0f, ang, 0f);
+                    facade.AddComponent<MeshFilter>().sharedMesh = tierWallMesh;
+                    facade.AddComponent<MeshRenderer>().sharedMaterial = vermilionMat;
 
-                // Tejado curvo japonés esculpido con aleros levantados (Warabi-te)
+                    GameObject fGlow = new GameObject("Facade_ShojiGlow");
+                    fGlow.transform.SetParent(facade.transform, false);
+                    fGlow.AddComponent<MeshFilter>().sharedMesh = tierGlowMesh;
+                    fGlow.AddComponent<MeshRenderer>().sharedMaterial = shojiWindowMat;
+                }
+
+                // Tejado curvo japonés Irimoya con aleros levantados (Warabi-te) y tejas Kawara PBR
                 Mesh tierRoofMesh = ZenBonsaiProceduralMeshes.CreateCurvedPagodaRoofMesh(
-                    $"Mesh_PagodaTierRoof_{tier}", roofW, roofW, roofH, 0.16f * scale);
+                    $"Mesh_PagodaTierRoof_{tier}", roofW, roofW, roofH, 0.18f * scale);
                 GameObject roofObj = new GameObject($"Pagoda_CurvedRoof_{tier}");
                 roofObj.transform.SetParent(pagoda.transform, false);
                 roofObj.transform.localPosition = new Vector3(0f, currY + storyH, 0f);
                 roofObj.AddComponent<MeshFilter>().sharedMesh = tierRoofMesh;
                 roofObj.AddComponent<MeshRenderer>().sharedMaterial = kawaraRoofMat;
 
-                currY += storyH + roofH * 0.72f;
+                currY += storyH + roofH * 0.74f;
             }
 
-            // Aguja imperial dorada (Sōrin) con los 9 anillos budistas (Kurin) en la cúspide
-            GameObject sorinSpire = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            sorinSpire.name = "Pagoda_GoldenSorinSpire";
+            // Aguja budista imperial (Sōrin) esculpida con los 9 anillos sagrados Kurin y joya Hōju
+            Mesh sorinMesh = ZenBonsaiProceduralMeshes.CreateSculptedSorinSpireMesh("Mesh_Pagoda_SorinSpire", 1.55f);
+            GameObject sorinSpire = new GameObject("Pagoda_GoldenSorinSpire");
             sorinSpire.transform.SetParent(pagoda.transform, false);
-            sorinSpire.transform.localPosition = new Vector3(0f, currY + 0.65f, 0f);
-            sorinSpire.transform.localScale = new Vector3(0.09f, 0.65f, 0.09f);
-            sorinSpire.GetComponent<Renderer>().sharedMaterial = goldMat;
-            DestroyImmediate(sorinSpire.GetComponent<Collider>());
+            sorinSpire.transform.localPosition = new Vector3(0f, currY + 0.12f, 0f);
+            sorinSpire.AddComponent<MeshFilter>().sharedMesh = sorinMesh;
+            sorinSpire.AddComponent<MeshRenderer>().sharedMaterial = goldMat;
         }
 
         private static void BuildGardenLandscapeTree(
             Transform parent, string name, Vector3 localPos, float scale,
-            Material barkMat, Material foliageMat, int seed)
+            Material barkMat, Material foliageMat, Material goldMat, TreeType species, int seed)
         {
             GameObject tree = new GameObject(name);
             tree.transform.SetParent(parent, false);
@@ -1440,30 +1839,67 @@ namespace ZenBonsai.Editor
 
             BranchSpline[] branches = new BranchSpline[]
             {
-                new BranchSpline(new Vector3(-0.02f, 0.25f, 0f), new Vector3(-0.18f, 0.34f, 0.04f), new Vector3(-0.34f, 0.38f, 0.06f), new Vector3(-0.46f, 0.42f, 0.08f), 0.038f, 0.012f),
-                new BranchSpline(new Vector3(0.02f, 0.35f, 0f), new Vector3(0.18f, 0.44f, -0.04f), new Vector3(0.32f, 0.48f, -0.06f), new Vector3(0.44f, 0.52f, -0.08f), 0.034f, 0.011f),
-                new BranchSpline(new Vector3(0f, 0.45f, 0.02f), new Vector3(-0.08f, 0.58f, 0.14f), new Vector3(-0.14f, 0.66f, 0.24f), new Vector3(-0.18f, 0.72f, 0.30f), 0.028f, 0.010f),
-                new BranchSpline(new Vector3(0f, 0.55f, 0f), new Vector3(0.04f, 0.68f, 0f), new Vector3(0.02f, 0.78f, 0f), new Vector3(0f, 0.86f, 0f), 0.030f, 0.010f)
+                new BranchSpline(new Vector3(-0.02f, 0.24f, 0f), new Vector3(-0.18f, 0.34f, 0.04f), new Vector3(-0.34f, 0.38f, 0.06f), new Vector3(-0.46f, 0.42f, 0.08f), 0.040f, 0.012f),
+                new BranchSpline(new Vector3(0.02f, 0.34f, 0f),  new Vector3(0.18f, 0.44f, -0.04f), new Vector3(0.32f, 0.48f, -0.06f), new Vector3(0.44f, 0.52f, -0.08f), 0.036f, 0.011f),
+                new BranchSpline(new Vector3(0f, 0.44f, 0.02f),  new Vector3(-0.08f, 0.58f, 0.14f), new Vector3(-0.14f, 0.66f, 0.24f), new Vector3(-0.18f, 0.72f, 0.30f), 0.030f, 0.010f),
+                new BranchSpline(new Vector3(0.01f, 0.48f, -0.02f), new Vector3(0.10f, 0.58f, -0.14f), new Vector3(0.18f, 0.66f, -0.24f), new Vector3(0.24f, 0.72f, -0.30f), 0.028f, 0.009f),
+                new BranchSpline(new Vector3(-0.01f, 0.54f, -0.01f), new Vector3(-0.12f, 0.64f, -0.10f), new Vector3(-0.22f, 0.72f, -0.16f), new Vector3(-0.28f, 0.78f, -0.20f), 0.026f, 0.009f),
+                new BranchSpline(new Vector3(0f, 0.58f, 0f), new Vector3(0.04f, 0.70f, 0f), new Vector3(0.02f, 0.80f, 0f), new Vector3(0f, 0.88f, 0f), 0.032f, 0.010f)
             };
 
             Mesh trunkMesh = ZenBonsaiProceduralMeshes.CreateMasterTreeWoodMesh(
                 $"Mesh_{name}_Trunk",
-                Vector3.zero, new Vector3(-0.08f, 0.26f, 0.03f), new Vector3(0.06f, 0.50f, -0.02f), new Vector3(0f, 0.72f, 0f),
-                0.085f, 0.052f, 0.022f, branches, 6, 0.65f, 0.14f, 5.0f, seed);
+                Vector3.zero, new Vector3(-0.08f, 0.26f, 0.03f), new Vector3(0.06f, 0.50f, -0.02f), new Vector3(0f, 0.74f, 0f),
+                0.088f, 0.054f, 0.022f, branches, 8, 0.72f, 0.15f, 5.5f, seed);
 
             GameObject trunkObj = new GameObject("LandscapeTrunk");
             trunkObj.transform.SetParent(tree.transform, false);
             trunkObj.AddComponent<MeshFilter>().sharedMesh = trunkMesh;
             trunkObj.AddComponent<MeshRenderer>().sharedMaterial = barkMat;
 
+            Vector3 padScale = new Vector3(0.44f, 0.16f, 0.38f);
             for (int i = 0; i < branches.Length; i++)
             {
                 GameObject pad = new GameObject($"LandscapeCanopy_{i}");
                 pad.transform.SetParent(tree.transform, false);
                 pad.transform.localPosition = branches[i].p3 + new Vector3(0f, 0.02f, 0f);
                 pad.AddComponent<MeshFilter>().sharedMesh = ZenBonsaiProceduralMeshes.CreateFoliageCloudPadMesh(
-                    $"Mesh_{name}_Pad_{i}", new Vector3(0.42f, 0.15f, 0.36f), 14, 0.80f, 0.20f, seed + i * 19);
+                    $"Mesh_{name}_Pad_{i}", padScale, 14, 0.80f, 0.20f, seed + i * 19);
                 pad.AddComponent<MeshRenderer>().sharedMaterial = foliageMat;
+
+                // Añadir flores de Sakura 3D, hojas de Arce 3D o acículas de Pino 3D sobre cada copa del árbol de jardín
+                if (species == TreeType.Sakura)
+                {
+                    Mesh corollas = ZenBonsaiProceduralMeshes.CreateSakuraBlossomCorollasMesh(
+                        $"Mesh_{name}_Blossoms_{i}", padScale, 32, seed + 100 + i * 13, out Mesh stamens);
+                    GameObject bObj = new GameObject("Canopy_3DBlossoms");
+                    bObj.transform.SetParent(pad.transform, false);
+                    bObj.AddComponent<MeshFilter>().sharedMesh = corollas;
+                    bObj.AddComponent<MeshRenderer>().sharedMaterial = foliageMat;
+
+                    GameObject sObj = new GameObject("Canopy_Stamens");
+                    sObj.transform.SetParent(pad.transform, false);
+                    sObj.AddComponent<MeshFilter>().sharedMesh = stamens;
+                    sObj.AddComponent<MeshRenderer>().sharedMaterial = goldMat;
+                }
+                else if (species == TreeType.Momiji)
+                {
+                    Mesh mapleLeaves = ZenBonsaiProceduralMeshes.CreateMomijiStarLeavesMesh(
+                        $"Mesh_{name}_Maple_{i}", padScale, 28, seed + 200 + i * 13);
+                    GameObject mObj = new GameObject("Canopy_3DMapleLeaves");
+                    mObj.transform.SetParent(pad.transform, false);
+                    mObj.AddComponent<MeshFilter>().sharedMesh = mapleLeaves;
+                    mObj.AddComponent<MeshRenderer>().sharedMaterial = foliageMat;
+                }
+                else
+                {
+                    Mesh pineNeedles = ZenBonsaiProceduralMeshes.CreateMatsuNeedleClustersMesh(
+                        $"Mesh_{name}_Needles_{i}", padScale, 32, seed + 300 + i * 13);
+                    GameObject nObj = new GameObject("Canopy_3DPineNeedles");
+                    nObj.transform.SetParent(pad.transform, false);
+                    nObj.AddComponent<MeshFilter>().sharedMesh = pineNeedles;
+                    nObj.AddComponent<MeshRenderer>().sharedMaterial = foliageMat;
+                }
             }
         }
 
@@ -2508,8 +2944,8 @@ namespace ZenBonsai.Editor
         {
             Material mat = CreateOrGetPBRMaterial(matName, Color.white, smoothness, metallic);
 
-            string texPath = $"Assets/ZenBonsai/Materials/{matName}_v25_Tex.png";
-            string normPath = $"Assets/ZenBonsai/Materials/{matName}_v25_Norm.png";
+            string texPath = $"Assets/ZenBonsai/Materials/{matName}_v26_Tex.png";
+            string normPath = $"Assets/ZenBonsai/Materials/{matName}_v26_Norm.png";
 
             Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>(texPath);
             Texture2D normTex = AssetDatabase.LoadAssetAtPath<Texture2D>(normPath);
@@ -2596,6 +3032,161 @@ namespace ZenBonsai.Editor
                             c = Color.Lerp(c, lightAccent, Mathf.Pow(groove, 2f) * 0.4f);
                             hVal = groove * 0.80f + n3 * 0.20f;
                         }
+                        else if (style == 17) // Tablones de madera noble japonesa (Engawa Hinoki / Keyaki) con vetas, nudos y juntas
+                        {
+                            float plankIdx = Mathf.Floor(u * 8f);
+                            float plankFrac = Mathf.Repeat(u * 8f, 1f);
+                            float seamX = Mathf.SmoothStep(0.0f, 0.045f, plankFrac) * Mathf.SmoothStep(1.0f, 0.955f, plankFrac);
+                            float endJointV = Mathf.Repeat(v * 2f + plankIdx * 0.37f, 1f);
+                            float seamY = Mathf.SmoothStep(0.0f, 0.018f, endJointV) * Mathf.SmoothStep(1.0f, 0.982f, endJointV);
+                            float seam = seamX * seamY;
+
+                            float grainU = (u * 26f) + plankIdx * 3.7f + Mathf.Sin(v * Mathf.PI * 4f + n1 * 3f) * 0.8f;
+                            float ring = Mathf.Sin(grainU * Mathf.PI * 2f + n2 * 4.5f) * 0.5f + 0.5f;
+                            float plankTone = Mathf.Sin(plankIdx * 2.3f) * 0.08f;
+
+                            c = Color.Lerp(darkAccent, baseColor, ring * 0.65f + n1 * 0.35f + plankTone);
+                            c = Color.Lerp(c, lightAccent, Mathf.Pow(ring, 2.2f) * 0.38f);
+                            c = Color.Lerp(darkAccent * 0.42f, c, seam);
+                            hVal = seam * (0.65f + ring * 0.25f + n3 * 0.10f);
+                        }
+                        else if (style == 18) // Estera Tatami tejida (Igusa) con ribete de brocado tradicional (Tatami-beri)
+                        {
+                            bool isBrocade = (u < 0.075f || u > 0.925f);
+                            if (isBrocade)
+                            {
+                                float diamond = Mathf.Abs(Mathf.Sin(u * Mathf.PI * 80f) * Mathf.Cos(v * Mathf.PI * 48f));
+                                Color brocadeBase = new Color(0.11f, 0.16f, 0.24f);
+                                Color goldThread = new Color(0.86f, 0.68f, 0.26f);
+                                c = Color.Lerp(brocadeBase, goldThread, Mathf.SmoothStep(0.62f, 0.88f, diamond) * 0.85f);
+                                hVal = 0.72f + diamond * 0.20f;
+                            }
+                            else
+                            {
+                                float rushStraw = Mathf.Sin(v * Mathf.PI * 140f + n2 * 1.5f) * 0.5f + 0.5f;
+                                float warpThread = Mathf.Sin(u * Mathf.PI * 36f) * 0.5f + 0.5f;
+                                c = Color.Lerp(darkAccent, baseColor, rushStraw * 0.70f + n1 * 0.30f);
+                                c = Color.Lerp(c, lightAccent, warpThread * 0.25f);
+                                hVal = rushStraw * 0.65f + warpThread * 0.25f;
+                            }
+                        }
+                        else if (style == 19) // Tejas cerámicas japonesas Ibushi-Gawara (canales Honbuki + escalones de teja)
+                        {
+                            float tileCol = Mathf.Sin(u * Mathf.PI * 24f) * 0.5f + 0.5f;
+                            float tileRowFrac = Mathf.Repeat(v * 14f, 1f);
+                            float rowOverlap = Mathf.SmoothStep(0.0f, 0.14f, tileRowFrac);
+                            float glazeSheen = Mathf.SmoothStep(0.20f, 0.85f, tileCol) * rowOverlap;
+                            c = Color.Lerp(darkAccent * 0.75f, baseColor, glazeSheen);
+                            c = Color.Lerp(c, lightAccent, Mathf.Pow(tileCol, 3.0f) * rowOverlap * 0.55f);
+                            hVal = tileCol * 0.72f * rowOverlap + tileRowFrac * 0.28f;
+                        }
+                        else if (style == 20) // Panel Shoji con cuadrícula de madera Kumiko y papel Washi translúcido
+                        {
+                            float gridU = Mathf.Repeat(u * 6f, 1f);
+                            float gridV = Mathf.Repeat(v * 10f, 1f);
+                            bool isOuterBorder = (u < 0.045f || u > 0.955f || v < 0.035f || v > 0.965f);
+                            bool isKumikoBar = (gridU < 0.065f || gridU > 0.935f || gridV < 0.055f || gridV > 0.945f);
+                            if (isOuterBorder || isKumikoBar)
+                            {
+                                float woodGrain = Mathf.Sin((u + v) * 90f + n1 * 4f) * 0.5f + 0.5f;
+                                c = Color.Lerp(darkAccent * 0.75f, darkAccent, woodGrain);
+                                hVal = 0.92f;
+                            }
+                            else
+                            {
+                                float washiFiber = Mathf.PerlinNoise(u * 42f, v * 42f) * 0.5f + Mathf.PerlinNoise(u * 85f, v * 18f) * 0.5f;
+                                float warmGlow = Mathf.Clamp01(1f - Vector2.Distance(new Vector2(u, v), new Vector2(0.5f, 0.5f)) * 0.95f);
+                                c = Color.Lerp(baseColor, lightAccent, washiFiber * 0.45f + warmGlow * 0.45f);
+                                hVal = 0.25f + washiFiber * 0.15f;
+                            }
+                        }
+                        else if (style == 21) // Mampostería de piedra de templo japonés (Ishigaki) con juntas y musgo
+                        {
+                            float row = Mathf.Floor(v * 7f);
+                            float rowV = Mathf.Repeat(v * 7f, 1f);
+                            float colU = Mathf.Repeat(u * 5f + (row % 2f) * 0.5f, 1f);
+                            float mortarH = Mathf.SmoothStep(0.0f, 0.08f, rowV) * Mathf.SmoothStep(1.0f, 0.92f, rowV);
+                            float mortarV = Mathf.SmoothStep(0.0f, 0.06f, colU) * Mathf.SmoothStep(1.0f, 0.94f, colU);
+                            float stoneMask = mortarH * mortarV;
+
+                            float blockSeed = Mathf.Sin(row * 7.1f + Mathf.Floor(u * 5f + (row % 2f) * 0.5f) * 13.3f) * 0.08f;
+                            c = Color.Lerp(darkAccent, baseColor, n1 * 0.55f + n2 * 0.45f + blockSeed);
+                            c = Color.Lerp(c, lightAccent, Mathf.Pow(n3, 2f) * 0.35f);
+                            // Musgo natural en las juntas húmedas e inferiores
+                            Color mossTint = new Color(0.16f, 0.38f, 0.13f);
+                            float mossCrevice = (1f - stoneMask) * Mathf.SmoothStep(0.35f, 0.75f, n1) + Mathf.Clamp01((0.28f - v) * 2.5f) * n2;
+                            c = Color.Lerp(darkAccent * 0.45f, c, stoneMask);
+                            c = Color.Lerp(c, mossTint, Mathf.Clamp01(mossCrevice * 0.75f));
+                            hVal = stoneMask * (0.60f + n2 * 0.28f + n3 * 0.12f);
+                        }
+                        else if (style == 22) // Muro de estuco blanco japonés (Shikkui) con zócalo de madera de cedro (Koshikabe)
+                        {
+                            if (v < 0.28f)
+                            {
+                                float boardFrac = Mathf.Repeat(u * 12f, 1f);
+                                float boardSeam = Mathf.SmoothStep(0.0f, 0.06f, boardFrac) * Mathf.SmoothStep(1.0f, 0.94f, boardFrac);
+                                float woodRing = Mathf.Sin(u * 95f + n1 * 5f) * 0.5f + 0.5f;
+                                Color cedarDark = new Color(0.22f, 0.14f, 0.09f);
+                                Color cedarMid = new Color(0.36f, 0.23f, 0.15f);
+                                c = Color.Lerp(cedarDark, cedarMid, woodRing * boardSeam);
+                                hVal = 0.65f * boardSeam + woodRing * 0.20f;
+                            }
+                            else
+                            {
+                                float trowel = n1 * 0.55f + n2 * 0.30f + n3 * 0.15f;
+                                c = Color.Lerp(darkAccent, baseColor, trowel);
+                                c = Color.Lerp(c, lightAccent, Mathf.Pow(trowel, 2f) * 0.35f);
+                                hVal = 0.40f + trowel * 0.25f;
+                            }
+                        }
+                        else if (style == 23) // Laderas volcánicas del Monte Fuji con barrancos de basalto y escarcha alpina
+                        {
+                            float gully = Mathf.Sin(rad * 18f + n1 * 4f) * 0.5f + 0.5f;
+                            float scree = n2 * 0.6f + n3 * 0.4f;
+                            c = Color.Lerp(darkAccent, baseColor, gully * 0.65f + scree * 0.35f);
+                            float highFrost = Mathf.Clamp01((v - 0.48f) / 0.42f) * Mathf.SmoothStep(0.42f, 0.78f, gully * 0.7f + n2 * 0.3f);
+                            c = Color.Lerp(c, lightAccent, highFrost * 0.85f);
+                            hVal = gully * 0.70f + scree * 0.30f;
+                        }
+                        else if (style == 24) // Agua de estanque y lago espejo con ondas entrelazadas y reflejos
+                        {
+                            float w1 = Mathf.Sin(u * Mathf.PI * 24f + v * Mathf.PI * 16f + n1 * 4f) * 0.5f + 0.5f;
+                            float w2 = Mathf.Cos(u * Mathf.PI * 18f - v * Mathf.PI * 28f + n2 * 5f) * 0.5f + 0.5f;
+                            float wave = (w1 + w2) * 0.5f;
+                            c = Color.Lerp(darkAccent, baseColor, wave * 0.75f + n1 * 0.25f);
+                            c = Color.Lerp(c, lightAccent, Mathf.Pow(wave, 3.2f) * 0.48f);
+                            hVal = wave * 0.80f + n3 * 0.20f;
+                        }
+                        else if (style == 25) // Pergamino Kakemono pintado en tinta Sumi-e (Monte Fuji, Sol Rojo y Pino)
+                        {
+                            bool border = (u < 0.10f || u > 0.90f || v < 0.08f || v > 0.92f);
+                            if (border)
+                            {
+                                float silkPat = Mathf.Abs(Mathf.Sin(u * Mathf.PI * 40f) * Mathf.Cos(v * Mathf.PI * 40f));
+                                c = Color.Lerp(darkAccent, new Color(0.76f, 0.62f, 0.28f), silkPat * 0.45f);
+                                hVal = 0.70f + silkPat * 0.20f;
+                            }
+                            else
+                            {
+                                c = Color.Lerp(baseColor, lightAccent, n1 * 0.35f + 0.5f);
+                                // Sol carmesí japonés (Hinomaru) en la parte superior derecha del pergamino
+                                float sunDist = Vector2.Distance(new Vector2(u, v), new Vector2(0.64f, 0.72f));
+                                if (sunDist < 0.095f)
+                                {
+                                    c = Color.Lerp(new Color(0.82f, 0.16f, 0.12f), c, Mathf.SmoothStep(0.075f, 0.095f, sunDist));
+                                }
+                                // Silueta Sumi-e del Monte Fuji en el centro del pergamino
+                                float fujiProfile = 0.34f + Mathf.Pow(Mathf.Clamp01(1f - Mathf.Abs(u - 0.50f) * 2.6f), 1.6f) * 0.30f;
+                                if (Mathf.Abs(u - 0.50f) < 0.055f) fujiProfile = Mathf.Min(fujiProfile, 0.61f);
+                                if (v < fujiProfile && v > 0.22f)
+                                {
+                                    float snowZone = Mathf.Clamp01((v - (fujiProfile - 0.09f)) / 0.09f);
+                                    Color inkColor = Color.Lerp(new Color(0.14f, 0.16f, 0.20f), baseColor, snowZone * 0.85f + (0.34f - v) * 1.5f);
+                                    c = Color.Lerp(c, inkColor, 0.85f);
+                                }
+                                hVal = 0.35f + n3 * 0.15f;
+                            }
+                        }
 
                         c.a = 1f;
                         pixels[y * w + x] = c;
@@ -2603,7 +3194,7 @@ namespace ZenBonsai.Editor
                     }
                 }
 
-                float bumpStrength = (style == 11 || style == 16) ? 3.2f : 1.8f;
+                float bumpStrength = (style == 11 || style == 16 || style >= 17) ? 3.2f : 1.8f;
                 for (int y = 0; y < h; y++)
                 {
                     int yUp = (y + 1) % h;
@@ -2651,6 +3242,132 @@ namespace ZenBonsai.Editor
             if (mat.HasProperty("_ZWrite")) mat.SetFloat("_ZWrite", 1f);
             if (mat.HasProperty("_Cull")) mat.SetFloat("_Cull", 0f);
             mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Geometry;
+            EditorUtility.SetDirty(mat);
+            return mat;
+        }
+
+        /// <summary>
+        /// Genera una textura equirectangular panorámica 360° (1024x512) pintada con gradiente atmosférico Rayleigh/Mie,
+        /// halo solar cálido, nubes cúmulos/cirros iluminadas por el sol y 3 cordilleras lejanas con niebla en 360°.
+        /// </summary>
+        private static Material CreateOrGetPanoramicSkyDomeMaterial(
+            string matName, Color zenithColor, Color midSkyColor, Color horizonGlowColor,
+            Color cloudLightColor, Color cloudShadowColor, Color distantMtnColor, int skySeed)
+        {
+            Material mat = CreateOrGetPBRMaterial(matName, Color.white, 0.0f, 0.0f);
+            string texPath = $"Assets/ZenBonsai/Materials/{matName}_v26_Sky.png";
+            Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>(texPath);
+
+            if (tex == null)
+            {
+                int w = 1024, h = 512;
+                Texture2D skyTex = new Texture2D(w, h, TextureFormat.RGBA32, true);
+                skyTex.wrapModeU = TextureWrapMode.Repeat;
+                skyTex.wrapModeV = TextureWrapMode.Clamp;
+                Color[] pixels = new Color[w * h];
+
+                for (int y = 0; y < h; y++)
+                {
+                    float v = y / (float)(h - 1);
+                    for (int x = 0; x < w; x++)
+                    {
+                        float u = x / (float)w;
+                        float rad = u * Mathf.PI * 2f;
+                        float cx = Mathf.Cos(rad) * 2.2f + 5.0f + skySeed * 3.1f;
+                        float cy = Mathf.Sin(rad) * 2.2f + 5.0f + skySeed * 1.7f;
+
+                        // 1. Gradiente atmosférico de cúpula celeste
+                        Color skyCol;
+                        if (v >= 0.62f)
+                        {
+                            float t = Mathf.SmoothStep(0.62f, 0.98f, v);
+                            skyCol = Color.Lerp(midSkyColor, zenithColor, t);
+                        }
+                        else if (v >= 0.44f)
+                        {
+                            float t = Mathf.SmoothStep(0.44f, 0.62f, v);
+                            skyCol = Color.Lerp(horizonGlowColor, midSkyColor, t);
+                        }
+                        else
+                        {
+                            float t = Mathf.SmoothStep(0.18f, 0.44f, v);
+                            skyCol = Color.Lerp(distantMtnColor * 0.72f, horizonGlowColor, t);
+                        }
+
+                        // 2. Halo solar dorado suave en el horizonte frontal-derecho
+                        float dU = Mathf.Abs(Mathf.DeltaAngle(u * 360f, 195f)) / 180f;
+                        float dV = Mathf.Abs(v - 0.53f) * 2.2f;
+                        float sunDist = Mathf.Sqrt(dU * dU + dV * dV);
+                        float sunGlow = Mathf.Pow(Mathf.Clamp01(1f - sunDist * 1.85f), 2.4f);
+                        skyCol = Color.Lerp(skyCol, new Color(1.0f, 0.90f, 0.68f), sunGlow * 0.65f);
+
+                        // 3. Nubes volumétricas pintadas en 360° (cúmulos y cirros iluminados al atardecer/día)
+                        if (v > 0.45f && v < 0.86f)
+                        {
+                            float c1 = Mathf.PerlinNoise(cx * 2.4f, v * 7.5f + skySeed);
+                            float c2 = Mathf.PerlinNoise(cx * 5.8f + cy * 2.5f, v * 16f + skySeed * 2.3f);
+                            float c3 = Mathf.PerlinNoise(cx * 12f - cy * 4f, v * 32f);
+                            float cloudDensity = c1 * 0.55f + c2 * 0.30f + c3 * 0.15f;
+                            float bandMask = Mathf.Sin(Mathf.Clamp01((v - 0.45f) / 0.41f) * Mathf.PI);
+                            float cloudAlpha = Mathf.SmoothStep(0.48f, 0.76f, cloudDensity) * bandMask;
+
+                            if (cloudAlpha > 0.01f)
+                            {
+                                float cTop = Mathf.PerlinNoise(cx * 5.8f + cy * 2.5f, (v + 0.015f) * 16f + skySeed * 2.3f);
+                                float rimLight = Mathf.Clamp01((cloudDensity - cTop) * 4.5f + 0.55f + sunGlow * 0.45f);
+                                Color cloudCol = Color.Lerp(cloudShadowColor, cloudLightColor, rimLight);
+                                skyCol = Color.Lerp(skyCol, cloudCol, cloudAlpha * 0.88f);
+                            }
+                        }
+
+                        // 4. Tres cordilleras lejanas en 360° con perspectiva atmosférica y niebla en los valles
+                        float m1 = 0.455f + Mathf.PerlinNoise(cx * 1.6f, cy * 1.6f) * 0.075f + Mathf.Sin(rad * 5f + skySeed) * 0.022f;
+                        float m2 = 0.430f + Mathf.PerlinNoise(cx * 2.8f + 4f, cy * 2.8f + 4f) * 0.062f + Mathf.Cos(rad * 8f) * 0.018f;
+                        float m3 = 0.405f + Mathf.PerlinNoise(cx * 4.5f + 9f, cy * 4.5f + 9f) * 0.048f;
+
+                        if (v < m1)
+                        {
+                            float mist1 = Mathf.Clamp01((m1 - v) / 0.065f);
+                            Color farRidge = Color.Lerp(horizonGlowColor * 0.92f, distantMtnColor, mist1 * 0.62f);
+                            skyCol = Color.Lerp(skyCol, farRidge, Mathf.SmoothStep(m1, m1 - 0.008f, v));
+                        }
+                        if (v < m2)
+                        {
+                            float mist2 = Mathf.Clamp01((m2 - v) / 0.055f);
+                            Color midRidge = Color.Lerp(horizonGlowColor * 0.82f, distantMtnColor * 0.78f, mist2 * 0.78f);
+                            skyCol = Color.Lerp(skyCol, midRidge, Mathf.SmoothStep(m2, m2 - 0.006f, v));
+                        }
+                        if (v < m3)
+                        {
+                            Color nearRidge = distantMtnColor * 0.58f;
+                            skyCol = Color.Lerp(skyCol, nearRidge, Mathf.SmoothStep(m3, m3 - 0.005f, v));
+                        }
+
+                        skyCol.a = 1f;
+                        pixels[y * w + x] = skyCol;
+                    }
+                }
+
+                skyTex.SetPixels(pixels);
+                skyTex.Apply();
+                System.IO.File.WriteAllBytes(texPath, skyTex.EncodeToPNG());
+                Object.DestroyImmediate(skyTex);
+
+                AssetDatabase.ImportAsset(texPath, ImportAssetOptions.ForceSynchronousImport);
+                tex = AssetDatabase.LoadAssetAtPath<Texture2D>(texPath);
+            }
+
+            if (tex != null)
+            {
+                tex.wrapModeU = TextureWrapMode.Repeat;
+                tex.wrapModeV = TextureWrapMode.Clamp;
+                mat.mainTexture = tex;
+                if (mat.HasProperty("_BaseMap")) mat.SetTexture("_BaseMap", tex);
+                mat.EnableKeyword("_EMISSION");
+                if (mat.HasProperty("_EmissionMap")) mat.SetTexture("_EmissionMap", tex);
+                if (mat.HasProperty("_EmissionColor")) mat.SetColor("_EmissionColor", new Color(0.68f, 0.68f, 0.68f));
+            }
+            if (mat.HasProperty("_Cull")) mat.SetFloat("_Cull", 0f);
             EditorUtility.SetDirty(mat);
             return mat;
         }
@@ -4791,14 +5508,23 @@ namespace ZenBonsai.Editor
             List<int> tris = new List<int>();
             List<Vector2> uvs = new List<Vector2>();
 
-            // Cuerpo fusiforme de carpa Nishikigoi con aleta caudal en abanico
+            // 1. Cuerpo fusiforme sinuoso de carpa Nishikigoi
             AppendSplineTube(
                 verts, tris, uvs,
                 new Vector3(0f, 0f, -0.22f),
-                new Vector3(0.015f, 0f, -0.06f),
-                new Vector3(-0.01f, 0f, 0.08f),
-                new Vector3(0f, 0f, 0.20f),
-                0.008f, 0.045f, 0.018f, 12, 10, 0, 0f, 0f, 0f, 1, true);
+                new Vector3(0.016f, 0.005f, -0.06f),
+                new Vector3(-0.012f, 0.006f, 0.09f),
+                new Vector3(0f, 0f, 0.22f),
+                0.007f, 0.052f, 0.020f, 14, 12, 0, 0f, 0f, 0f, 1, true);
+
+            // 2. Aleta caudal bifurcada en abanico (cola elegante)
+            AppendSingleCurvedPetal(verts, tris, uvs, new Vector3(-0.012f, 0.004f, -0.24f), Quaternion.Euler(85f, 165f, 15f), 0.085f);
+            AppendSingleCurvedPetal(verts, tris, uvs, new Vector3(0.012f, 0.004f, -0.24f), Quaternion.Euler(85f, 195f, -15f), 0.085f);
+
+            // 3. Aletas pectorales abiertas a ambos lados y aleta dorsal
+            AppendSingleCurvedPetal(verts, tris, uvs, new Vector3(-0.042f, -0.006f, 0.07f), Quaternion.Euler(12f, -115f, -10f), 0.070f);
+            AppendSingleCurvedPetal(verts, tris, uvs, new Vector3(0.042f, -0.006f, 0.07f), Quaternion.Euler(12f, 115f, 10f), 0.070f);
+            AppendSingleCurvedPetal(verts, tris, uvs, new Vector3(0f, 0.042f, -0.02f), Quaternion.Euler(-35f, 180f, 90f), 0.075f);
 
             Mesh mesh = new Mesh();
             mesh.SetVertices(verts); mesh.SetTriangles(tris, 0); mesh.SetUVs(0, uvs);
@@ -4811,10 +5537,19 @@ namespace ZenBonsai.Editor
             List<int> tris = new List<int>();
             List<Vector2> uvs = new List<Vector2>();
 
-            int gridX = 48;
-            int gridZ = 40;
-            float hx = width * 0.5f;
-            float hz = depth * 0.5f;
+            int gridX = 72;
+            int gridZ = 60;
+
+            Vector2[] rockIslands =
+            {
+                new Vector2(-3.2f, -2.7f),
+                new Vector2(-1.4f, -1.0f),
+                new Vector2(1.8f, -1.8f),
+                new Vector2(3.4f, 0.6f),
+                new Vector2(-2.5f, 2.0f),
+                new Vector2(0.4f, 2.6f),
+                new Vector2(2.6f, 3.4f)
+            };
 
             for (int iz = 0; iz <= gridZ; iz++)
             {
@@ -4824,10 +5559,22 @@ namespace ZenBonsai.Editor
                 {
                     float vx = ix / (float)gridX;
                     float x = (vx - 0.5f) * width;
-                    // Surcos longitudinales y ondas concéntricas de grava rastrillada Karesansui
-                    float wave = Mathf.Sin(x * 8.5f) * 0.018f + Mathf.Cos(Mathf.Sqrt(x * x + z * z) * 6.0f) * 0.012f;
+
+                    // Surcos longitudinales Samon + anillos concéntricos alrededor de cada isla de roca Suiseki
+                    float wave = Mathf.Sin(x * 11.5f) * 0.022f;
+                    for (int r = 0; r < rockIslands.Length; r++)
+                    {
+                        float d = Vector2.Distance(new Vector2(x, z), rockIslands[r]);
+                        if (d < 2.25f)
+                        {
+                            float ringBlend = Mathf.SmoothStep(2.25f, 0.85f, d);
+                            float ringWave = Mathf.Cos(d * 14.0f) * 0.028f;
+                            wave = Mathf.Lerp(wave, ringWave, ringBlend);
+                        }
+                    }
+
                     verts.Add(new Vector3(x, wave, z));
-                    uvs.Add(new Vector2(vx * 8f, vz * 8f));
+                    uvs.Add(new Vector2(vx * 10f, vz * 10f));
                 }
             }
 
@@ -4848,6 +5595,747 @@ namespace ZenBonsai.Editor
             Mesh mesh = new Mesh();
             mesh.SetVertices(verts); mesh.SetTriangles(tris, 0); mesh.SetUVs(0, uvs);
             return SaveOrReplaceMesh(mesh, assetName);
+        }
+
+        public static Mesh CreatePanoramicSkySphereMesh(string assetName, float radius, int lonSegs = 64, int latSegs = 32)
+        {
+            List<Vector3> verts = new List<Vector3>();
+            List<int> tris = new List<int>();
+            List<Vector2> uvs = new List<Vector2>();
+
+            for (int lat = 0; lat <= latSegs; lat++)
+            {
+                float v = lat / (float)latSegs;
+                float phi = (v - 0.5f) * Mathf.PI;
+                float cosPhi = Mathf.Cos(phi);
+                float sinPhi = Mathf.Sin(phi);
+
+                for (int lon = 0; lon <= lonSegs; lon++)
+                {
+                    float u = lon / (float)lonSegs;
+                    float theta = u * Mathf.PI * 2f;
+                    float x = cosPhi * Mathf.Sin(theta) * radius;
+                    float y = sinPhi * radius * 0.72f;
+                    float z = cosPhi * Mathf.Cos(theta) * radius;
+                    verts.Add(new Vector3(x, y, z));
+                    uvs.Add(new Vector2(u, v));
+                }
+            }
+
+            int stride = lonSegs + 1;
+            for (int lat = 0; lat < latSegs; lat++)
+            {
+                for (int lon = 0; lon < lonSegs; lon++)
+                {
+                    int a = lat * stride + lon;
+                    int b = a + stride;
+                    int c = b + 1;
+                    int d = a + 1;
+                    // Normales mirando hacia el interior de la cúpula celeste
+                    tris.Add(a); tris.Add(c); tris.Add(b);
+                    tris.Add(a); tris.Add(d); tris.Add(c);
+                }
+            }
+
+            Mesh mesh = new Mesh();
+            mesh.SetVertices(verts); mesh.SetTriangles(tris, 0); mesh.SetUVs(0, uvs);
+            return SaveOrReplaceMesh(mesh, assetName);
+        }
+
+        public static Mesh CreateFull360SanctuaryTerrainMesh(
+            string assetName, float size, float baseHeight,
+            Vector2 pondCenter, Vector2 pondRadii, float pondDepth, int seed)
+        {
+            List<Vector3> verts = new List<Vector3>();
+            List<int> tris = new List<int>();
+            List<Vector2> uvs = new List<Vector2>();
+
+            int grid = 64;
+            for (int iz = 0; iz <= grid; iz++)
+            {
+                float vz = iz / (float)grid;
+                float z = (vz - 0.5f) * size;
+                for (int ix = 0; ix <= grid; ix++)
+                {
+                    float vx = ix / (float)grid;
+                    float x = (vx - 0.5f) * size;
+
+                    float distFromOrigin = Mathf.Sqrt(x * x + z * z);
+                    float n1 = Mathf.PerlinNoise(vx * 6.5f + seed * 1.7f, vz * 6.5f + seed * 2.3f);
+                    float n2 = Mathf.PerlinNoise(vx * 16f + seed * 4.1f, vz * 16f + seed * 3.7f);
+
+                    // Colinas suaves de musgo (Koke-yama) alrededor de los 360°, manteniendo plana la base del salón central
+                    float courtyardFlatten = Mathf.SmoothStep(3.6f, 8.5f, distFromOrigin);
+                    float outerHills = Mathf.SmoothStep(11f, 32f, distFromOrigin) * (1.2f + n1 * 2.4f);
+                    float y = baseHeight + ( (n1 - 0.35f) * 0.42f + (n2 - 0.5f) * 0.16f ) * courtyardFlatten + outerHills;
+
+                    // Cuenca excavada natural para el estanque o lago
+                    if (pondRadii.x > 0.1f && pondRadii.y > 0.1f)
+                    {
+                        float dx = (x - pondCenter.x) / pondRadii.x;
+                        float dz = (z - pondCenter.y) / pondRadii.y;
+                        float pDist = Mathf.Sqrt(dx * dx + dz * dz);
+                        if (pDist < 1.25f)
+                        {
+                            float basin = Mathf.SmoothStep(1.25f, 0.65f, pDist);
+                            y = Mathf.Lerp(y, baseHeight - pondDepth, basin);
+                        }
+                    }
+
+                    verts.Add(new Vector3(x, y, z));
+                    uvs.Add(new Vector2(vx * 18f, vz * 18f));
+                }
+            }
+
+            int stride = grid + 1;
+            for (int iz = 0; iz < grid; iz++)
+            {
+                for (int ix = 0; ix < grid; ix++)
+                {
+                    int a = iz * stride + ix;
+                    int b = a + stride;
+                    int c = b + 1;
+                    int d = a + 1;
+                    tris.Add(a); tris.Add(b); tris.Add(c);
+                    tris.Add(a); tris.Add(c); tris.Add(d);
+                }
+            }
+
+            Mesh mesh = new Mesh();
+            mesh.SetVertices(verts); mesh.SetTriangles(tris, 0); mesh.SetUVs(0, uvs);
+            return SaveOrReplaceMesh(mesh, assetName);
+        }
+
+        public static Mesh Create360MountainHorizonRingMesh(
+            string assetName, float innerRadius, float outerRadius, float maxPeakHeight, float frontValleyDip, int seed)
+        {
+            List<Vector3> verts = new List<Vector3>();
+            List<int> tris = new List<int>();
+            List<Vector2> uvs = new List<Vector2>();
+
+            int radialSegs = 96;
+            int rings = 14;
+
+            for (int r = 0; r <= rings; r++)
+            {
+                float t = r / (float)rings;
+                float rad = Mathf.Lerp(innerRadius, outerRadius, t);
+                // Perfil de montaña: sube desde la base interior hasta la cresta (t=0.68) y baja por detrás
+                float profile = Mathf.Sin(Mathf.Pow(t, 0.78f) * Mathf.PI);
+
+                for (int s = 0; s <= radialSegs; s++)
+                {
+                    float u = s / (float)radialSegs;
+                    float ang = u * Mathf.PI * 2f;
+                    float cx = Mathf.Cos(ang) * 2.5f + seed * 3.1f;
+                    float cz = Mathf.Sin(ang) * 2.5f + seed * 1.9f;
+
+                    float n1 = Mathf.PerlinNoise(cx * 1.8f + t * 1.5f, cz * 1.8f);
+                    float n2 = 1f - Mathf.Abs(Mathf.Sin(ang * 7f + n1 * 3.5f));
+                    float n3 = Mathf.PerlinNoise(cx * 5.2f, cz * 5.2f + t * 3f);
+
+                    // En el frente exacto (+Z, ang cercano a PI/2) bajamos ligeramente las colinas si queremos despejar la vista al Monte Fuji
+                    float frontDist = Mathf.Abs(Mathf.DeltaAngle(ang * Mathf.Rad2Deg, 90f));
+                    float valleyMask = Mathf.Lerp(1f - frontValleyDip, 1.0f, Mathf.SmoothStep(8f, 38f, frontDist));
+
+                    float h = (0.32f + n1 * 0.42f + n2 * 0.35f + n3 * 0.15f) * maxPeakHeight * profile * valleyMask;
+                    float rJitter = rad + (n1 - 0.5f) * 2.2f * profile;
+
+                    verts.Add(new Vector3(Mathf.Cos(ang) * rJitter, -1.1f + h, Mathf.Sin(ang) * rJitter));
+                    uvs.Add(new Vector2(u * 12f, t * 2f));
+                }
+            }
+
+            int stride = radialSegs + 1;
+            for (int r = 0; r < rings; r++)
+            {
+                for (int s = 0; s < radialSegs; s++)
+                {
+                    int a = r * stride + s;
+                    int b = a + stride;
+                    int c = b + 1;
+                    int d = a + 1;
+                    tris.Add(a); tris.Add(b); tris.Add(c);
+                    tris.Add(a); tris.Add(c); tris.Add(d);
+                    tris.Add(a); tris.Add(c); tris.Add(b);
+                    tris.Add(a); tris.Add(d); tris.Add(c);
+                }
+            }
+
+            Mesh mesh = new Mesh();
+            mesh.SetVertices(verts); mesh.SetTriangles(tris, 0); mesh.SetUVs(0, uvs);
+            return SaveOrReplaceMesh(mesh, assetName);
+        }
+
+        public static Mesh CreateVolumetricCloudBankMesh(string assetName, float ringRadius, float baseHeight, int clusterCount, int seed)
+        {
+            Random.State oldState = Random.state;
+            Random.InitState(seed);
+
+            List<Vector3> verts = new List<Vector3>();
+            List<int> tris = new List<int>();
+            List<Vector2> uvs = new List<Vector2>();
+
+            for (int i = 0; i < clusterCount; i++)
+            {
+                float ang = (i / (float)clusterCount) * Mathf.PI * 2f + Random.Range(-0.12f, 0.12f);
+                float dist = ringRadius + Random.Range(-3.2f, 3.2f);
+                Vector3 center = new Vector3(Mathf.Cos(ang) * dist, baseHeight + Random.Range(-0.4f, 0.9f), Mathf.Sin(ang) * dist);
+                Vector3 radii = new Vector3(Random.Range(3.2f, 5.4f), Random.Range(0.42f, 0.85f), Random.Range(2.4f, 4.2f));
+                AppendBotanicalPuff(verts, tris, uvs, center, radii, 0.55f, 0.18f, seed + i * 17);
+            }
+
+            Random.state = oldState;
+            Mesh mesh = new Mesh();
+            mesh.SetVertices(verts); mesh.SetTriangles(tris, 0); mesh.SetUVs(0, uvs);
+            return SaveOrReplaceMesh(mesh, assetName);
+        }
+
+        public static Mesh CreateSculptedTurnedPillarMesh(
+            string assetName, float radius, float height, out Mesh stonePlinthMesh, out Mesh bracketCorbelMesh)
+        {
+            List<Vector3> pVerts = new List<Vector3>();
+            List<int> pTris = new List<int>();
+            List<Vector2> pUvs = new List<Vector2>();
+
+            // Columna cilíndrica torneada de cedro Hinoki con éntasis japonés tradicional
+            AppendSplineTube(
+                pVerts, pTris, pUvs,
+                new Vector3(0f, 0.14f, 0f),
+                new Vector3(0f, height * 0.36f, 0f),
+                new Vector3(0f, height * 0.70f, 0f),
+                new Vector3(0f, height - 0.12f, 0f),
+                radius * 1.04f, radius, radius * 0.94f, 16, 18, 0, 0f, 0.008f, 0f, 11, true);
+
+            // Basa de piedra tallada acampanada (Soseki / Tsuka-ishi)
+            List<Vector3> sVerts = new List<Vector3>();
+            List<int> sTris = new List<int>();
+            List<Vector2> sUvs = new List<Vector2>();
+            AppendSplineTube(
+                sVerts, sTris, sUvs,
+                new Vector3(0f, 0.0f, 0f),
+                new Vector3(0f, 0.06f, 0f),
+                new Vector3(0f, 0.11f, 0f),
+                new Vector3(0f, 0.16f, 0f),
+                radius * 1.55f, radius * 1.42f, radius * 1.12f, 6, 12, 0, 0f, 0.02f, 0f, 22, true);
+
+            // Capitel de ménsulas escalonadas de carpintería tradicional (Kumimono / Masugumi)
+            List<Vector3> bVerts = new List<Vector3>();
+            List<int> bTris = new List<int>();
+            List<Vector2> bUvs = new List<Vector2>();
+            AppendSplineTube(
+                bVerts, bTris, bUvs,
+                new Vector3(-radius * 2.4f, height - 0.08f, 0f),
+                new Vector3(-radius * 0.8f, height - 0.04f, 0f),
+                new Vector3(radius * 0.8f, height - 0.04f, 0f),
+                new Vector3(radius * 2.4f, height - 0.08f, 0f),
+                radius * 0.65f, radius * 0.85f, radius * 0.65f, 8, 8, 0, 0f, 0f, 0f, 33, true);
+            AppendSplineTube(
+                bVerts, bTris, bUvs,
+                new Vector3(0f, height - 0.08f, -radius * 2.4f),
+                new Vector3(0f, height - 0.04f, -radius * 0.8f),
+                new Vector3(0f, height - 0.04f, radius * 0.8f),
+                new Vector3(0f, height - 0.08f, radius * 2.4f),
+                radius * 0.65f, radius * 0.85f, radius * 0.65f, 8, 8, 0, 0f, 0f, 0f, 34, true);
+
+            Mesh sMesh = new Mesh();
+            sMesh.SetVertices(sVerts); sMesh.SetTriangles(sTris, 0); sMesh.SetUVs(0, sUvs);
+            stonePlinthMesh = SaveOrReplaceMesh(sMesh, assetName + "_Plinth");
+
+            Mesh bMesh = new Mesh();
+            bMesh.SetVertices(bVerts); bMesh.SetTriangles(bTris, 0); bMesh.SetUVs(0, bUvs);
+            bracketCorbelMesh = SaveOrReplaceMesh(bMesh, assetName + "_Corbel");
+
+            Mesh pMesh = new Mesh();
+            pMesh.SetVertices(pVerts); pMesh.SetTriangles(pTris, 0); pMesh.SetUVs(0, pUvs);
+            return SaveOrReplaceMesh(pMesh, assetName);
+        }
+
+        public static Mesh CreateSculptedShojiScreenMesh(
+            string assetName, float width, float height, int cols, int rows, out Mesh paperInsertMesh)
+        {
+            List<Vector3> wVerts = new List<Vector3>();
+            List<int> wTris = new List<int>();
+            List<Vector2> wUvs = new List<Vector2>();
+
+            float hx = width * 0.5f;
+            float frameT = 0.032f;
+
+            // Montantes verticales exteriores (Tsukeko)
+            for (int side = -1; side <= 1; side += 2)
+            {
+                float x = side * (hx - frameT * 0.5f);
+                AppendSplineTube(
+                    wVerts, wTris, wUvs,
+                    new Vector3(x, 0f, 0f), new Vector3(x, height * 0.33f, 0f),
+                    new Vector3(x, height * 0.66f, 0f), new Vector3(x, height, 0f),
+                    frameT * 0.65f, frameT * 0.65f, frameT * 0.65f, 6, 8, 0, 0f, 0f, 0f, 10 + side, true);
+            }
+
+            // Travesaños horizontales principales (inferiores, zócalo Koshita y dintel superior)
+            float[] mainRungs = { 0.02f, height * 0.22f, height - 0.02f };
+            for (int r = 0; r < mainRungs.Length; r++)
+            {
+                float y = mainRungs[r];
+                AppendSplineTube(
+                    wVerts, wTris, wUvs,
+                    new Vector3(-hx, y, 0f), new Vector3(-hx * 0.33f, y, 0f),
+                    new Vector3(hx * 0.33f, y, 0f), new Vector3(hx, y, 0f),
+                    frameT * 0.62f, frameT * 0.62f, frameT * 0.62f, 6, 8, 0, 0f, 0f, 0f, 20 + r, true);
+            }
+
+            // Celosía fina Kumiko vertical y horizontal
+            for (int c = 1; c < cols; c++)
+            {
+                float x = Mathf.Lerp(-hx, hx, c / (float)cols);
+                AppendSplineTube(
+                    wVerts, wTris, wUvs,
+                    new Vector3(x, height * 0.22f, 0f), new Vector3(x, height * 0.48f, 0f),
+                    new Vector3(x, height * 0.74f, 0f), new Vector3(x, height - 0.02f, 0f),
+                    0.008f, 0.008f, 0.008f, 4, 6, 0, 0f, 0f, 0f, 30 + c, false);
+            }
+            for (int r = 1; r < rows; r++)
+            {
+                float y = Mathf.Lerp(height * 0.22f, height - 0.02f, r / (float)rows);
+                AppendSplineTube(
+                    wVerts, wTris, wUvs,
+                    new Vector3(-hx, y, 0f), new Vector3(-hx * 0.33f, y, 0f),
+                    new Vector3(hx * 0.33f, y, 0f), new Vector3(hx, y, 0f),
+                    0.007f, 0.007f, 0.007f, 4, 6, 0, 0f, 0f, 0f, 50 + r, false);
+            }
+
+            // Lámina interior de papel Washi translúcido
+            List<Vector3> pVerts = new List<Vector3>
+            {
+                new Vector3(-hx + frameT * 0.5f, 0.02f, 0f),
+                new Vector3(hx - frameT * 0.5f, 0.02f, 0f),
+                new Vector3(hx - frameT * 0.5f, height - 0.02f, 0f),
+                new Vector3(-hx + frameT * 0.5f, height - 0.02f, 0f)
+            };
+            List<Vector2> pUvs = new List<Vector2>
+            {
+                new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(0f, 1f)
+            };
+            List<int> pTris = new List<int> { 0, 2, 1, 0, 3, 2, 0, 1, 2, 0, 2, 3 };
+
+            Mesh pM = new Mesh();
+            pM.SetVertices(pVerts); pM.SetTriangles(pTris, 0); pM.SetUVs(0, pUvs);
+            paperInsertMesh = SaveOrReplaceMesh(pM, assetName + "_Paper");
+
+            Mesh wM = new Mesh();
+            wM.SetVertices(wVerts); wM.SetTriangles(wTris, 0); wM.SetUVs(0, wUvs);
+            return SaveOrReplaceMesh(wM, assetName);
+        }
+
+        public static Mesh CreateSculptedChigaidanaCabinetMesh(string assetName, out Mesh brassHardwareMesh)
+        {
+            List<Vector3> wVerts = new List<Vector3>();
+            List<int> wTris = new List<int>();
+            List<Vector2> wUvs = new List<Vector2>();
+
+            List<Vector3> gVerts = new List<Vector3>();
+            List<int> gTris = new List<int>();
+            List<Vector2> gUvs = new List<Vector2>();
+
+            // 6 Columnas torneadas de palisandro de la estantería escalonada japonesa Chigaidana
+            Vector3[] postPos =
+            {
+                new Vector3(-0.18f, 0f, -0.58f), new Vector3(0.18f, 0f, -0.58f),
+                new Vector3(-0.18f, 0f, 0.00f),  new Vector3(0.18f, 0f, 0.00f),
+                new Vector3(-0.18f, 0f, 0.58f),  new Vector3(0.18f, 0f, 0.58f)
+            };
+            float[] postHeights = { 0.86f, 0.86f, 0.86f, 0.86f, 0.62f, 0.62f };
+            for (int i = 0; i < postPos.Length; i++)
+            {
+                Vector3 p = postPos[i];
+                float h = postHeights[i];
+                AppendSplineTube(wVerts, wTris, wUvs, p, p + Vector3.up * (h * 0.35f), p + Vector3.up * (h * 0.7f), p + Vector3.up * h,
+                    0.022f, 0.019f, 0.018f, 8, 8, 0, 0f, 0f, 0f, 10 + i, true);
+            }
+
+            // Baldas escalonadas asimétricas (Chigai-dana) con bordes moldurados
+            float[] shelfY = { 0.08f, 0.36f, 0.60f, 0.84f };
+            float[] shelfZMin = { -0.62f, -0.62f, -0.12f, -0.62f };
+            float[] shelfZMax = { 0.62f, 0.18f, 0.62f, 0.12f };
+            for (int s = 0; s < shelfY.Length; s++)
+            {
+                for (int r = -2; r <= 2; r++)
+                {
+                    float x = r * 0.075f;
+                    AppendSplineTube(
+                        wVerts, wTris, wUvs,
+                        new Vector3(x, shelfY[s], shelfZMin[s]),
+                        new Vector3(x, shelfY[s], Mathf.Lerp(shelfZMin[s], shelfZMax[s], 0.33f)),
+                        new Vector3(x, shelfY[s], Mathf.Lerp(shelfZMin[s], shelfZMax[s], 0.66f)),
+                        new Vector3(x, shelfY[s], shelfZMax[s]),
+                        0.042f, 0.042f, 0.042f, 6, 6, 0, 0f, 0f, 0f, 30 + s * 5 + r, true);
+                }
+            }
+
+            // Herrajes circulares de latón (Hikite) y jarrón cerámico decorativo sobre la balda
+            AppendSplineTube(
+                gVerts, gTris, gUvs,
+                new Vector3(0.02f, 0.38f, 0.34f),
+                new Vector3(0.02f, 0.45f, 0.34f),
+                new Vector3(0.02f, 0.52f, 0.34f),
+                new Vector3(0.02f, 0.57f, 0.34f),
+                0.045f, 0.072f, 0.032f, 10, 14, 0, 0f, 0f, 0f, 77, true);
+
+            Mesh gM = new Mesh();
+            gM.SetVertices(gVerts); gM.SetTriangles(gTris, 0); gM.SetUVs(0, gUvs);
+            brassHardwareMesh = SaveOrReplaceMesh(gM, assetName + "_Brass");
+
+            Mesh wM = new Mesh();
+            wM.SetVertices(wVerts); wM.SetTriangles(wTris, 0); wM.SetUVs(0, wUvs);
+            return SaveOrReplaceMesh(wM, assetName);
+        }
+
+        public static Mesh CreateSculptedAndonLampMesh(string assetName, out Mesh glowingWashiMesh)
+        {
+            List<Vector3> fVerts = new List<Vector3>();
+            List<int> fTris = new List<int>();
+            List<Vector2> fUvs = new List<Vector2>();
+
+            float r = 0.135f;
+            float h = 0.44f;
+
+            // 4 Columnillas de esquina de madera lacada + anillos de celosía Kumiko
+            for (int c = 0; c < 4; c++)
+            {
+                float ang = (c * 90f + 45f) * Mathf.Deg2Rad;
+                Vector3 corner = new Vector3(Mathf.Cos(ang) * r, 0f, Mathf.Sin(ang) * r);
+                AppendSplineTube(
+                    fVerts, fTris, fUvs,
+                    corner, corner + Vector3.up * (h * 0.33f), corner + Vector3.up * (h * 0.66f), corner + Vector3.up * h,
+                    0.012f, 0.011f, 0.011f, 6, 6, 0, 0f, 0f, 0f, 10 + c, true);
+            }
+
+            float[] ringHeights = { 0.04f, 0.16f, 0.28f, 0.40f };
+            for (int rh = 0; rh < ringHeights.Length; rh++)
+            {
+                float y = ringHeights[rh];
+                for (int c = 0; c < 4; c++)
+                {
+                    float a0 = (c * 90f + 45f) * Mathf.Deg2Rad;
+                    float a1 = ((c + 1) * 90f + 45f) * Mathf.Deg2Rad;
+                    Vector3 p0 = new Vector3(Mathf.Cos(a0) * r, y, Mathf.Sin(a0) * r);
+                    Vector3 p3 = new Vector3(Mathf.Cos(a1) * r, y, Mathf.Sin(a1) * r);
+                    AppendSplineTube(fVerts, fTris, fUvs, p0, Vector3.Lerp(p0, p3, 0.33f), Vector3.Lerp(p0, p3, 0.66f), p3,
+                        0.009f, 0.009f, 0.009f, 4, 6, 0, 0f, 0f, 0f, 30 + rh * 4 + c, false);
+                }
+            }
+
+            // Cilindro interior luminoso de papel Washi cálido
+            List<Vector3> gVerts = new List<Vector3>();
+            List<int> gTris = new List<int>();
+            List<Vector2> gUvs = new List<Vector2>();
+            AppendSplineTube(
+                gVerts, gTris, gUvs,
+                new Vector3(0f, 0.05f, 0f), new Vector3(0f, 0.16f, 0f),
+                new Vector3(0f, 0.28f, 0f), new Vector3(0f, 0.39f, 0f),
+                0.105f, 0.112f, 0.105f, 8, 16, 0, 0f, 0f, 0f, 99, true);
+
+            Mesh gM = new Mesh();
+            gM.SetVertices(gVerts); gM.SetTriangles(gTris, 0); gM.SetUVs(0, gUvs);
+            glowingWashiMesh = SaveOrReplaceMesh(gM, assetName + "_Glow");
+
+            Mesh fM = new Mesh();
+            fM.SetVertices(fVerts); fM.SetTriangles(fTris, 0); fM.SetUVs(0, fUvs);
+            return SaveOrReplaceMesh(fM, assetName);
+        }
+
+        public static Mesh CreateSculptedHangingChochinLanternMesh(string assetName, out Mesh silkGlowMesh)
+        {
+            List<Vector3> fVerts = new List<Vector3>();
+            List<int> fTris = new List<int>();
+            List<Vector2> fUvs = new List<Vector2>();
+
+            // Cadena superior, casquillos lacados (Jūbako) y borla colgante inferior
+            AppendSplineTube(
+                fVerts, fTris, fUvs,
+                new Vector3(0f, 0.0f, 0f), new Vector3(0f, -0.12f, 0f),
+                new Vector3(0f, -0.24f, 0f), new Vector3(0f, -0.34f, 0f),
+                0.010f, 0.010f, 0.012f, 6, 8, 0, 0f, 0f, 0f, 1, true);
+            AppendSplineTube(
+                fVerts, fTris, fUvs,
+                new Vector3(0f, -0.32f, 0f), new Vector3(0f, -0.35f, 0f),
+                new Vector3(0f, -0.38f, 0f), new Vector3(0f, -0.40f, 0f),
+                0.11f, 0.14f, 0.13f, 4, 14, 0, 0f, 0f, 0f, 2, true);
+            AppendSplineTube(
+                fVerts, fTris, fUvs,
+                new Vector3(0f, -0.78f, 0f), new Vector3(0f, -0.81f, 0f),
+                new Vector3(0f, -0.88f, 0f), new Vector3(0f, -0.98f, 0f),
+                0.12f, 0.09f, 0.015f, 6, 14, 0, 0f, 0f, 0f, 3, true);
+
+            // Globo ovalado acanalado de seda luminosa (Chōchin)
+            List<Vector3> gVerts = new List<Vector3>();
+            List<int> gTris = new List<int>();
+            List<Vector2> gUvs = new List<Vector2>();
+            AppendSplineTube(
+                gVerts, gTris, gUvs,
+                new Vector3(0f, -0.38f, 0f), new Vector3(0f, -0.50f, 0f),
+                new Vector3(0f, -0.66f, 0f), new Vector3(0f, -0.80f, 0f),
+                0.13f, 0.22f, 0.12f, 14, 18, 0, 0f, 0.03f, 0f, 4, true);
+
+            Mesh gM = new Mesh();
+            gM.SetVertices(gVerts); gM.SetTriangles(gTris, 0); gM.SetUVs(0, gUvs);
+            silkGlowMesh = SaveOrReplaceMesh(gM, assetName + "_Glow");
+
+            Mesh fM = new Mesh();
+            fM.SetVertices(fVerts); fM.SetTriangles(fTris, 0); fM.SetUVs(0, fUvs);
+            return SaveOrReplaceMesh(fM, assetName);
+        }
+
+        public static Mesh CreateSculptedToroNagashiMesh(string assetName, out Mesh paperGlowMesh)
+        {
+            List<Vector3> wVerts = new List<Vector3>();
+            List<int> wTris = new List<int>();
+            List<Vector2> wUvs = new List<Vector2>();
+
+            // Base flotante de madera de cedro con proa y popa curvadas + 4 finos montantes y tejadillo
+            AppendSplineTube(
+                wVerts, wTris, wUvs,
+                new Vector3(0f, 0.02f, -0.19f), new Vector3(0f, 0.0f, -0.06f),
+                new Vector3(0f, 0.0f, 0.06f), new Vector3(0f, 0.02f, 0.19f),
+                0.12f, 0.16f, 0.12f, 8, 8, 0, 0f, 0f, 0f, 1, true);
+
+            for (int c = 0; c < 4; c++)
+            {
+                float ang = (c * 90f + 45f) * Mathf.Deg2Rad;
+                Vector3 pt = new Vector3(Mathf.Cos(ang) * 0.105f, 0.01f, Mathf.Sin(ang) * 0.105f);
+                AppendSplineTube(wVerts, wTris, wUvs, pt, pt + Vector3.up * 0.10f, pt + Vector3.up * 0.20f, pt + Vector3.up * 0.30f,
+                    0.009f, 0.008f, 0.008f, 4, 6, 0, 0f, 0f, 0f, 10 + c, true);
+            }
+
+            List<Vector3> gVerts = new List<Vector3>();
+            List<int> gTris = new List<int>();
+            List<Vector2> gUvs = new List<Vector2>();
+            AppendSplineTube(
+                gVerts, gTris, gUvs,
+                new Vector3(0f, 0.03f, 0f), new Vector3(0f, 0.11f, 0f),
+                new Vector3(0f, 0.20f, 0f), new Vector3(0f, 0.28f, 0f),
+                0.082f, 0.092f, 0.082f, 8, 12, 0, 0f, 0f, 0f, 5, true);
+
+            Mesh gM = new Mesh();
+            gM.SetVertices(gVerts); gM.SetTriangles(gTris, 0); gM.SetUVs(0, gUvs);
+            paperGlowMesh = SaveOrReplaceMesh(gM, assetName + "_Glow");
+
+            Mesh wM = new Mesh();
+            wM.SetVertices(wVerts); wM.SetTriangles(wTris, 0); wM.SetUVs(0, wUvs);
+            return SaveOrReplaceMesh(wM, assetName);
+        }
+
+        public static Mesh CreateSculptedSorinSpireMesh(string assetName, float height)
+        {
+            List<Vector3> verts = new List<Vector3>();
+            List<int> tris = new List<int>();
+            List<Vector2> uvs = new List<Vector2>();
+
+            // Aguja budista imperial (Sōrin) con base Roban, cuenco Fukubachi, 9 anillos sagrados Kurin y joya Hōju
+            int steps = 36;
+            int segs = 16;
+            for (int i = 0; i <= steps; i++)
+            {
+                float t = i / (float)steps;
+                float y = t * height;
+                float r = Mathf.Lerp(0.14f, 0.025f, t);
+
+                if (t < 0.14f) r = 0.24f * (1f - t * 2f); // Roban & Fukubachi
+                else if (t >= 0.18f && t <= 0.74f) // 9 Anillos Kurin
+                {
+                    float ringWave = Mathf.Sin(((t - 0.18f) / 0.56f) * Mathf.PI * 18f);
+                    r += Mathf.Max(0f, ringWave) * 0.085f * (1f - t * 0.35f);
+                }
+                else if (t > 0.86f) // Joya sagrada Hōju en la cúspide
+                {
+                    r = Mathf.Sin(((1f - t) / 0.14f) * Mathf.PI) * 0.095f + 0.005f;
+                }
+
+                for (int s = 0; s <= segs; s++)
+                {
+                    float u = s / (float)segs;
+                    float ang = u * Mathf.PI * 2f;
+                    verts.Add(new Vector3(Mathf.Cos(ang) * r, y, Mathf.Sin(ang) * r));
+                    uvs.Add(new Vector2(u, t));
+                }
+            }
+
+            int stride = segs + 1;
+            for (int i = 0; i < steps; i++)
+            {
+                for (int s = 0; s < segs; s++)
+                {
+                    int a = i * stride + s;
+                    int b = a + stride;
+                    int c = b + 1;
+                    int d = a + 1;
+                    tris.Add(a); tris.Add(b); tris.Add(c);
+                    tris.Add(a); tris.Add(c); tris.Add(d);
+                }
+            }
+
+            Mesh mesh = new Mesh();
+            mesh.SetVertices(verts); mesh.SetTriangles(tris, 0); mesh.SetUVs(0, uvs);
+            return SaveOrReplaceMesh(mesh, assetName);
+        }
+
+        public static Mesh CreateSculptedKoranBalustradeMesh(
+            string assetName, float length, float height, int postCount, out Mesh giboshiFinialsMesh)
+        {
+            List<Vector3> rVerts = new List<Vector3>();
+            List<int> rTris = new List<int>();
+            List<Vector2> rUvs = new List<Vector2>();
+
+            List<Vector3> gVerts = new List<Vector3>();
+            List<int> gTris = new List<int>();
+            List<Vector2> gUvs = new List<Vector2>();
+
+            float hx = length * 0.5f;
+
+            // Barandillas horizontales (Hōtate superior con extremos curvados Warabi-te, Hirageta central y Jifuku inferior)
+            float[] railY = { 0.12f, height * 0.56f, height };
+            float[] railR = { 0.032f, 0.026f, 0.040f };
+            for (int i = 0; i < railY.Length; i++)
+            {
+                float lift = (i == 2) ? 0.07f : 0f;
+                AppendSplineTube(
+                    rVerts, rTris, rUvs,
+                    new Vector3(-hx - 0.10f, railY[i] + lift, 0f),
+                    new Vector3(-hx * 0.45f, railY[i], 0f),
+                    new Vector3(hx * 0.45f, railY[i], 0f),
+                    new Vector3(hx + 0.10f, railY[i] + lift, 0f),
+                    railR[i], railR[i], railR[i], 14, 10, 0, 0f, 0f, 0f, 10 + i, true);
+            }
+
+            // Postes verticales con remates de bronce en forma de bulbo de loto (Giboshi)
+            for (int p = 0; p < postCount; p++)
+            {
+                float x = Mathf.Lerp(-hx, hx, p / (float)(postCount - 1));
+                AppendSplineTube(
+                    rVerts, rTris, rUvs,
+                    new Vector3(x, 0f, 0f), new Vector3(x, height * 0.35f, 0f),
+                    new Vector3(x, height * 0.70f, 0f), new Vector3(x, height + 0.04f, 0f),
+                    0.042f, 0.038f, 0.040f, 6, 10, 0, 0f, 0f, 0f, 30 + p, true);
+
+                AppendSplineTube(
+                    gVerts, gTris, gUvs,
+                    new Vector3(x, height + 0.03f, 0f),
+                    new Vector3(x, height + 0.09f, 0f),
+                    new Vector3(x, height + 0.15f, 0f),
+                    new Vector3(x, height + 0.20f, 0f),
+                    0.048f, 0.064f, 0.010f, 8, 12, 0, 0f, 0f, 0f, 60 + p, true);
+            }
+
+            Mesh gM = new Mesh();
+            gM.SetVertices(gVerts); gM.SetTriangles(gTris, 0); gM.SetUVs(0, gUvs);
+            giboshiFinialsMesh = SaveOrReplaceMesh(gM, assetName + "_Giboshi");
+
+            Mesh rM = new Mesh();
+            rM.SetVertices(rVerts); rM.SetTriangles(rTris, 0); rM.SetUVs(0, rUvs);
+            return SaveOrReplaceMesh(rM, assetName);
+        }
+
+        public static Mesh CreateSculptedLotusPadAndFlowerMesh(
+            string assetName, int padCount, int seed, out Mesh lotusFlowerMesh)
+        {
+            Random.State oldState = Random.state;
+            Random.InitState(seed);
+
+            List<Vector3> pVerts = new List<Vector3>();
+            List<int> pTris = new List<int>();
+            List<Vector2> pUvs = new List<Vector2>();
+
+            List<Vector3> fVerts = new List<Vector3>();
+            List<int> fTris = new List<int>();
+            List<Vector2> fUvs = new List<Vector2>();
+            List<Vector3> sVerts = new List<Vector3>();
+            List<int> sTris = new List<int>();
+            List<Vector2> sUvs = new List<Vector2>();
+
+            for (int i = 0; i < padCount; i++)
+            {
+                float ang = (i / (float)padCount) * Mathf.PI * 2f + Random.Range(-0.35f, 0.35f);
+                float dist = Random.Range(0.45f, 2.35f);
+                Vector3 center = new Vector3(Mathf.Cos(ang) * dist, 0.008f + (i % 3) * 0.003f, Mathf.Sin(ang) * dist);
+                float rad = Random.Range(0.22f, 0.36f);
+
+                // Hoja circular de loto con muesca radial y borde ligeramente ondulado
+                int baseIdx = pVerts.Count;
+                pVerts.Add(center);
+                pUvs.Add(new Vector2(0.5f, 0.5f));
+                int segs = 20;
+                for (int s = 0; s <= segs; s++)
+                {
+                    float u = s / (float)segs;
+                    float a = u * Mathf.PI * 1.92f + i * 1.1f;
+                    float rMod = rad * (1f + Mathf.Sin(u * Mathf.PI * 12f) * 0.05f);
+                    pVerts.Add(center + new Vector3(Mathf.Cos(a) * rMod, Mathf.Sin(u * Mathf.PI * 6f) * 0.008f, Mathf.Sin(a) * rMod));
+                    pUvs.Add(new Vector2(Mathf.Cos(a) * 0.5f + 0.5f, Mathf.Sin(a) * 0.5f + 0.5f));
+                }
+                for (int s = 0; s < segs; s++)
+                {
+                    pTris.Add(baseIdx); pTris.Add(baseIdx + s + 2); pTris.Add(baseIdx + s + 1);
+                    pTris.Add(baseIdx); pTris.Add(baseIdx + s + 1); pTris.Add(baseIdx + s + 2);
+                }
+
+                // Flor de loto abierta de doble corona sobre la mitad de las hojas
+                if (i % 2 == 0)
+                {
+                    Vector3 fPos = center + new Vector3(0.05f, 0.025f, 0.04f);
+                    AppendFivePetalSakuraFlower(fVerts, fTris, fUvs, sVerts, sTris, sUvs, fPos, Quaternion.identity, 0.14f);
+                    AppendFivePetalSakuraFlower(fVerts, fTris, fUvs, sVerts, sTris, sUvs, fPos + new Vector3(0f, 0.018f, 0f), Quaternion.Euler(0f, 36f, 0f), 0.10f);
+                }
+            }
+
+            Random.state = oldState;
+
+            Mesh fM = new Mesh();
+            fM.SetVertices(fVerts); fM.SetTriangles(fTris, 0); fM.SetUVs(0, fUvs);
+            lotusFlowerMesh = SaveOrReplaceMesh(fM, assetName + "_Flowers");
+
+            Mesh pM = new Mesh();
+            pM.SetVertices(pVerts); pM.SetTriangles(pTris, 0); pM.SetUVs(0, pUvs);
+            return SaveOrReplaceMesh(pM, assetName);
+        }
+
+        public static Mesh CreateSculptedZenStatueMesh(string assetName, out Mesh lotusPedestalMesh)
+        {
+            List<Vector3> sVerts = new List<Vector3>();
+            List<int> sTris = new List<int>();
+            List<Vector2> sUvs = new List<Vector2>();
+
+            // Estatua tallada en piedra de Buda / Jizō meditando en postura de loto (Zazen) + nimbo sagrado Kōhai detrás
+            AppendSplineTube(
+                sVerts, sTris, sUvs,
+                new Vector3(0f, 0.16f, 0f), new Vector3(0f, 0.28f, 0f),
+                new Vector3(0f, 0.44f, 0f), new Vector3(0f, 0.56f, 0f),
+                0.22f, 0.16f, 0.08f, 12, 16, 0, 0f, 0.015f, 0f, 10, true);
+            // Cabeza serena y Ushnisha
+            AppendSplineTube(
+                sVerts, sTris, sUvs,
+                new Vector3(0f, 0.54f, 0f), new Vector3(0f, 0.62f, 0f),
+                new Vector3(0f, 0.70f, 0f), new Vector3(0f, 0.76f, 0f),
+                0.075f, 0.095f, 0.045f, 10, 14, 0, 0f, 0.008f, 0f, 11, true);
+            // Nimbo / Halo flamígero tallado en piedra (Kōhai) detrás de la estatua
+            AppendSingleCurvedPetal(sVerts, sTris, sUvs, new Vector3(0f, 0.18f, 0.10f), Quaternion.Euler(-82f, 0f, 0f), 0.68f);
+
+            // Pedestal de loto tallado (Rengeza)
+            List<Vector3> pVerts = new List<Vector3>();
+            List<int> pTris = new List<int>();
+            List<Vector2> pUvs = new List<Vector2>();
+            AppendSplineTube(
+                pVerts, pTris, pUvs,
+                new Vector3(0f, 0.0f, 0f), new Vector3(0f, 0.06f, 0f),
+                new Vector3(0f, 0.12f, 0f), new Vector3(0f, 0.18f, 0f),
+                0.30f, 0.24f, 0.28f, 8, 16, 0, 0f, 0.025f, 0f, 20, true);
+
+            Mesh pM = new Mesh();
+            pM.SetVertices(pVerts); pM.SetTriangles(pTris, 0); pM.SetUVs(0, pUvs);
+            lotusPedestalMesh = SaveOrReplaceMesh(pM, assetName + "_Pedestal");
+
+            Mesh sM = new Mesh();
+            sM.SetVertices(sVerts); sM.SetTriangles(sTris, 0); sM.SetUVs(0, sUvs);
+            return SaveOrReplaceMesh(sM, assetName);
         }
     }
 }

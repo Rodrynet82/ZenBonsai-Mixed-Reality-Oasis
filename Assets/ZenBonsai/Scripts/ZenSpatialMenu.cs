@@ -268,11 +268,30 @@ namespace ZenBonsai
                     {
                         Transform fl = floatingLanterns.GetChild(l);
                         Vector3 lp = fl.localPosition;
-                        lp.y = -0.76f + Mathf.Sin(t * 1.6f + l * 1.3f) * 0.025f;
-                        lp.x += Mathf.Sin(t * 0.45f + l * 0.9f) * 0.04f * dt;
+                        lp.y = -0.80f + Mathf.Sin(t * 1.6f + l * 1.3f) * 0.022f;
+                        lp.x += Mathf.Sin(t * 0.45f + l * 0.9f) * 0.035f * dt;
                         fl.localPosition = lp;
-                        fl.Rotate(0f, 8f * dt, 0f, Space.Self);
+                        fl.Rotate(0f, 7f * dt, 0f, Space.Self);
                     }
+                }
+
+                Transform hangingLanterns = activeBackdrop.transform.Find("Sanctuary_HangingLanterns");
+                if (hangingLanterns != null)
+                {
+                    int hc = hangingLanterns.childCount;
+                    for (int h = 0; h < hc; h++)
+                    {
+                        Transform hl = hangingLanterns.GetChild(h);
+                        float swayX = Mathf.Sin(t * 1.25f + h * 1.7f) * 2.2f;
+                        float swayZ = Mathf.Cos(t * 0.95f + h * 2.3f) * 1.8f;
+                        hl.localRotation = Quaternion.Euler(swayX, h * 45f, swayZ);
+                    }
+                }
+
+                Transform mistRing = activeBackdrop.transform.Find("Sanctuary_MistCloudRing");
+                if (mistRing != null)
+                {
+                    mistRing.Rotate(0f, 0.45f * dt, 0f, Space.Self);
                 }
             }
         }
@@ -565,7 +584,10 @@ namespace ZenBonsai
                 cams[c].backgroundColor = isVirtualEnvironmentActive ? skyBgColor : new Color(0f, 0f, 0f, 0f);
             }
 
-            // Si existen las cúpulas celestes 360 de los Santuarios Virtuales, actualizar su tono atmosférico
+            // Si existen las cúpulas celestes panorámicas 360 de los Santuarios Virtuales, ajustar su luminosidad manteniendo su textura pintada
+            Color domeTint = (preset == 0) ? Color.white : (preset == 1 ? new Color(1.0f, 0.84f, 0.72f, 1.0f) : new Color(0.26f, 0.36f, 0.58f, 1.0f));
+            Color domeEmission = (preset == 0) ? new Color(0.68f, 0.68f, 0.68f) : (preset == 1 ? new Color(0.76f, 0.54f, 0.42f) : new Color(0.18f, 0.25f, 0.42f));
+
             if (virtualEnvironmentBackdrops != null && virtualEnvironmentBackdrops.Length > 0)
             {
                 for (int i = 0; i < virtualEnvironmentBackdrops.Length; i++)
@@ -577,12 +599,14 @@ namespace ZenBonsai
                         Renderer r = skyDome.GetComponent<Renderer>();
                         if (r != null && r.material != null)
                         {
-                            r.material.color = skyBgColor;
-                            if (r.material.HasProperty("_BaseColor")) r.material.SetColor("_BaseColor", skyBgColor);
+                            r.material.color = domeTint;
+                            if (r.material.HasProperty("_BaseColor")) r.material.SetColor("_BaseColor", domeTint);
                             if (r.material.HasProperty("_EmissionColor"))
                             {
                                 r.material.EnableKeyword("_EMISSION");
-                                r.material.SetColor("_EmissionColor", skyBgColor * 0.65f);
+                                if (r.material.HasProperty("_EmissionMap") && r.material.mainTexture != null)
+                                    r.material.SetTexture("_EmissionMap", r.material.mainTexture);
+                                r.material.SetColor("_EmissionColor", domeEmission);
                             }
                         }
                     }
@@ -596,12 +620,14 @@ namespace ZenBonsai
                     Renderer r = skyDome.GetComponent<Renderer>();
                     if (r != null && r.material != null)
                     {
-                        r.material.color = skyBgColor;
-                        if (r.material.HasProperty("_BaseColor")) r.material.SetColor("_BaseColor", skyBgColor);
+                        r.material.color = domeTint;
+                        if (r.material.HasProperty("_BaseColor")) r.material.SetColor("_BaseColor", domeTint);
                         if (r.material.HasProperty("_EmissionColor"))
                         {
                             r.material.EnableKeyword("_EMISSION");
-                            r.material.SetColor("_EmissionColor", skyBgColor * 0.65f);
+                            if (r.material.HasProperty("_EmissionMap") && r.material.mainTexture != null)
+                                r.material.SetTexture("_EmissionMap", r.material.mainTexture);
+                            r.material.SetColor("_EmissionColor", domeEmission);
                         }
                     }
                 }
